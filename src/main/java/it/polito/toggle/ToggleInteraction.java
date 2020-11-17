@@ -209,9 +209,9 @@ public abstract class ToggleInteraction {
 
     public File manageScreenshot(String starting_folder) throws IOException {
         cropped_image = ImageManipulationTools.cutImage(screen_capture,left,top,right,bottom);
-        cropped_screenshot_file = ImageManipulationTools.saveCroppedScreenshotToFile(starting_folder,timestamp,ImageManipulationTools.resizeScreenshot(cropped_image,1080,363)); //nexus 5x, nexus 5
+        //cropped_screenshot_file = ImageManipulationTools.saveCroppedScreenshotToFile(starting_folder,timestamp,ImageManipulationTools.resizeScreenshot(cropped_image,1080,363)); //nexus 5x, nexus 5
         //cropped_screenshot_file = ImageManipulationTools.saveCroppedScreenshotToFile(starting_folder, timestamp, ImageManipulationTools.resizeScreenshot(cropped_image,768,376)); // nexus 4
-        //cropped_screenshot_file = ImageManipulationTools.saveCroppedScreenshotToFile(starting_folder, timestamp, ImageManipulationTools.resizeScreenshot(cropped_image,1440,362)); // pixel xl
+        cropped_screenshot_file = ImageManipulationTools.saveCroppedScreenshotToFile(starting_folder, timestamp, ImageManipulationTools.resizeScreenshot(cropped_image,1440,362)); // pixel xl
         //cropped_screenshot_file = ImageManipulationTools.saveCroppedScreenshotToFile(starting_folder, timestamp, ImageManipulationTools.resizeScreenshot(cropped_image,480,348)); // nexus s
         //cropped_screenshot_file = ImageManipulationTools.saveCroppedScreenshotToFile(starting_folder, timestamp, ImageManipulationTools.resizeScreenshot(cropped_image,480,337)); // nexus one
         //cropped_screenshot_file = ImageManipulationTools.saveCroppedScreenshotToFile(starting_folder, timestamp, ImageManipulationTools.resizeScreenshot(cropped_image,1440,389)); // nexus 6

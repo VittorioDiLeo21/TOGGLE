@@ -7,7 +7,9 @@ import it.enhancer.Utils;
 import it.polito.toggle.ToggleClassManager;
 import it.polito.toggle.ToggleInteraction;
 import it.polito.toggle.ToggleTranslator;
+import it.windowUtils.ResizeException;
 
+import javax.naming.NameNotFoundException;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,6 +35,18 @@ public class Main {
             return false;
         }
         return true;
+    }
+//458x804
+    public static void resizeEmulator() throws NameNotFoundException, ResizeException {
+        Rectangle rect = null;
+        for (DesktopWindow desktopWindow : WindowUtils.getAllWindows(true)) {
+            if (desktopWindow.getTitle().contains("Android Emulator")) {
+                rect = desktopWindow.getLocAndSize();
+                String device = desktopWindow.getTitle().split(" - ")[1];
+                System.out.println(device + " : " + rect.width + " x " + rect.height);
+                it.windowUtils.WindowUtils.resizeWindow(desktopWindow.getHWND(),rect.x,rect.y,458,804,true);
+            }
+        }
     }
 
     public static int getEmulatorWidth(){
@@ -106,6 +120,7 @@ public class Main {
         }
     }
 
+
     public static void pullLogFile(String start_folder) throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
                 "cmd.exe","/c\"",adbPath + "\\adb\" pull /sdcard/mylog.txt " + start_folder + "\\mylog.txt"
@@ -134,12 +149,26 @@ public class Main {
         String logcat_tool_tag = "touchtest";
         String instrumentation="org.ligi.passandroid.test/androidx.test.runner.AndroidJUnitRunner";
 
+
+        //int windowWidth = getEmulatorWidth();
+        //double ratio =((double) 389)/windowWidth;
+        //double ratio = 0.7908496732026143; // NEXUS 5
+        //PIXEL XL ratio 0.9211195928753181
+
+        //int emulatorWidth = (int) (windowWidth*ratio);
+        int emulatorWidth = 362;
+        try {
+            resizeEmulator();
+        }catch (ResizeException re){
+            re.printStackTrace();
+        }
+        System.out.println("Original resolution: " +getEmulatorResolution()+" \nActual Width: " + emulatorWidth);
         //System.out.println("*************\n" + getEmulatorResolution() + "\n****************\n" + getEmulatorWidth() + "\n****************\n" + getEmulatorWidth()/getEmulatorResolution());
-        /*Enhancer en = new Enhancer("androidTest");
+        Enhancer en = new Enhancer("androidTest");
         Utils.removeLogFiles();
         //en.generateEnhancedClassFrom("C:\\Users\\vitto\\AndroidStudioProjects\\Espresso\\app\\src\\androidTest\\java\\com\\example\\android\\teatime\\orderActivityBasicTest.java");
-        en.generateEnhancedClassFrom("C:\\Users\\vitto\\AndroidStudioProjects\\PassAndroid\\PassAndroid\\app\\src\\androidTest\\java\\org\\ligi\\passandroid\\TestHomeActivity.java");
-*/
+        en.generateEnhancedClassFrom("C:\\Users\\vitto\\AndroidStudioProjects\\PassAndroid\\app\\src\\androidTest\\java\\org\\ligi\\passandroid\\TestHomeActivity.java");
+
         //enhancement of a test class
         //en.generateEnhancedClassFrom("C:\\Users\\Riccardo Coppola\\MiMangaNu-master_oldgraphics\\MiMangaNu-master\\app\\src\\androidTest\\java\\ar\\rulosoft\\mimanganu\\TestAdvancedFeatures.java");
         //en.generateEnhancedClassFrom("C:\\Users\\Riccardo Coppola\\StudioProjects\\Travel-Mate-master\\Android\\app\\src\\androidTest\\java\\io\\github\\project_travel_mate\\TripsTest.java");
@@ -156,7 +185,7 @@ public class Main {
 		System.out.println("time to execute " + (et - st));
 
         //translation of instructions
-        /*long time_for_script_creation_before = System.currentTimeMillis();
+        long time_for_script_creation_before = System.currentTimeMillis();
         ArrayList<String> tests = new ArrayList<>();
         //tests.add(test_name);
         tests.add("testCreatePassIsShown");
@@ -165,7 +194,7 @@ public class Main {
         tests.add("testOpenFileIsShown");
         tests.add("testFabButtonGoesBackWithClick");
         tests.add("testWhatIsIt");
-        tests.add("testLeftMenuIsShown");*/
+        tests.add("testLeftMenuIsShown");
 
         //tests.add("testTripInfoFields");
         //tests.add("testAddTwoTrips");
@@ -178,21 +207,19 @@ public class Main {
         //ToggleClassManager tcm = new ToggleClassManager("TestInterfaceBasicTry", "ar.rulosoft.mimanganu", "C:\\Users\\Riccardo Coppola\\Desktop\\touchtest", tests);
         //ToggleClassManager tcm = new ToggleClassManager("TripsTest", "io.github.project_travel_mate", "C:\\Users\\Riccardo Coppola\\Desktop\\touchtest", tests);
 
-
-        //ToggleClassManager tcm = new ToggleClassManager(className, testPackage, starting_folder, tests,getEmulatorResolution(),getEmulatorWidth());
-
+        ToggleClassManager tcm = new ToggleClassManager(className, testPackage, starting_folder, tests,getEmulatorResolution(),emulatorWidth);
 
         //ToggleClassManager tcm = new ToggleClassManager("MessageOperationsTest", "com.fsck.k9.debug", "C:\\Users\\Riccardo Coppola\\Desktop\\touchtest", tests);
         //ToggleClassManager tcm = new ToggleClassManager("TestAdvancedFeatures", "ar.rulosoft.mimanganu", "C:\\Users\\Riccardo Coppola\\Desktop\\touchtest", tests);
         //it.polito.toggle.Utils.createJavaProjectFolder(starting_folder);
 
-        /*ArrayList<String> result_class = tcm.createClass();
-        for (String s: result_class) {
+        ArrayList<String> result_class = tcm.createClass();
+        /*for (String s: result_class) {
             System.out.println("******************");
             System.out.println(s);
             System.out.println("******************");
-        }
-        for(String test: tests) {
+        }*/
+        /*for(String test: tests) {
             ToggleTranslator tt = new ToggleTranslator(starting_folder, testPackage, className, test);
             //tt.readLogcatToFile(logcat_filename);
             List<String> filtered_logcat_interactions = tt.filterLogcat(logcat_filename, logcat_tool_tag);
@@ -207,7 +234,7 @@ public class Main {
                 interactions.add(interaction);
             }
 
-            tt.saveCroppedScreenshots(interactions);
+            tt.saveCroppedScreenshots(interactions,getEmulatorResolution(),emulatorWidth);
             tt.createEyeStudioScript(interactions);
             tt.createSikuliScript(interactions);
             tt.createEyeAutomateJavaMethod(interactions);

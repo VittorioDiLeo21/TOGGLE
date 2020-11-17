@@ -378,6 +378,10 @@ public class ToggleTranslator {
     }
 
     public final void saveCroppedScreenshots(List<ToggleInteraction> interactions,int screenResolution, int actualWidth) throws IOException, XPathExpressionException, SAXException, ParserConfigurationException {
+        System.out.println("************************************************\n\n\n");
+        System.out.println("saveCroppedScreenshot of " + interactions.size() + " with screenRes " + screenResolution + " and width " + actualWidth);
+        System.out.println("\n\n************************************************\n\n\n");
+
         for (ToggleInteraction i:interactions) {
             //aggiungere campo booleano needs_cut_screenshot per gestire tutti questi casi
             if (i.needScreenshot()) {

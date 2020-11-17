@@ -2,8 +2,10 @@ plugins {
     id 'java'
     id 'maven-publish'
 }
+
 group 'TOGGLE'
 version '1.0-SNAPSHOT'
+
 
 sourceCompatibility = 1.8
 
@@ -16,6 +18,14 @@ repositories {
 }
 
 dependencies {
+
+    //compile group: 'com.android.library', name: 'com.android.library.gradle.plugin', version: '4.2.0-alpha16', ext: 'pom'
+    //compile group: 'com.android.application', name: 'com.android.application.gradle.plugin', version: '4.2.0-alpha16', ext: 'pom'
+    //compile group: 'com.google.android', name: 'android', version: '4.0.1.2'
+    //compile group: 'org.robolectric', name: 'android-all', version: '4.3_r2-robolectric-0'
+    //compile group: 'com.github.kedzie.supportanimator', name: 'support-v4-animator', version: '19.0.1'
+    //compile group: 'com.android.support', name: 'support-v4', version: '28.0.0-rc02'
+
     compile group: 'net.java.dev.jna', name: 'jna', version: '5.2.0'
     compile group: 'net.java.dev.jna', name: 'jna-platform', version: '5.2.0'
     implementation 'com.github.javaparser:javaparser-core:3.6.12'

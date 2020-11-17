@@ -378,6 +378,8 @@ public class ToggleClassManager {
                 translator.saveCroppedScreenshots(interactions);
             translator.createEyeStudioScript(interactions);
             translator.createSikuliScript(interactions);
+            //translator.createSikuliJavaMethod(interactions);
+            //translator.createCombinedJavaMethod(interactions);
 
             eyeautomate_only.addAll(translator.createEyeAutomateJavaMethod(interactions));
             sikuli_only.addAll(translator.createSikuliJavaMethod(interactions));

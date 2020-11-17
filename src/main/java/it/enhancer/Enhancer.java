@@ -10,10 +10,8 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.ConstructorDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.*;
+import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
@@ -121,12 +119,84 @@ public class Enhancer {
      * For a generic file at "<folderPath>/<fileName>.java" this method will generate :
      *  - <folderPath>/<fileName>Enhanced.java : The enhanced java class
      *  - <folderPath>/<fileName>_Statistic.txt : a file to collect statistics ?? todo
-     *  - Eventually : a line reporting the exception in the log file //todo it could not be essential to be specified
+     *  - Eventually : a line reporting the exception in the log file //todo it could be not essential to specify
+     * @param fileName
+     * @param folderPath
+     */
+    public List<String> generateEnhancedClassFrom(String fileName,String folderPath){
+        long time_begin = System.currentTimeMillis();
+        List<String> testNames = new ArrayList<>();
+        try {
+            populateEmptyStatistic();
+            FileInputStream in = new FileInputStream( folderPath + fileName );
+            compilationUnit = JavaParser.parse(in);
+
+            addImportsToCompilationUnit();
+            addPrivateField();
+            changeConstructorsName();
+            addActivityInstanceMethod();
+
+            //visit the body of all methods in the class
+            compilationUnit.accept(new MethodVisitor(), null);
+            // System.out.println(compilationUnit.toString());
+
+            System.out.println("");
+            String fileNameEnhanced = folderPath + fileName + "Enhanced.java";
+            System.out.println("Saving everything to " + fileNameEnhanced);
+
+            PrintWriter w = new PrintWriter(fileNameEnhanced,"UTF-8");
+            w.print(compilationUnit.toString());
+            w.close();
+            testNames = printMethods();
+            //save statistics into file
+            String statisticFileName = folderPath + fileName + "_Statistic.txt";
+            Statistic.writeDataToFile(statistic, statisticFileName);
+
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+            //TODO do something useful to handle different kinds of exceptions
+            Utils.logException(e, "generateEnhancedClassFrom for " + folderPath + fileName);
+        }
+
+        long end_time = System.currentTimeMillis();
+        long enhance_time = end_time - time_begin;
+        System.out.println("Time to enhance = " + enhance_time);
+        return testNames;
+    }
+
+    public List<String> printMethods() {
+        List<String> testNames = new ArrayList<>();
+        for (TypeDeclaration typeDec : compilationUnit.getTypes()) {
+            List<BodyDeclaration> members = typeDec.getMembers();
+            if (members != null) {
+                for (BodyDeclaration member : members) {
+                    if (member.isMethodDeclaration()) {
+                        MethodDeclaration field = (MethodDeclaration) member;
+                        NodeList<AnnotationExpr> annotations = member.getAnnotations();
+                        for(AnnotationExpr ann:annotations){
+                            if(ann.getName().asString().contains("Test")){
+                                System.out.println("Method name: " + field.getNameAsString());
+                                testNames.add(field.getNameAsString());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return testNames;
+    }
+
+    /**
+     * Method to enhance a file whose path is filePath.
+     * For a generic file at "<folderPath>/<fileName>.java" this method will generate :
+     *  - <folderPath>/<fileName>Enhanced.java : The enhanced java class
+     *  - <folderPath>/<fileName>_Statistic.txt : a file to collect statistics ?? todo
+     *  - Eventually : a line reporting the exception in the log file //todo it could be not essential to specify
      * @param filePath
      */
-    public void generateEnhancedClassFrom(String filePath){
+    public List<String> generateEnhancedClassFrom(String filePath){
         long time_begin = System.currentTimeMillis();
-
+        List<String> testNames = new ArrayList<>();
         try {
             populateEmptyStatistic();
             int slashIndex = filePath.lastIndexOf('/');
@@ -153,7 +223,7 @@ public class Enhancer {
             PrintWriter w = new PrintWriter(fileNameEnhanced,"UTF-8");
             w.print(compilationUnit.toString());
             w.close();
-
+            testNames = printMethods();
             //save statistics into file
             String statisticFileName = folderPath + fileName + "_Statistic.txt";
             Statistic.writeDataToFile(statistic, statisticFileName);
@@ -171,6 +241,7 @@ public class Enhancer {
         long end_time = System.currentTimeMillis();
         long enhance_time = end_time - time_begin;
         System.out.println("Time to enhance = " + enhance_time);
+        return testNames;
     }
 
     /**
