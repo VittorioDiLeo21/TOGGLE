@@ -26,8 +26,8 @@ dependencies {
     //compile group: 'com.github.kedzie.supportanimator', name: 'support-v4-animator', version: '19.0.1'
     //compile group: 'com.android.support', name: 'support-v4', version: '28.0.0-rc02'
 
-    compile group: 'net.java.dev.jna', name: 'jna', version: '5.2.0'
-    compile group: 'net.java.dev.jna', name: 'jna-platform', version: '5.2.0'
+    implementation 'net.java.dev.jna:jna-platform:5.2.0'
+    implementation 'net.java.dev.jna:jna:5.2.0'
     implementation 'com.github.javaparser:javaparser-core:3.6.12'
     implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.5.20'
     implementation 'org.json:json:20140107'

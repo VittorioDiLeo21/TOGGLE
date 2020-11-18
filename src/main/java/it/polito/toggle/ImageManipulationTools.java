@@ -42,6 +42,7 @@ public class ImageManipulationTools {
         g2d.drawImage(src, 0, 0, new_width, new_height,null);
         g2d.dispose();
 
+
         return scaledImage;
     }
 }

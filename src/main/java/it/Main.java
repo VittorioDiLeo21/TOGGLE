@@ -44,9 +44,15 @@ public class Main {
                 rect = desktopWindow.getLocAndSize();
                 String device = desktopWindow.getTitle().split(" - ")[1];
                 System.out.println(device + " : " + rect.width + " x " + rect.height);
-                it.windowUtils.WindowUtils.resizeWindow(desktopWindow.getHWND(),rect.x,rect.y,458,804,true);
+                it.windowUtils.WindowUtils.resizeWindow(desktopWindow.getHWND(),rect.x,rect.y,600,1054,true);
             }
         }
+    }
+
+    public static double computeRatio(){
+        Toolkit t = Toolkit.getDefaultToolkit();
+        double pxPerCm = t.getScreenResolution()/2.54;
+        return 0.6707317073170732;
     }
 
     public static int getEmulatorWidth(){
@@ -143,12 +149,19 @@ public class Main {
         List<ToggleInteraction> interactions = new ArrayList<>();
         String starting_folder = "C:\\Users\\vitto\\OneDrive\\Desktop\\toggleTests";
         String testPackage = "org.ligi.passandroid";
-        String className = "TestHomeActivity";
-        String enhancedClassName = "TestHomeActivityEnhanced";
+        //String className = "TestHomeActivity";
+        String className = "TestEditPassProperties";
+        String enhancedClassName = "TestEditPassPropertiesEnhanced";
         String test_name = "orderActivityBasicTest";
         String logcat_tool_tag = "touchtest";
         String instrumentation="org.ligi.passandroid.test/androidx.test.runner.AndroidJUnitRunner";
 
+        it.windowUtils.WindowUtils wu = new it.windowUtils.WindowUtils();
+        /*int emWidth = wu.getWindowWidth("Android Emulator");
+        wu.getPixelsFromCm(12.0);
+        int cm = wu.getPixelsFromCm(8.0497);*/
+        int emulatorWidth = wu.getEmulatorScreenPixelsWidth();
+        System.out.println(emulatorWidth);
 
         //int windowWidth = getEmulatorWidth();
         //double ratio =((double) 389)/windowWidth;
@@ -156,18 +169,23 @@ public class Main {
         //PIXEL XL ratio 0.9211195928753181
 
         //int emulatorWidth = (int) (windowWidth*ratio);
-        int emulatorWidth = 362;
-        try {
+        //int emulator = getEmulatorWidth();
+        //int emulatorWidth = (int)(emulator*computeRatio());
+        //System.out.println("Emulator : " + emulator + " - "+ emulatorWidth);
+        /*if((1+1) == 2)
+            return;*/
+        /*try {
             resizeEmulator();
         }catch (ResizeException re){
             re.printStackTrace();
-        }
+        }*/
         System.out.println("Original resolution: " +getEmulatorResolution()+" \nActual Width: " + emulatorWidth);
         //System.out.println("*************\n" + getEmulatorResolution() + "\n****************\n" + getEmulatorWidth() + "\n****************\n" + getEmulatorWidth()/getEmulatorResolution());
         Enhancer en = new Enhancer("androidTest");
         Utils.removeLogFiles();
         //en.generateEnhancedClassFrom("C:\\Users\\vitto\\AndroidStudioProjects\\Espresso\\app\\src\\androidTest\\java\\com\\example\\android\\teatime\\orderActivityBasicTest.java");
-        en.generateEnhancedClassFrom("C:\\Users\\vitto\\AndroidStudioProjects\\PassAndroid\\app\\src\\androidTest\\java\\org\\ligi\\passandroid\\TestHomeActivity.java");
+        //en.generateEnhancedClassFrom("C:\\Users\\vitto\\AndroidStudioProjects\\PassAndroid\\app\\src\\androidTest\\java\\org\\ligi\\passandroid\\TestHomeActivity.java");
+        en.generateEnhancedClassFrom("C:\\Users\\vitto\\AndroidStudioProjects\\PassAndroid\\app\\src\\androidTest\\java\\org\\ligi\\passandroid\\TestEditPassProperties.java");
 
         //enhancement of a test class
         //en.generateEnhancedClassFrom("C:\\Users\\Riccardo Coppola\\MiMangaNu-master_oldgraphics\\MiMangaNu-master\\app\\src\\androidTest\\java\\ar\\rulosoft\\mimanganu\\TestAdvancedFeatures.java");
@@ -188,13 +206,19 @@ public class Main {
         long time_for_script_creation_before = System.currentTimeMillis();
         ArrayList<String> tests = new ArrayList<>();
         //tests.add(test_name);
-        tests.add("testCreatePassIsShown");
+        /*tests.add("testCreatePassIsShown");
         tests.add("testScanIsShown");
         tests.add("testDemoPassIsShown");
         tests.add("testOpenFileIsShown");
         tests.add("testFabButtonGoesBackWithClick");
         tests.add("testWhatIsIt");
-        tests.add("testLeftMenuIsShown");
+        tests.add("testLeftMenuIsShown");*/
+        tests.add("testSetDescriptionWorks");
+        tests.add("testCanSetToQR");
+        tests.add("testCanSetToPDF417");
+        tests.add("testCanSetToAZTEC");
+        tests.add("testCanSetMessage");
+        tests.add("testCanSetAltMessage");
 
         //tests.add("testTripInfoFields");
         //tests.add("testAddTwoTrips");
