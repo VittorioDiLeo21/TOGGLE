@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Toggle {
     private String logFilename = "toggleLog.txt";
@@ -21,50 +23,95 @@ public class Toggle {
     private Enhancer enhancer;
     private long startEspressoExecution;
     private long endEspressoExecution;
+    private String testDirectoryPath;
+    private String appProjectPath;
+    private Map<String,ClassData> testCaseInfos;
     private static String adbPath = System.getenv("LOCALAPPDATA")+"\\Android\\Sdk\\platform-tools";
 
-    public Toggle(String testDirectory, String guiTestsPath, String appPackageName){
+    public Toggle(String testDirectoryName,
+                  String guiTestsPath,
+                  String appPackageName,
+                  String testDirectoryPath){
         this.guiTestsPath = guiTestsPath;
-        this.enhancer = new Enhancer(testDirectory);
+        this.enhancer = new Enhancer(testDirectoryName);
         this.startEspressoExecution = 0;
         this.endEspressoExecution = 0;
         this.appPackageName = appPackageName;
+        this.testCaseInfos = new HashMap<>();
+        this.testDirectoryPath = testDirectoryPath;
     }
 
-    public Toggle(String testDirectory, String logFilename, String guiTestsPath, String appPackageName){
+    public Toggle(String testDirectoryName, //androidTest
+                  String logFilename, //nonServe?
+                  String guiTestsPath, //dove li vogliamo mettere
+                  String appPackageName, //org.ligi.passandroid
+                  String testDirectoryPath){ //C:\Users\vitto\AndroidStudioProjects\PassAndroid\app\src\androidTest\java\org\ligi\passandroid\
         this.logFilename = logFilename;
         this.guiTestsPath = guiTestsPath;
-        this.enhancer = new Enhancer(testDirectory);
+        int index = testDirectoryPath.indexOf("\\app\\");
+        this.appProjectPath = testDirectoryPath.substring(0,index);
+        this.enhancer = new Enhancer(testDirectoryName);
         this.startEspressoExecution = 0;
         this.endEspressoExecution = 0;
         this.appPackageName = appPackageName;
+        this.testCaseInfos = new HashMap<>();
+        this.testDirectoryPath = testDirectoryPath;
     }
+
+    public void executeFullProcess(){
+        //1
+        Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath);
+        //2 build and install the apk
+        try {
+            //buildProject(appProjectPath);
+            installApp();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //3 getInstrumentation<--
+        //todo
+        //4
+        //getDeviceDensity<-- da toggleGUI.EspressoGUI
+        //4.5
+        //eventually resize the emulator
+        //5
+        //executeAllEnhancedEspresso(tests.keys(),instrumentation);
+        //6
+        //for(testClassName : tests.keys()){
+            //pullLogFile(testClassName);
+            //7
+            //toggleClassManager.getClass()
+        //}
+    }
+
 
     public List<String> enhanceEspressoClass(String path) {
         return enhancer.generateEnhancedClassFrom(path);
     }
 
-    public Map<String,List<String>> enhanceEspressoTestFolder(String testFolder){
+    public Map<String,ClassData> enhanceEspressoTestFolder(String testFolder){
         File folder = new File(testFolder);
         FileFilter filter = new WildcardFileFilter("*.java", IOCase.INSENSITIVE);
         File[] tests = folder.listFiles(filter);
-        Map<String,List<String>> result = new HashMap<>();
-
+        Map<String,ClassData> result = new HashMap<>();
+        //TODO check if the class is actually a test class
         if(tests == null)
             return result;
         for(File test : tests){
             String name = test.getName();
             int dotIndex = name.lastIndexOf('.');
             List<String> methods = enhancer.generateEnhancedClassFrom(name.substring(0,dotIndex),testFolder);
-            result.put(name.substring(0,dotIndex)+"Enhanced",methods);
-            //filenames.add(name.substring(0,dotIndex)+"Enhanced");
+            String className = name.substring(0,dotIndex)+"Enhanced";
+            ClassData cd = new ClassData(methods,className+".txt");
+            result.put(className,cd);
         }
-        //return filenames;
         return result;
     }
 
     public void executeAllEnhancedEspresso(List<String> testNames, String instrumentation) throws IOException {
+        installApp();
         grantPermissions();
+        resetLogFiles();
         ProcessBuilder builder;
         Process p;
         BufferedReader r;
@@ -81,11 +128,94 @@ public class Toggle {
             }
         }
         endEspressoExecution = System.currentTimeMillis();
-        pullLogFile();
+        testNames.forEach(testName -> {
+            try {
+                pullLogFile(testName+".txt");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Method that builds the project with Gradle
+     * @throws IOException
+     */
+    public static boolean buildProject(String androidProjectPath) throws IOException {
+
+        System.out.println("BUILDING PROJECT");
+		/*ProcessBuilder builder = new ProcessBuilder(
+				"cmd.exe", "/c\"", projectPath + "\\gradlew\" assembleDebug");
+		 */
+        ProcessBuilder builder = new ProcessBuilder(
+                "cmd.exe", "/c\"", "gradlew\" build");
+        builder.directory(new File(androidProjectPath));
+        builder.redirectErrorStream(true);
+        Process p = builder.start();
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        while (true) {
+            line = r.readLine();
+            if (line == null) { break; }
+            System.out.println(line);
+            if(line.contains("OK")) {
+                System.out.println(line);
+                return true;
+            }
+            else if(line.contains("FAILED")) {
+                System.out.println(line);
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Method that installs the APK in the selected device
+     * @param apkPath path of the APK to be installed
+     * @throws IOException
+     */
+    public static void installApk(String pack,String apkPath) throws IOException {
+        ProcessBuilder builder;
+        if(pack==null) {
+            String cmd="adb\" install -r \""+apkPath+"\"";
+            builder = new ProcessBuilder(
+                    "cmd.exe", "/c\"", cmd);
+        }
+        else {
+            builder = new ProcessBuilder(
+                    "cmd.exe", "/c\"", "adb\" push \""+apkPath+"\" /data/local/tmp/\""+pack+"\"");
+        }
+        builder.redirectErrorStream(true);
+        builder.directory(new File(adbPath));
+        Process p = builder.start();
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        while ((line = r.readLine()) != null) {
+            System.out.println("Install APK: "+line);
+        }
+    }
+
+
+    private void installApp() throws IOException {
+        ProcessBuilder builder = new ProcessBuilder(
+                "cmd.exe", "/c\"", "gradlew\" installDebug");
+
+        builder.redirectErrorStream(true);
+        builder.directory(new File(this.appProjectPath));
+        Process p = builder.start();
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        while ((line = r.readLine()) != null) {
+            //if(line.contains("install")&&!line.contains("uninstall")&&!line.contains("tasks"))
+            System.out.println(line);
+        }
     }
 
     public void executeEnhancedEspresso( String testName, String instrumentation) throws IOException {
+        installApp();
         grantPermissions();
+        resetLogFile();
         startEspressoExecution = System.currentTimeMillis();
         ProcessBuilder builder = new ProcessBuilder(
                 "cmd.exe", "/c\"", adbPath + "\\adb\" shell am instrument -w -e class "+appPackageName+"."+testName+" "+instrumentation);
@@ -106,6 +236,23 @@ public class Toggle {
     public void pullLogFile() throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
                 "cmd.exe","/c\"",adbPath + "\\adb\" pull /sdcard/" + logFilename + " " + guiTestsPath + "\\" + logFilename
+        );
+        builder.redirectErrorStream(true);
+        Process p = builder.start();
+
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        //todo --> debug
+        String line;
+        System.out.println("pullLogFile.............");
+        int i = 0;
+        while((line = r.readLine()) != null){
+            System.out.println( i++ + "->" + line);
+        }
+    }
+
+    public void pullLogFile(String logFile ) throws IOException {
+        ProcessBuilder builder = new ProcessBuilder(
+                "cmd.exe","/c\"",adbPath + "\\adb\" pull /sdcard/" + logFile + " " + guiTestsPath + "\\" + logFilename
         );
         builder.redirectErrorStream(true);
         Process p = builder.start();
@@ -174,6 +321,35 @@ public class Toggle {
         return ret;
     }
 
+    public void resetLogFiles() throws IOException {
+        ProcessBuilder builder = new ProcessBuilder(
+                "cmd.exe", "/c\"", adbPath + "\\adb\" shell rm -f /sdcard/*Enhanced.txt");
+
+        builder.redirectErrorStream(true);
+        Process p = builder.start();
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+        String line;
+        while ((line = r.readLine()) != null) {
+            System.out.println(line);
+        }
+    }
+
+    //funge!
+    public void resetLogFile() throws IOException {
+        ProcessBuilder builder = new ProcessBuilder(
+                "cmd.exe", "/c\"", adbPath + "\\adb\" shell rm -f /sdcard/"+logFilename);
+
+        builder.redirectErrorStream(true);
+        Process p = builder.start();
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+        String line;
+        while ((line = r.readLine()) != null) {
+            System.out.println(line);
+        }
+    }
+
     public void grantPermissions() throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
                 "cmd.exe", "/c\"", adbPath + "\\adb\" shell pm grant " + appPackageName + " android.permission.WRITE_EXTERNAL_STORAGE");
@@ -195,5 +371,223 @@ public class Toggle {
         while ((line = r.readLine()) != null) {
             System.out.println(line);
         }
+    }
+    //todo
+    public ArrayList<String> getGradlewTasks() throws IOException {
+        ArrayList<String> apks=new ArrayList<>();
+        ProcessBuilder builder = new ProcessBuilder(
+                "cmd.exe", "/c\"", "gradlew\" tasks");
+
+        builder.redirectErrorStream(true);
+        builder.directory(new File(this.appProjectPath));
+        Process p = builder.start();
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        while ((line = r.readLine()) != null) {
+            if(line.contains("install")&&!line.contains("uninstall")&&!line.contains("tasks"))
+                apks.add(line.split("-")[0].trim());
+            System.out.println(line);
+        }
+
+        return apks;
+    }
+    //todo
+    public static void gradlewInstall(String task) throws IOException {
+
+        String projectPath = "";//todo ??
+        ProcessBuilder builder = new ProcessBuilder(
+                "cmd.exe", "/c\"", "gradlew\" "+task);
+
+        builder.redirectErrorStream(true);
+        builder.directory(new File(projectPath));
+        Process p = builder.start();
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        while (true) {
+            line = r.readLine();
+            if (line == null) { break; }
+            System.out.println(line);
+        }
+
+    }
+
+
+    /** todo
+     * Get all the instrumentations
+     * @return List with all the instrumentations
+     * @throws IOException
+     */
+    public static ArrayList<String> getInstrumentations() throws IOException{
+        //todo testPackage??
+        String testPackage = "";
+
+        String instrumentationRegex="instrumentation:";
+        String targetRegex="[(]target=";
+        String targetPackage;
+
+        ArrayList<String> instrumentations=new ArrayList<>();
+        ProcessBuilder builder = new ProcessBuilder(
+                "cmd.exe", "/c\"", adbPath + "\\adb\" shell pm list instrumentation");
+
+        builder.redirectErrorStream(true);
+        Process p = builder.start();
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+
+        while ((line = r.readLine()) != null) {
+            if(line.contains(testPackage)) {
+
+                line=line.replaceAll("\\s+","");
+                //System.out.println(line);
+                String[] substrings=line.split(targetRegex);
+
+                targetPackage=substrings[1].split("[)]")[0];
+                System.out.println(targetPackage);
+                //targetPackages.add(targetPackage); <-- era scommentato
+                //installationPackage=substrings[0].split(instrumentationRegex)[1].split("/")[0];
+
+                System.out.println(line.split(instrumentationRegex)[1]);
+
+                instrumentations.add(line.split(instrumentationRegex)[1]);
+
+            }
+
+        }
+
+        return instrumentations;
+    }
+
+    /** todo
+     * Checks if the selected has already been enhanced
+     * @param test test to be checked
+     * @return true if the the test has been enhanced
+     */
+    public boolean isEnhanced(File test) {
+        try {
+            @SuppressWarnings("resource")
+            Scanner scanner=new Scanner(test);
+            while(scanner.hasNextLine()) {
+                String line=scanner.nextLine();
+                if(line.matches("(.*)import " + this.appPackageName+".TOGGLETools(.*)")&&!line.matches("(.*)//(.*)")) {
+                    return true;
+                }
+
+            }
+            scanner.close();
+        } catch (FileNotFoundException fnfe) {
+            // TODO Auto-generated catch block
+            fnfe.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
+    /** todo
+     * Method that gets the package of the selected test
+     * @param test from which the package is taken
+     */
+    public static void getTestPackage(File test) {
+        String packageStr="package";
+        String javaStr=".java";
+        String testPackage;
+        String testName;
+        try {
+            Scanner scanner=new Scanner(test);
+            while(scanner.hasNextLine()) {
+                String line=scanner.nextLine();
+                if(contains(line, "package")) {
+
+                    testPackage=line.substring(packageStr.length(), line.length()-1).trim();
+                    String name=test.getName();
+                    testName=name.split(javaStr)[0];
+                    break;
+                }
+
+            }
+            scanner.close();
+        } catch (FileNotFoundException fnfe) {
+            // TODO Auto-generated catch block
+            fnfe.printStackTrace();
+        }
+    }
+
+    /** todo
+     * Checks if a source string contains an exact word
+     * @param source string in which the word is searched
+     * @param subItem word to be searched
+     * @return
+     */
+    private static boolean contains(String source, String subItem){
+        String pattern = "\\b"+subItem+"\\b";
+        Pattern p=Pattern.compile(pattern);
+        Matcher m=p.matcher(source);
+        return m.find();
+    }
+    //todo non è che funzioni benissimo
+    private static boolean isAndroidFolder(File file) {
+
+        int fileCount=0;
+
+        File[] list = file.listFiles();
+        if(list!=null)
+            for (File fil : list) {
+                if(!fil.isDirectory()) {
+                    String fileName=fil.getName();
+                    //System.out.println(fileName);
+                    if(fileName.compareToIgnoreCase("build.gradle")==0
+                            || fileName.compareToIgnoreCase("gradle.properties")==0
+                            || fileName.compareToIgnoreCase("gradlew")==0
+                            || fileName.compareToIgnoreCase("gradlew.bat")==0
+                            || fileName.compareToIgnoreCase("settings.gradle")==0)
+
+                        fileCount++;
+                }
+            }
+
+        //System.out.println(fileCount);
+        if(fileCount==5) {
+            System.out.println("Is an android folder");
+            return true;
+        }
+        return false;
+
+    }
+    //todo
+    private static boolean hasAndroidManifest(File file) {
+
+        if(file.getName().compareToIgnoreCase("main")!=0) {
+
+            File[] list = file.listFiles();
+            if(list!=null)
+                for (File fil : list) {
+                    //System.out.println(fil.getName());
+                    if(fil.isDirectory())
+                        return hasAndroidManifest(fil);
+                }
+        } else {
+            File[] list = file.listFiles();
+            if(list!=null) {
+                for (File fil : list) {
+                    //System.out.println(file.getName());
+                    if (!fil.isDirectory()) {
+                        try {
+                            Scanner scanner = new Scanner(fil);
+                            while (scanner.hasNextLine()) {
+                                String line = scanner.nextLine();
+                                if (line.matches("(.*)manifest(.*)") && !line.matches("(.*)<!--(.*)")) {
+                                    //System.out.println(line);
+                                    return true;
+                                }
+
+                            }
+                            scanner.close();
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

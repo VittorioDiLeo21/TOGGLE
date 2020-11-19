@@ -49,6 +49,7 @@ public class Enhancer {
     private Statement activity = JavaParser.parseStatement("activityTOGGLETools = getActivityInstance();");
     private Statement captureTaskValue = JavaParser.parseStatement("capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTask(now, activityTOGGLETools));");
     private Statement captureTaskValueProgressive = JavaParser.parseStatement("capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, activityTOGGLETools));");
+
     private TryStmt screenCapture = (TryStmt) JavaParser.parseStatement("try { runOnUiThread(capture_task); } catch (Throwable t) { t.printStackTrace(); }");
     //private Statement dumpScreen = JavaParser.parseStatement("TOGGLETools.DumpScreen(now, device);");
     private Statement dumpScreenProgressive = JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, device);");

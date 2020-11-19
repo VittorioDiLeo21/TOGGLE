@@ -185,7 +185,7 @@ public class Main {
         Utils.removeLogFiles();
         //en.generateEnhancedClassFrom("C:\\Users\\vitto\\AndroidStudioProjects\\Espresso\\app\\src\\androidTest\\java\\com\\example\\android\\teatime\\orderActivityBasicTest.java");
         //en.generateEnhancedClassFrom("C:\\Users\\vitto\\AndroidStudioProjects\\PassAndroid\\app\\src\\androidTest\\java\\org\\ligi\\passandroid\\TestHomeActivity.java");
-        en.generateEnhancedClassFrom("C:\\Users\\vitto\\AndroidStudioProjects\\PassAndroid\\app\\src\\androidTest\\java\\org\\ligi\\passandroid\\TestEditPassProperties.java");
+        List<String> testNames = en.generateEnhancedClassFrom("C:\\Users\\vitto\\AndroidStudioProjects\\PassAndroid\\app\\src\\androidTest\\java\\org\\ligi\\passandroid\\TestEditPassProperties.java");
 
         //enhancement of a test class
         //en.generateEnhancedClassFrom("C:\\Users\\Riccardo Coppola\\MiMangaNu-master_oldgraphics\\MiMangaNu-master\\app\\src\\androidTest\\java\\ar\\rulosoft\\mimanganu\\TestAdvancedFeatures.java");

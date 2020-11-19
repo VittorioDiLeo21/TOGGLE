@@ -17,6 +17,15 @@ repositories {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            exclude('it/polito/toggle/utils/TOGGLETools.java')
+        }
+    }
+}
+
+
 dependencies {
 
     //compile group: 'com.android.library', name: 'com.android.library.gradle.plugin', version: '4.2.0-alpha16', ext: 'pom'
