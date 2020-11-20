@@ -129,7 +129,7 @@ public class Enhancer {
         List<String> testNames = new ArrayList<>();
         try {
             populateEmptyStatistic();
-            FileInputStream in = new FileInputStream( folderPath + fileName );
+            FileInputStream in = new FileInputStream( folderPath + fileName + ".java" );
             compilationUnit = JavaParser.parse(in);
 
             addImportsToCompilationUnit();
@@ -278,6 +278,9 @@ public class Enhancer {
         List<ConstructorDeclaration> constructors = classOrInterfaceDeclaration.getConstructors();
         for(ConstructorDeclaration constructor : constructors){
             constructor.setName(constructor.getName() + "Enhanced");
+            constructor.getBody().asBlockStmt().addStatement(
+                    JavaParser.parseStatement("TOGGLETools.setLogFileName(\""+constructor.getName()+"\");")
+            );
         }
     }
 
@@ -747,7 +750,7 @@ public class Enhancer {
             }
         }
     }
-    //todo i == index
+
     private int parseStatement(BlockStmt block, String methodName, Statement stmt, int i){
 
         //System.out.println("parsing statement + " + block.toString() + " from row " + i);

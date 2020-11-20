@@ -1,4 +1,4 @@
-package java.it.polito.toggle.utils;
+package it.polito.toggle.utils;
 
 
 import android.Manifest;
@@ -41,7 +41,8 @@ import java.util.concurrent.Callable;
 
 public class TOGGLETools {
 
-    private static String LOG_FILE_PATH = "sdcard/mylog.txt";
+    private static String LOG_FILE_PATH = "sdcard/";
+    private static String LOG_FILE_NAME = "mylog.txt";
 
     public static void request(/*String... permissions*/) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -85,9 +86,13 @@ public class TOGGLETools {
         pw.close();
     }
 
+    public static void setLogFileName(String name){
+        LOG_FILE_NAME = name+".txt";
+    }
+
     public static void appendLog(String text)
     {
-        File logFile = new File(LOG_FILE_PATH);
+        File logFile = new File(LOG_FILE_PATH + LOG_FILE_NAME);
         if (!logFile.exists()) {
             try {
                 logFile.createNewFile();

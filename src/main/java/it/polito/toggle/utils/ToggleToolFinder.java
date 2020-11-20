@@ -41,20 +41,23 @@ public class ToggleToolFinder extends Thread {
 		return false;
 	}
 
-	public static void copyToggleTools(String toggleToolsDestPath, String toggleToolsSourcePath, String testClassPackage) {
+	public static void copyToggleTools(String toggleToolsDestPath, String testClassPackage) {
 
 		try {
 
-			String toggleToolsContent=testClassPackage+"\n";
+			String toggleToolsContent="package "+testClassPackage+";\n";
 
-			try(BufferedReader br = new BufferedReader(new FileReader(toggleToolsSourcePath+"\\TOGGLETools.java"))) {
+			try(BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir")+"\\src\\main\\java\\it\\polito\\toggle\\utils\\TOGGLETools.java"))) {
 			    StringBuilder sb = new StringBuilder();
-			    String line = br.readLine();
+			    String line;
 
-			    while (line != null) {
+
+			    while ((line = br.readLine()) != null) {
+					if(line.contains("package")) {
+						continue;
+					}
 			        sb.append(line);
 			        sb.append(System.lineSeparator());
-			        line = br.readLine();
 			    }
 			    toggleToolsContent += sb.toString();
 			}

@@ -3,6 +3,8 @@ package it.polito.toggle;
 import com.sun.jna.platform.DesktopWindow;
 import com.sun.jna.platform.WindowUtils;
 import it.enhancer.Enhancer;
+import it.polito.toggle.utils.EspressoTestFinder;
+import it.polito.toggle.utils.ToggleToolFinder;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
@@ -25,7 +27,8 @@ public class Toggle {
     private long endEspressoExecution;
     private String testDirectoryPath;
     private String appProjectPath;
-    private Map<String,ClassData> testCaseInfos;
+
+    private it.windowUtils.WindowUtils windowUtils;
     private static String adbPath = System.getenv("LOCALAPPDATA")+"\\Android\\Sdk\\platform-tools";
 
     public Toggle(String testDirectoryName,
@@ -37,8 +40,10 @@ public class Toggle {
         this.startEspressoExecution = 0;
         this.endEspressoExecution = 0;
         this.appPackageName = appPackageName;
-        this.testCaseInfos = new HashMap<>();
         this.testDirectoryPath = testDirectoryPath;
+        int indexProjectPath = testDirectoryPath.indexOf("\\app\\");
+        this.appProjectPath = testDirectoryPath.substring(0,indexProjectPath);
+        this.windowUtils = new it.windowUtils.WindowUtils();
     }
 
     public Toggle(String testDirectoryName, //androidTest
@@ -54,34 +59,47 @@ public class Toggle {
         this.startEspressoExecution = 0;
         this.endEspressoExecution = 0;
         this.appPackageName = appPackageName;
-        this.testCaseInfos = new HashMap<>();
+        this.windowUtils = new it.windowUtils.WindowUtils();
         this.testDirectoryPath = testDirectoryPath;
     }
 
-    public void executeFullProcess(){
+    public void injectToggleTool(String path){
+        File folder = new File(path);
+        if(!ToggleToolFinder.findToggleTools(folder)){
+            ToggleToolFinder.copyToggleTools(path,appPackageName);
+        }
+    }
+
+    public boolean executeFullProcess() throws IOException {
         //1
-        Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath);
+        Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath); //todo : fa l'enhance anche di altre classi di test nella directory
+        injectToggleTool(testDirectoryPath);
         //2 build and install the apk
         try {
             //buildProject(appProjectPath);
             installApp();
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
-        //3 getInstrumentation<--
-        //todo
+        //3 get the test Instrumentation
+        String instrumentation = getInstrumentation();
+        if(instrumentation.isEmpty())
+            return false;
         //4
         //getDeviceDensity<-- da toggleGUI.EspressoGUI
         //4.5
         //eventually resize the emulator
         //5
-        //executeAllEnhancedEspresso(tests.keys(),instrumentation);
+        //todo
+        executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
         //6
         //for(testClassName : tests.keys()){
             //pullLogFile(testClassName);
             //7
             //toggleClassManager.getClass()
         //}
+        return true;
     }
 
 
@@ -91,12 +109,21 @@ public class Toggle {
 
     public Map<String,ClassData> enhanceEspressoTestFolder(String testFolder){
         File folder = new File(testFolder);
-        FileFilter filter = new WildcardFileFilter("*.java", IOCase.INSENSITIVE);
-        File[] tests = folder.listFiles(filter);
+        //todo test this
+        List<String> files = EspressoTestFinder.getEspressoTests(folder);
         Map<String,ClassData> result = new HashMap<>();
-        //TODO check if the class is actually a test class
+        for(String test: files){
+            List<String> methods = enhancer.generateEnhancedClassFrom(test,testFolder);
+            String className = test+"Enhanced";
+            ClassData cd = new ClassData(methods,className+".txt");
+            result.put(className,cd);
+        }
+
+        /*FileFilter filter = new WildcardFileFilter("*.java", IOCase.INSENSITIVE);
+        File[] tests = folder.listFiles(filter);
         if(tests == null)
             return result;
+
         for(File test : tests){
             String name = test.getName();
             int dotIndex = name.lastIndexOf('.');
@@ -104,12 +131,12 @@ public class Toggle {
             String className = name.substring(0,dotIndex)+"Enhanced";
             ClassData cd = new ClassData(methods,className+".txt");
             result.put(className,cd);
-        }
+        }*/
         return result;
     }
 
-    public void executeAllEnhancedEspresso(List<String> testNames, String instrumentation) throws IOException {
-        installApp();
+    public void executeAllEnhancedEspresso(List<String> testClasses, String instrumentation) throws IOException {
+        //installApp();
         grantPermissions();
         resetLogFiles();
         ProcessBuilder builder;
@@ -117,7 +144,7 @@ public class Toggle {
         BufferedReader r;
         String line;
         startEspressoExecution = System.currentTimeMillis();
-        for(String testName : testNames){
+        for(String testName : testClasses){
             builder = new ProcessBuilder(
                     "cmd.exe", "/c\"", adbPath + "\\adb\" shell am instrument -w -e class "+appPackageName+"."+testName+" "+instrumentation);
             builder.redirectErrorStream(true);
@@ -128,7 +155,7 @@ public class Toggle {
             }
         }
         endEspressoExecution = System.currentTimeMillis();
-        testNames.forEach(testName -> {
+        testClasses.forEach(testName -> {
             try {
                 pullLogFile(testName+".txt");
             } catch (IOException e) {
@@ -412,14 +439,13 @@ public class Toggle {
     }
 
 
-    /** todo
+    /**
      * Get all the instrumentations
-     * @return List with all the instrumentations
+     * @return the instrumentation needed to run the espresso tests
      * @throws IOException
      */
-    public static ArrayList<String> getInstrumentations() throws IOException{
-        //todo testPackage??
-        String testPackage = "";
+    public /*ArrayList<String>*/ String getInstrumentation() throws IOException{
+
 
         String instrumentationRegex="instrumentation:";
         String targetRegex="[(]target=";
@@ -435,26 +461,28 @@ public class Toggle {
         String line;
 
         while ((line = r.readLine()) != null) {
-            if(line.contains(testPackage)) {
-
+            if(line.contains(appPackageName)) {
                 line=line.replaceAll("\\s+","");
                 //System.out.println(line);
-                String[] substrings=line.split(targetRegex);
+                //String[] substrings=line.split(targetRegex); <-- utile per ricavare il nome dell'app in automatico'
 
-                targetPackage=substrings[1].split("[)]")[0];
-                System.out.println(targetPackage);
+                //targetPackage=substrings[1].split("[)]")[0];
+                //System.out.println(targetPackage);
                 //targetPackages.add(targetPackage); <-- era scommentato
                 //installationPackage=substrings[0].split(instrumentationRegex)[1].split("/")[0];
 
                 System.out.println(line.split(instrumentationRegex)[1]);
-
-                instrumentations.add(line.split(instrumentationRegex)[1]);
+                if(line.contains("AndroidJUnitRunner")) {
+                    return line.split(instrumentationRegex)[1].split(targetRegex)[0];
+                }
+                //instrumentations.add(line.split(instrumentationRegex)[1]);
 
             }
 
         }
 
-        return instrumentations;
+        //return instrumentations;
+        return "";
     }
 
     /** todo
