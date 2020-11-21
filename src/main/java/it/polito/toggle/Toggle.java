@@ -3,6 +3,7 @@ package it.polito.toggle;
 import com.sun.jna.platform.DesktopWindow;
 import com.sun.jna.platform.WindowUtils;
 import it.enhancer.Enhancer;
+import it.polito.toggle.utils.Emulators;
 import it.polito.toggle.utils.EspressoTestFinder;
 import it.polito.toggle.utils.ToggleToolFinder;
 import org.apache.commons.io.IOCase;
@@ -19,6 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Toggle {
+    Emulators device;
+
     private String logFilename = "toggleLog.txt";
     private String guiTestsPath;
     private String appPackageName;
@@ -34,7 +37,8 @@ public class Toggle {
     public Toggle(String testDirectoryName,
                   String guiTestsPath,
                   String appPackageName,
-                  String testDirectoryPath){
+                  String testDirectoryPath,
+                  Emulators device){
         this.guiTestsPath = guiTestsPath;
         this.enhancer = new Enhancer(testDirectoryName);
         this.startEspressoExecution = 0;
@@ -44,13 +48,15 @@ public class Toggle {
         int indexProjectPath = testDirectoryPath.indexOf("\\app\\");
         this.appProjectPath = testDirectoryPath.substring(0,indexProjectPath);
         this.windowUtils = new it.windowUtils.WindowUtils();
+        this.device = device;
     }
 
     public Toggle(String testDirectoryName, //androidTest
                   String logFilename, //nonServe?
                   String guiTestsPath, //dove li vogliamo mettere
                   String appPackageName, //org.ligi.passandroid
-                  String testDirectoryPath){ //C:\Users\vitto\AndroidStudioProjects\PassAndroid\app\src\androidTest\java\org\ligi\passandroid\
+                  String testDirectoryPath, //C:\Users\vitto\AndroidStudioProjects\PassAndroid\app\src\androidTest\java\org\ligi\passandroid\
+                  Emulators device){
         this.logFilename = logFilename;
         this.guiTestsPath = guiTestsPath;
         int index = testDirectoryPath.indexOf("\\app\\");
@@ -61,6 +67,11 @@ public class Toggle {
         this.appPackageName = appPackageName;
         this.windowUtils = new it.windowUtils.WindowUtils();
         this.testDirectoryPath = testDirectoryPath;
+        this.device = device;
+    }
+
+    public void setEmulatedDevice(Emulators device){
+        this.device = device;
     }
 
     public void injectToggleTool(String path){

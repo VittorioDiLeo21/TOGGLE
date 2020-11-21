@@ -7,6 +7,7 @@ import it.enhancer.Utils;
 import it.polito.toggle.ToggleClassManager;
 import it.polito.toggle.ToggleInteraction;
 import it.polito.toggle.ToggleTranslator;
+import it.polito.toggle.utils.Emulators;
 import it.windowUtils.ResizeException;
 
 import javax.naming.NameNotFoundException;
@@ -160,7 +161,7 @@ public class Main {
         /*int emWidth = wu.getWindowWidth("Android Emulator");
         wu.getPixelsFromCm(12.0);
         int cm = wu.getPixelsFromCm(8.0497);*/
-        int emulatorWidth = wu.getEmulatorScreenPixelsWidth();
+        int emulatorWidth = wu.getEmulatorScreenPixelsWidth(Emulators.PIXEL_XL);
         System.out.println(emulatorWidth);
 
         //int windowWidth = getEmulatorWidth();

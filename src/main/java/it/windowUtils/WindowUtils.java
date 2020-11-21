@@ -7,6 +7,7 @@ import com.sun.jna.platform.DesktopWindow;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinUser;
+import it.polito.toggle.utils.Emulators;
 
 import java.awt.*;
 
@@ -23,7 +24,7 @@ public class WindowUtils {
         this.pxPerCm = pxPerInch/2.54;
     }
 
-    public int getEmulatorScreenPixelsWidth(){
+    public int getEmulatorScreenPixelsWidth(Emulators DEVICE){
         int totalWidth;
         try {
             totalWidth = getWindowWidth("Android Emulator");
@@ -31,7 +32,46 @@ public class WindowUtils {
             e.printStackTrace();
             return -1;
         }
-        double ratio = 0.6707317073170732;// todo questo è valido solo per NEXUS 5
+        double ratio;
+        switch (DEVICE){
+            case NEXUS_5:
+                ratio = 0.6707317073170732;
+                break;
+            case NEXUS_5X:
+                ratio = 0.6714876033057852;
+                break;
+            case NEXUS_6:
+                ratio = 0.6436567164179104;
+                break;
+            case NEXUS_6P:
+                ratio = 0.6646216768916156;
+                break;
+            case NEXUS_4:
+                ratio = 0.6795131845841785;
+                break;
+            case NEXUS_S:
+                ratio = 0.5695970695970696;
+                break;
+            case NEXUS_ONE:
+                ratio = 0.5597014925373134;
+                break;
+            case GALAXY_NEXUS:
+                ratio = 0.5547576301615799;
+                break;
+            case PIXEL:
+                ratio = 0.6659528907922913;
+                break;
+            case PIXEL_3:
+                ratio = 0.7714987714987716;
+                break;
+            case PIXEL_XL:
+                ratio = 0.6597510373443983;
+                break;
+            default :
+                ratio = -1;
+        }
+        if(ratio == -1)
+            return -1;
         double screenPx = ratio*totalWidth;
         return (int) screenPx;
     }
