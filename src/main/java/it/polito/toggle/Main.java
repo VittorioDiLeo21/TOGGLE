@@ -10,7 +10,7 @@ public class Main {
                 "androidTest",
                 "C:\\Users\\vitto\\OneDrive\\Desktop\\toggleTests",
                 "org.ligi.passandroid",
-                "C:\\Users\\vitto\\AndroidStudioProjects\\PassAndroid\\app\\src\\androidTest\\java\\org\\ligi\\passandroid\\",
+                "C:\\Users\\vitto\\AndroidStudioProjects\\PassAndroid\\app\\src\\androidTest\\java\\org\\ligi\\passandroid\\tests\\",
                 Emulators.PIXEL_XL);
         try {
             toggle.executeFullProcess();

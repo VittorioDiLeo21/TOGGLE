@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class SwipeDown extends ToggleInteraction {
 
 	public SwipeDown(String packagename, String search_type, String search_keyword, String timestamp,
-                     String interaction_type, String args, File screen_capture, File dump)
+			String interaction_type, String args, File screen_capture, File dump)
 			throws XPathExpressionException, SAXException, IOException, ParserConfigurationException {
 		super(packagename, search_type, search_keyword, timestamp, interaction_type, args, screen_capture, dump);
 	}
@@ -32,7 +32,6 @@ public class SwipeDown extends ToggleInteraction {
 		res.add("mouseMove(run)");
 		res.add("mouseUp()");
 		res.add("wait(0.2)");
-
 		return res;
 	}
 
@@ -45,16 +44,14 @@ public class SwipeDown extends ToggleInteraction {
 		res.add("MouseLeftPress");
 		res.add("MoveRelative \"0\" \"250\"");
 		res.add("MouseLeftRelease");
-
 		return res;
 	}
 
 	@Override
 	public ArrayList<String> generateSikuliJavaLines(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
-
 		res.add("try {");
-		res.add("\tsikuli_screen.wait(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 30);");
+		res.add("\tsikuli_screen.wait(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 30);");
 		res.add("\torg.sikuli.script.Match sikuli_match = sikuli_screen.find(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\",  "\\\\") + "\");");
 		res.add("\torg.sikuli.script.Location l = sikuli_match.getCenter();");
 		res.add("\tsikuli_screen.mouseMove(l);");
@@ -75,12 +72,11 @@ public class SwipeDown extends ToggleInteraction {
 	@Override
 	public ArrayList<String> generateEyeAutomateJavaLines(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
-
-		res.add("image = eye.loadImage(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
+		res.add("image = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
 		res.add("if (image != null) {");
 		res.add("\tmatch = eye.findImage(image);");
 		res.add("\tif (match == null) {");
-		res.add("\t\tSystem.out.println(\"Test failed - " + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
+		res.add("\t\tSystem.out.println(\"Test failed - " + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
 		res.add("\t\treturn \"fail;\"+interactions;");
 		res.add("\t}");
 		res.add("		eye.move(match.getCenterLocation());\r\n" +
@@ -99,15 +95,13 @@ public class SwipeDown extends ToggleInteraction {
 		res.add("\tSystem.out.println(\"image not found\");");
 		res.add("\treturn \"fail;\"+interactions;");
 		res.add("}");
-
 		return res;
 	}
 
 	@Override
 	public ArrayList<String> generateCombinedJavaLines(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
-
-		res.add("image = eye.loadImage(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
+		res.add("image = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
 		res.add("if (image != null) {");
 		res.add("\tmatch = eye.findImage(image);");
 
@@ -115,7 +109,7 @@ public class SwipeDown extends ToggleInteraction {
 		res.add("\tif (match == null) {");
 		res.add("\t\teyeautomate_failures++;");
 		res.add("\t\ttry {");
-		res.add("\t\t\tsikuli_screen.wait(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 25);");
+		res.add("\t\t\tsikuli_screen.wait(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 25);");
 		res.add("\t\t\torg.sikuli.script.Match sikuli_match = sikuli_screen.find(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\",  "\\\\") + "\");");
 		res.add("\t\t\torg.sikuli.script.Location l = sikuli_match.getCenter();");
 		res.add("\t\t\tsikuli_screen.mouseMove(l);");
@@ -130,7 +124,6 @@ public class SwipeDown extends ToggleInteraction {
 		res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions;");
 		res.add("\t\t}");
 		res.add("\t}");
-
 		//eyeautomate
 		res.add("\telse {");
 		res.add("		eye.move(match.getCenterLocation());\r\n" +
@@ -159,7 +152,7 @@ public class SwipeDown extends ToggleInteraction {
 	public ArrayList<String> generateCombinedJavaLinesSikuliFirst(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
 		res.add("try {");
-		res.add("\tsikuli_screen.wait(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 5);");
+		res.add("\tsikuli_screen.wait(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 5);");
 		res.add("\torg.sikuli.script.Match sikuli_match = sikuli_screen.find(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\",  "\\\\") + "\");");
 		res.add("\torg.sikuli.script.Location l = sikuli_match.getCenter();");
 		res.add("\tsikuli_screen.mouseMove(l);");
@@ -171,7 +164,7 @@ public class SwipeDown extends ToggleInteraction {
 		res.add("}");
 		res.add("catch (FindFailed ffe) {");
 		res.add("\tsikuli_failures++;");
-		res.add("\timage = eye.loadImage(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
+		res.add("\timage = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
 		res.add("\tif (image != null) {");
 		res.add("\t\tmatch = eye.findImage(image);");
 		res.add("\t\tif (match == null) {");		//test failed also with eyeautomate

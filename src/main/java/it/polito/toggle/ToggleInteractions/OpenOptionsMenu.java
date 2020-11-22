@@ -10,41 +10,38 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class OpenOptionsMenu extends ToggleInteraction {
-
 	public OpenOptionsMenu(String packagename, String search_type, String search_keyword, String timestamp,
-                           String interaction_type, String args, File screen_capture, File dump)
+			String interaction_type, String args, File screen_capture, File dump)
 			throws XPathExpressionException, SAXException, IOException, ParserConfigurationException {
 		super(packagename, search_type, search_keyword, timestamp, interaction_type, args, screen_capture, dump);
-
+		// TODO Auto-generated constructor stub
 		this.need_screenshot = false;
 	}
 
 	public ArrayList<String> generateSikuliLines() {
 		ArrayList<String> res = new ArrayList<>();
-
 		res.add("keyDown(Key.CTRL)");
 		res.add("sleep(0.01)");
 		res.add("type(\"m\")");
 		res.add("sleep(0.01)");
 		res.add("keyUp(Key.CTRL)");
-
 		return res;
 	}
 
 	public ArrayList<String> generateEyeStudioLines() {
 		ArrayList<String> res = new ArrayList<>();
-
 		res.add("Type [CTRL_PRESS]");
 		res.add("Sleep 10");
 		res.add("Type \"m\"");
 		res.add("Sleep 10");
 		res.add("Type [CTRL_RELEASE]");
-
 		return res;
 	}
 
 	@Override
-	public void extractBounds() { }
+	public void extractBounds() {
+		return;
+	}
 
 	@Override
 	public ArrayList<String> generateEyeAutomateJavaLines(String starting_folder) {
@@ -76,7 +73,6 @@ public class OpenOptionsMenu extends ToggleInteraction {
 	public ArrayList<String> generateCombinedJavaLines(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
 		//IS IT POSSIBLE TO HAVE EXCEPTIONS IN THIS SIMPLE OPERATIONS WITH EYEAUTOMATE??? CHECK
-
 		res.add("try {");
 		res.add("\teye.type(\"[CTRL_PRESS]\");");
 		res.add("\tThread.sleep(10);");

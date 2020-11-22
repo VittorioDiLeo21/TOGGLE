@@ -11,12 +11,10 @@ import java.util.ArrayList;
 
 public class TypeText extends ToggleInteraction {
 	private String text;
-
 	public TypeText(String packagename, String search_type, String search_keyword, String timestamp,
-                    String interaction_type, String args, File screen_capture, File dump)
+			String interaction_type, String args, File screen_capture, File dump)
 			throws XPathExpressionException, SAXException, IOException, ParserConfigurationException {
 		super(packagename, search_type, search_keyword, timestamp, interaction_type, args, screen_capture, dump);
-
 		text = args;
 	}
 
@@ -80,7 +78,6 @@ public class TypeText extends ToggleInteraction {
 		res.add("image = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
 		res.add("if (image != null) {");
 		res.add("\tmatch = eye.findImage(image);");
-
 		//try sikuli
 		res.add("\tif (match == null) {");
 		res.add("\t\teyeautomate_failures++;");
@@ -105,7 +102,6 @@ public class TypeText extends ToggleInteraction {
 		res.add("\tSystem.out.println(\"image not found\");");
 		res.add("\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions;");
 		res.add("}");
-
 		return res;
 	}
 
@@ -113,15 +109,14 @@ public class TypeText extends ToggleInteraction {
 	@Override
 	public ArrayList<String> generateCombinedJavaLinesSikuliFirst(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
-
 		res.add("try {");
-		res.add("\tsikuli_screen.wait(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 5);");
-		res.add("\tsikuli_screen.click(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
+		res.add("\tsikuli_screen.wait(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 5);");
+		res.add("\tsikuli_screen.click(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
 		res.add("\tsikuli_screen.type(\"" + text + "\");");
 		res.add("}");
 		res.add("catch (FindFailed ffe) {");
 		res.add("\tsikuli_failures++;");
-		res.add("\timage = eye.loadImage(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
+		res.add("\timage = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
 		res.add("\tif (image != null) {");
 		res.add("\t\tmatch = eye.findImage(image);");
 		res.add("\t\tif (match == null) {");		//test failed also with eyeautomate
@@ -137,7 +132,6 @@ public class TypeText extends ToggleInteraction {
 		res.add("\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions;");
 		res.add("\t}");
 		res.add("}");
-
 		return res;
 	}
 }

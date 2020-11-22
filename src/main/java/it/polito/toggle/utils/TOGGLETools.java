@@ -90,9 +90,9 @@ public class TOGGLETools {
         LOG_FILE_NAME = name+".txt";
     }
 
-    public static void appendLog(String text)
+    public static void appendLog(String className,String text)
     {
-        File logFile = new File(LOG_FILE_PATH + LOG_FILE_NAME);
+        File logFile = new File(LOG_FILE_PATH + className + ".txt");
         if (!logFile.exists()) {
             try {
                 logFile.createNewFile();
@@ -384,10 +384,10 @@ public class TOGGLETools {
 
     //progressive versions
 
-    public static void LogInteractionProgressive(int num, String test_name, String search_type, String search_kw, String interaction_type, String interaction_params) {
+    public static void LogInteractionProgressive(String className, int num, String test_name, String search_type, String search_kw, String interaction_type, String interaction_params) {
 
         //version for interaction with parameters
-        appendLog("touchtest: "
+        appendLog(className,"touchtest: "
                 + test_name + "; "
                 + test_name + num + "; "
                 + search_type + "; "
@@ -400,10 +400,10 @@ public class TOGGLETools {
 
     }
 
-    public static void LogInteractionProgressive(int num, String test_name, String search_type, String search_kw, String interaction_type) {
+    public static void LogInteractionProgressive(String className, int num, String test_name, String search_type, String search_kw, String interaction_type) {
 
         //version for interaction without parameters
-        appendLog("touchtest: "
+        appendLog(className,"touchtest: "
                 + test_name + "; "
                 + test_name + num + "; "
                 + search_type + "; "
@@ -415,10 +415,10 @@ public class TOGGLETools {
 
     }
 
-    public static void LogInteractionProgressive(int num) {
+    public static void LogInteractionProgressive(String className, int num) {
 
         //version for check of full screen
-        appendLog("touchtest: , , , , ");
+        appendLog(className,"touchtest: , , , , ");
         Log.d("touchtest", num + ", , , , ");
     }
 
@@ -437,7 +437,7 @@ public class TOGGLETools {
 
 
         Log.wtf("dialogs", String.valueOf(v1.hasWindowFocus()));
-        appendLog("dialogs: " + String.valueOf(v1.hasWindowFocus()));
+        //appendLog("dialogs: " + String.valueOf(v1.hasWindowFocus()));
         if (!v1.hasWindowFocus()) {
 
             getDialogScreenshot(activity.getApplicationContext(), v1, mPath2);

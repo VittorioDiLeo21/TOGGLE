@@ -21,6 +21,7 @@ sourceSets {
     main {
         java {
             exclude('it/polito/toggle/utils/TOGGLETools.java')
+            exclude('it/polito/toggle/utils/BitmapSaver.java')
         }
     }
 }

@@ -41,6 +41,35 @@ public class ToggleToolFinder extends Thread {
 		return false;
 	}
 
+	public static void copyBitmapSaver(String bitmapSaverDestPath, String testClassPackage){
+		try {
+			String content="package "+testClassPackage+";\n";
+
+			try(BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir")+"\\src\\main\\java\\it\\polito\\toggle\\utils\\BitmapSaver.java"))) {
+				StringBuilder sb = new StringBuilder();
+				String line;
+
+
+				while ((line = br.readLine()) != null) {
+					if(line.contains("package")) {
+						continue;
+					}
+					sb.append(line);
+					sb.append(System.lineSeparator());
+				}
+				content += sb.toString();
+			}
+
+			FileWriter toggleTools=new FileWriter(bitmapSaverDestPath+"\\BitmapSaver.java");
+			toggleTools.write(content);
+			toggleTools.close();
+			//Files.copy(Paths.get(toggleToolsSourcePath+"\\TOGGLETools.java"), Paths.get(toggleToolsDestPath+"\\TOGGLETools.java"), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public static void copyToggleTools(String toggleToolsDestPath, String testClassPackage) {
 
 		try {

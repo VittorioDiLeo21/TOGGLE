@@ -61,59 +61,12 @@ public class Enhancer {
             "\n" +
             "        }");
 
+    private String currentClass = "";
 
     public Enhancer(String packageName){
         this.packageName = packageName;
         this.statistic = new HashMap();
     }
-
-    /*private void addToggleToolsImportsToCompilationUnit(){
-
-    }
-
-    public void injectToggleTools(String folderPath){
-        long time_begin = System.currentTimeMillis();
-
-        try {
-            String filePath = folderPath+"TOGGLETools.java";
-            FileInputStream in = new FileInputStream( filePath );
-            compilationUnit = JavaParser.parse(in);
-
-            addToggleToolsImportsToCompilationUnit();
-            addPrivateField();
-            changeConstructorsName();
-            addActivityInstanceMethod();
-
-            //visit the body of all methods in the class
-            compilationUnit.accept(new MethodVisitor(), null);
-            // System.out.println(compilationUnit.toString());
-
-            System.out.println("");
-            String fileNameEnhanced = folderPath + fileName + "Enhanced.java";
-            System.out.println("Saving everything to " + fileNameEnhanced);
-
-            PrintWriter w = new PrintWriter(fileNameEnhanced,"UTF-8");
-            w.print(compilationUnit.toString());
-            w.close();
-
-            //save statistics into file
-            String statisticFileName = folderPath + fileName + "_Statistic.txt";
-            Statistic.writeDataToFile(statistic, statisticFileName);
-
-            //} catch (FileNotFoundException f) {
-            //	System.out.println("File: " + filePath + " not found!");
-            //} catch (UnsupportedEncodingException u) {
-            //	System.out.println("Unsupported encoding on enhanced file");
-
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            //TODO do something useful to handle different kinds of exceptions
-            Utils.logException(e, "generateEnhancedClassFrom for " + filePath);
-        }
-
-        long end_time = System.currentTimeMillis();
-        long enhance_time = end_time - time_begin;
-        System.out.println("Time to enhance = " + enhance_time);
-    }*/
 
     /**
      * Method to enhance a file whose path is filePath.
@@ -278,9 +231,10 @@ public class Enhancer {
         List<ConstructorDeclaration> constructors = classOrInterfaceDeclaration.getConstructors();
         for(ConstructorDeclaration constructor : constructors){
             constructor.setName(constructor.getName() + "Enhanced");
-            constructor.getBody().asBlockStmt().addStatement(
-                    JavaParser.parseStatement("TOGGLETools.setLogFileName(\""+constructor.getName()+"\");")
-            );
+            this.currentClass = constructor.getName().asString();
+           /* constructor.getBody().asBlockStmt().addStatement(
+                    JavaParser.parseStatement("TOGGLETools.setLogFileName(\""+constructor.getName().+"\");")
+            );*/
         }
     }
 
@@ -1246,7 +1200,8 @@ public class Enhancer {
 
 
 
-                        l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(num, " + "\"" + log.getMethodName()
+                        l = JavaParser.parseStatement(
+                                "TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName()
                                 + "\", " + "\"" + log.getSearchType() + "\"" + "," + "\"" + log.getSearchKw() + "\"" + ","
                                 + "\"" + log.getInteractionType() + "\", String.valueOf(textToBeReplacedLength" + (i - 1)
                                 + ")+\";\"+" + log.getInteractionParams() + ");");
@@ -1265,7 +1220,7 @@ public class Enhancer {
                         b.addStatement(++i, JavaParser.parseStatement(stmt2));
 
 
-                        l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(num, " + "\"" + log.getMethodName()
+                        l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName()
                                 + "\", " + "\"" + log.getSearchType() + "\"" + "," + "\"" + log.getSearchKw() + "\"" + ","
                                 + "\"" + log.getInteractionType() + "\", String.valueOf(textToBeReplacedLength" + (i - 2)
                                 + ")+\";\"+" + log.getInteractionParams() + ");");
@@ -1286,7 +1241,7 @@ public class Enhancer {
                     b.addStatement(++i, JavaParser.parseStatement(stmt));
 
 
-                    l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(num, " + "\"" + log.getMethodName() + "\","
+                    l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName() + "\","
                             + "\"" + log.getSearchType() + "\"" + "," + log.getSearchKw() + "," + "\""
                             + log.getInteractionType() + "\", String.valueOf(textToBeReplacedLength" + (i - 1) + ")+\";\"+"
                             + log.getInteractionParams() + ");");
@@ -1308,7 +1263,7 @@ public class Enhancer {
                                 + log.getSearchKw() + ")).getText().length();";
                         b.addStatement(++i, JavaParser.parseStatement(stmt));
 
-                        l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(num," + "\"" + log.getMethodName() + "\","
+                        l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName() + "\","
                                 + "\"" + log.getSearchType() + "\"" + "," + "\"" + log.getSearchKw() + "\"" + "," + "\""
                                 + log.getInteractionType() + "\", String.valueOf(textToBeClearedLength" + (i - 1) + "));");
 
@@ -1322,7 +1277,7 @@ public class Enhancer {
                         b.addStatement(++i, JavaParser.parseStatement(stmt));
                         b.addStatement(++i, JavaParser.parseStatement(stmt2));
 
-                        l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(num," + "\"" + log.getMethodName() + "\","
+                        l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName() + "\","
                                 + "\"" + log.getSearchType() + "\"" + "," + "\"" + log.getSearchKw() + "\"" + "," + "\""
                                 + log.getInteractionType() + "\", String.valueOf(textToBeClearedLength" + (i - 2) + "));");
 
@@ -1340,7 +1295,7 @@ public class Enhancer {
                     b.addStatement(++i, JavaParser.parseStatement(stmt));
 
 
-                    l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(num," + "\"" + log.getMethodName() + "\","
+                    l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName() + "\","
                             + "\"" + log.getSearchType() + "\"" + "," + log.getSearchKw() + "," + "\""
                             + log.getInteractionType() + "\", String.valueOf(textToBeClearedLength" + (i - 1) + "));");
 
@@ -1364,7 +1319,7 @@ public class Enhancer {
                 b.addStatement(++i, ifStmt);
 
 
-                stmt = "TOGGLETools.LogInteractionProgressive(num," + "\"" + log.getMethodName() + "\"," + "\"" + log.getSearchType()
+                stmt = "TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName() + "\"," + "\"" + log.getSearchType()
                         + "\"" + "," + log.getSearchKw() + "," + "\"" + log.getInteractionType() + "\"" + ", espressoKeyVal"
                         + (i - 3) + ");";
 
@@ -1380,7 +1335,7 @@ public class Enhancer {
             case "closekeyboard":
             case "openactionbaroverfloworoptionsmenu":
             case "opencontextualactionmodeoverflowmenu":
-                l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(num, " + "\"" + log.getMethodName() + "\","
+                l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName() + "\","
                         + "\"-\", \"-\"," + "\"" + log.getInteractionType() + "\"" + ");");
 
 
@@ -1392,7 +1347,7 @@ public class Enhancer {
             case "typeintofocused":
 
                 System.out.println(log.getInteractionParams());
-                l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(num, " + "\"" + log.getMethodName() + "\","
+                l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName() + "\","
                         + "\"-\", \"-\"," + "\"" + log.getInteractionType() + "\", \"" + log.getInteractionParams() + "\"" + ");");
 
 
@@ -1402,7 +1357,7 @@ public class Enhancer {
 
             default:
                 if (log.getInteractionParams().isEmpty())
-                    l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(num," + "\"" + log.getMethodName() + "\","
+                    l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, "+ "\"" + log.getMethodName() + "\","
                             + "\"" + log.getSearchType() + "\"" + "," + log.getSearchKw() + "," + "\""
                             + log.getInteractionType() + "\"" + ");");
 
@@ -1412,7 +1367,7 @@ public class Enhancer {
                     //		+ log.getInteractionType() + "\"" + ");");
                 else
 
-                    l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(num," + "\"" + log.getMethodName() + "\","
+                    l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName() + "\","
                             + "\"" + log.getSearchType() + "\"" + "," + log.getSearchKw() + "," + "\""
                             + log.getInteractionType() + "\"" + "," + log.getInteractionParams() + ");");
 
@@ -1433,7 +1388,7 @@ public class Enhancer {
                 .parseStatement("Rect currdisp = TOGGLETools.GetCurrentDisplaySize(activityTOGGLETools);");
 
 
-        String stmt = "TOGGLETools.LogInteractionProgressive(num," + "\"" + methodName
+        String stmt = "TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + methodName
                 + "\",\"-\", \"-\", \"fullcheck\", currdisp.bottom+\";\"+currdisp.top+\";\"+currdisp.right+\";\"+currdisp.left);";
 
 

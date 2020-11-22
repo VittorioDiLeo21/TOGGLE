@@ -10,12 +10,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class PressMenuKey extends ToggleInteraction {
-
 	public PressMenuKey(String packagename, String search_type, String search_keyword, String timestamp,
-                        String interaction_type, String args, File screen_capture, File dump)
+			String interaction_type, String args, File screen_capture, File dump)
 			throws XPathExpressionException, SAXException, IOException, ParserConfigurationException {
 		super(packagename, search_type, search_keyword, timestamp, interaction_type, args, screen_capture, dump);
-
+		// TODO Auto-generated constructor stub
 		this.need_screenshot = false;
 	}
 
@@ -32,18 +31,18 @@ public class PressMenuKey extends ToggleInteraction {
 
 	public ArrayList<String> generateEyeStudioLines() {
 		ArrayList<String> res = new ArrayList<>();
-
 		res.add("Type [CTRL_PRESS]");
 		res.add("Sleep 10");
 		res.add("Type \"h\"");
 		res.add("Sleep 10");
 		res.add("Type [CTRL_RELEASE]");
-
 		return res;
 	}
 
 	@Override
-	public void extractBounds() { }
+	public void extractBounds() {
+		return;
+	}
 
 	@Override
 	public ArrayList<String> generateEyeAutomateJavaLines(String starting_folder) {
@@ -75,7 +74,6 @@ public class PressMenuKey extends ToggleInteraction {
 	public ArrayList<String> generateCombinedJavaLines(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
 		//IS IT POSSIBLE TO HAVE EXCEPTIONS IN THIS SIMPLE OPERATIONS WITH EYEAUTOMATE??? CHECK
-
 		res.add("try {");
 		res.add("\teye.type(\"[CTRL_PRESS]\");");
 		res.add("\tThread.sleep(10);");
@@ -98,14 +96,12 @@ public class PressMenuKey extends ToggleInteraction {
 		res.add("\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions;");
 		res.add("\t}");
 		res.add("}");
-
 		return res;
 	}
 
 	@Override
 	public ArrayList<String> generateCombinedJavaLinesSikuliFirst(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
-
 		res.add("try {");
 		res.add("\t\tsikuli_screen.keyDown(Key.CTRL);");
 		res.add("\t\tThread.sleep(10);");

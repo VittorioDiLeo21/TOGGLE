@@ -3,12 +3,16 @@ package it.polito.toggle;
 import com.sun.jna.platform.DesktopWindow;
 import com.sun.jna.platform.WindowUtils;
 import it.enhancer.Enhancer;
+import it.polito.toggle.exceptions.ToggleException;
 import it.polito.toggle.utils.Emulators;
 import it.polito.toggle.utils.EspressoTestFinder;
 import it.polito.toggle.utils.ToggleToolFinder;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +34,7 @@ public class Toggle {
     private long endEspressoExecution;
     private String testDirectoryPath;
     private String appProjectPath;
+    private String toggleInjectionPath;
 
     private it.windowUtils.WindowUtils windowUtils;
     private static String adbPath = System.getenv("LOCALAPPDATA")+"\\Android\\Sdk\\platform-tools";
@@ -46,6 +51,9 @@ public class Toggle {
         this.appPackageName = appPackageName;
         this.testDirectoryPath = testDirectoryPath;
         int indexProjectPath = testDirectoryPath.indexOf("\\app\\");
+        int indexJava = testDirectoryPath.indexOf("\\java\\");
+        this.toggleInjectionPath = testDirectoryPath.substring(indexJava+6,testDirectoryPath.length()-1).replace("\\",".");
+
         this.appProjectPath = testDirectoryPath.substring(0,indexProjectPath);
         this.windowUtils = new it.windowUtils.WindowUtils();
         this.device = device;
@@ -77,39 +85,53 @@ public class Toggle {
     public void injectToggleTool(String path){
         File folder = new File(path);
         if(!ToggleToolFinder.findToggleTools(folder)){
-            ToggleToolFinder.copyToggleTools(path,appPackageName);
+            ToggleToolFinder.copyToggleTools(path,toggleInjectionPath);
+            ToggleToolFinder.copyBitmapSaver(path,toggleInjectionPath);
         }
     }
 
     public boolean executeFullProcess() throws IOException {
         //1
+
         Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath); //todo : fa l'enhance anche di altre classi di test nella directory
         injectToggleTool(testDirectoryPath);
         //2 build and install the apk
-        try {
+
+        /*try {
             //buildProject(appProjectPath);
             installApp();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }
+        }*/
         //3 get the test Instrumentation
-        String instrumentation = getInstrumentation();
+
+        /*String instrumentation = getInstrumentation();
         if(instrumentation.isEmpty())
-            return false;
+            return false;*/
         //4
         //getDeviceDensity<-- da toggleGUI.EspressoGUI
         //4.5
         //eventually resize the emulator
         //5
-        //todo
-        executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
+
+        //executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
         //6
-        //for(testClassName : tests.keys()){
-            //pullLogFile(testClassName);
+        for(String testClassName : tests.keySet()){
+            ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolution(),windowUtils.getEmulatorScreenPixelsWidth(this.device));
             //7
-            //toggleClassManager.getClass()
-        //}
+            try {
+                tcm.createClass(testClassName+".txt");
+            } catch (XPathExpressionException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            } catch (ToggleException e) {
+                e.printStackTrace();
+            }
+        }
         return true;
     }
 
@@ -157,7 +179,7 @@ public class Toggle {
         startEspressoExecution = System.currentTimeMillis();
         for(String testName : testClasses){
             builder = new ProcessBuilder(
-                    "cmd.exe", "/c\"", adbPath + "\\adb\" shell am instrument -w -e class "+appPackageName+"."+testName+" "+instrumentation);
+                    "cmd.exe", "/c\"", adbPath + "\\adb\" shell am instrument -w -e class "+/*appPackageName*/toggleInjectionPath+"."+testName+" "+instrumentation);
             builder.redirectErrorStream(true);
             p = builder.start();
             r = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -237,7 +259,7 @@ public class Toggle {
 
     private void installApp() throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                "cmd.exe", "/c\"", "gradlew\" installDebug");
+                "cmd.exe", "/c\"", "gradlew\" installDebugAndroidTest");
 
         builder.redirectErrorStream(true);
         builder.directory(new File(this.appProjectPath));
@@ -290,7 +312,7 @@ public class Toggle {
 
     public void pullLogFile(String logFile ) throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                "cmd.exe","/c\"",adbPath + "\\adb\" pull /sdcard/" + logFile + " " + guiTestsPath + "\\" + logFilename
+                "cmd.exe","/c\"",adbPath + "\\adb\" pull /sdcard/" + logFile + " " + guiTestsPath + "\\" + logFile
         );
         builder.redirectErrorStream(true);
         Process p = builder.start();

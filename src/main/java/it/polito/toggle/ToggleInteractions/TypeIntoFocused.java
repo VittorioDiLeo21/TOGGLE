@@ -10,14 +10,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class TypeIntoFocused extends ToggleInteraction {
-
 	private String text;
-
 	public TypeIntoFocused(String packagename, String search_type, String search_keyword, String timestamp,
-                           String interaction_type, String args, File screen_capture, File dump)
+			String interaction_type, String args, File screen_capture, File dump)
 			throws XPathExpressionException, SAXException, IOException, ParserConfigurationException {
 		super(packagename, search_type, search_keyword, timestamp, interaction_type, args, screen_capture, dump);
-
 		this.need_screenshot = false;
 		text = args;
 	}
@@ -38,7 +35,9 @@ public class TypeIntoFocused extends ToggleInteraction {
 
 
 	@Override
-	public void extractBounds() { }
+	public void extractBounds() {
+		return;
+	}
 
 
 	@Override
@@ -76,7 +75,6 @@ public class TypeIntoFocused extends ToggleInteraction {
 		return res;
 	}
 
-
 	@Override
 	public ArrayList<String> generateCombinedJavaLinesSikuliFirst(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
@@ -94,6 +92,7 @@ public class TypeIntoFocused extends ToggleInteraction {
 		res.add("\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions;");
 		res.add("\t}");
 		res.add("}");
+
 		return res;
 	}
 }

@@ -12,9 +12,11 @@ import java.util.ArrayList;
 
 public class FullCheck extends ToggleInteraction {
 	public FullCheck(String packagename, String search_type, String search_keyword, String timestamp,
-                     String interaction_type, String args, File screen_capture, File dump)
+			String interaction_type, String args, File screen_capture, File dump)
 			throws XPathExpressionException, SAXException, IOException, ParserConfigurationException {
 		super(packagename, search_type, search_keyword, timestamp, interaction_type, args, screen_capture, dump);
+		// TODO Auto-generated constructor stub
+
 	}
 
 	@Override
@@ -35,20 +37,20 @@ public class FullCheck extends ToggleInteraction {
 	@Override
 	public void extractBounds() {
 		String[] separated = args.split(";");
-		bottom = Integer.parseInt(separated[0]);
-		top = Integer.parseInt(separated[1]);
-		right = Integer.parseInt(separated[2]);
-		left = Integer.parseInt(separated[3]);
+		bottom = Integer.valueOf(separated[0]);
+		top = Integer.valueOf(separated[1]);
+		right = Integer.valueOf(separated[2]);
+		left = Integer.valueOf(separated[3]);
 	}
 
 	@Override
 	public ArrayList<String> generateEyeAutomateJavaLines(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
-		res.add("image = eye.loadImage(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
+		res.add("image = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
 		res.add("if (image != null) {");
 		res.add("\tmatch = eye.findImage(image);");
 		res.add("\tif (match == null) {");
-		res.add("\t\tSystem.out.println(\"Test failed - " + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
+		res.add("\t\tSystem.out.println(\"Test failed - " + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
 		res.add("\t\treturn \"fail;\"+interactions;");
 		res.add("\t}");
 		res.add("}");
@@ -64,9 +66,8 @@ public class FullCheck extends ToggleInteraction {
 	@Override
 	public ArrayList<String> generateSikuliJavaLines(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
-
 		res.add("try {");
-		res.add("\tsikuli_screen.wait(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 30);");
+		res.add("\tsikuli_screen.wait(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 30);");
 		res.add("}");
 		res.add("catch (FindFailed ffe) {");
 		res.add("\tffe.printStackTrace();");
@@ -80,7 +81,7 @@ public class FullCheck extends ToggleInteraction {
 	@Override
 	public ArrayList<String> generateCombinedJavaLines(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
-		res.add("image = eye.loadImage(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
+		res.add("image = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
 		res.add("if (image != null) {");
 		res.add("\tmatch = eye.findImage(image);");
 
@@ -88,7 +89,7 @@ public class FullCheck extends ToggleInteraction {
 		res.add("\tif (match == null) {");
 		res.add("\t\teyeautomate_failures++;");
 		res.add("\t\ttry {");
-		res.add("\t\t\tsikuli_screen.wait(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 25);");
+		res.add("\t\t\tsikuli_screen.wait(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 25);");
 		res.add("\t\t}");
 		res.add("\t\tcatch (FindFailed ffe) {");
 		res.add("\t\t\tffe.printStackTrace();");
@@ -100,7 +101,6 @@ public class FullCheck extends ToggleInteraction {
 		res.add("\tSystem.out.println(\"image not found\");");
 		res.add("\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions;");
 		res.add("}");
-
 		return res;
 	}
 
@@ -109,13 +109,12 @@ public class FullCheck extends ToggleInteraction {
 	@Override
 	public ArrayList<String> generateCombinedJavaLinesSikuliFirst(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
-
 		res.add("try {");
-		res.add("\tsikuli_screen.wait(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 5);");
+		res.add("\tsikuli_screen.wait(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 5);");
 		res.add("}");
 		res.add("catch (FindFailed ffe) {");
 		res.add("\tsikuli_failures++;");
-		res.add("\timage = eye.loadImage(\"" + (starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
+		res.add("\timage = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
 		res.add("\tif (image != null) {");
 		res.add("\t\tmatch = eye.findImage(image);");
 		res.add("\t\tif (match == null) {");
@@ -127,7 +126,6 @@ public class FullCheck extends ToggleInteraction {
 		res.add("\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions;");
 		res.add("\t}");
 		res.add("}");
-
 		return res;
 	}
 }
