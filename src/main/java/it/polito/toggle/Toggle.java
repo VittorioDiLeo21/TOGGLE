@@ -97,25 +97,25 @@ public class Toggle {
         injectToggleTool(testDirectoryPath);
         //2 build and install the apk
 
-        /*try {
+        try {
             //buildProject(appProjectPath);
             installApp();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }*/
+        }
         //3 get the test Instrumentation
 
-        /*String instrumentation = getInstrumentation();
+        String instrumentation = getInstrumentation();
         if(instrumentation.isEmpty())
-            return false;*/
+            return false;
         //4
         //getDeviceDensity<-- da toggleGUI.EspressoGUI
         //4.5
         //eventually resize the emulator
         //5
 
-        //executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
+        executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
         //6
         for(String testClassName : tests.keySet()){
             ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolution(),windowUtils.getEmulatorScreenPixelsWidth(this.device));

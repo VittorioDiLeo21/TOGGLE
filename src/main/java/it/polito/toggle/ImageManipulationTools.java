@@ -3,6 +3,7 @@ package it.polito.toggle;
 
 import com.mortennobel.imagescaling.ResampleFilters;
 import com.mortennobel.imagescaling.ResampleOp;
+import net.coobird.thumbnailator.Thumbnails;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -21,6 +22,34 @@ public class ImageManipulationTools {
         File outputFile = new File(path + '\\' + name + "_cropped.png");
         ImageIO.write(screenshot,"bmp",outputFile);
         return outputFile;
+    }
+
+    private static float getFileRatio(int original_width, int screen_width){
+        return screen_width != 0 ? (float) screen_width/ (float) original_width : -1;
+    }
+
+    public static boolean resizeScreenshotThumbnailator(
+            File src,
+            int left,
+            int top,
+            int right,
+            int bottom,
+            int original_screen_width,
+            int new_screen_width,
+            String path) {
+        float ratio = getFileRatio(original_screen_width, new_screen_width);
+        if (ratio < 0)
+            return false;
+        try {
+            Thumbnails.of(src)
+                    .sourceRegion(left, top, right - left, bottom - top)
+                    .scale(ratio)
+                    .toFile(path + "\\" + src.getName() + "_croppedThumb.png");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     public static BufferedImage resizeScreenshot(BufferedImage src, int original_screen_width, int new_screen_width) {

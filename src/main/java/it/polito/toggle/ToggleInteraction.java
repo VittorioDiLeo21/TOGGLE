@@ -229,4 +229,13 @@ public abstract class ToggleInteraction {
                         ImageManipulationTools.resizeScreenshot(cropped_image,originalWidth,actualWidth));
         return cropped_screenshot_file;
     }
+
+    public boolean manageScreenshotThumbnailator(String starting_folder,int originalWidth,int actualWidth) throws IOException {
+        return ImageManipulationTools
+                .resizeScreenshotThumbnailator(
+                        screen_capture,
+                        left,top,right,bottom,
+                        originalWidth,actualWidth,
+                        starting_folder);
+    }
 }

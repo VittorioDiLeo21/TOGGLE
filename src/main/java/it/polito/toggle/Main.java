@@ -11,7 +11,7 @@ public class Main {
                 "C:\\Users\\vitto\\OneDrive\\Desktop\\toggleTests",
                 "org.ligi.passandroid",
                 "C:\\Users\\vitto\\AndroidStudioProjects\\PassAndroid\\app\\src\\androidTest\\java\\org\\ligi\\passandroid\\tests\\",
-                Emulators.PIXEL_XL);
+                Emulators.NEXUS_5);
         try {
             toggle.executeFullProcess();
         } catch (IOException e) {
