@@ -28,7 +28,7 @@ public class ImageManipulationTools {
         return screen_width != 0 ? (float) screen_width/ (float) original_width : -1;
     }
 
-    public static boolean resizeScreenshotThumbnailator(
+    public static File resizeScreenshotThumbnailator(
             File src,
             int left,
             int top,
@@ -39,17 +39,23 @@ public class ImageManipulationTools {
             String path) {
         float ratio = getFileRatio(original_screen_width, new_screen_width);
         if (ratio < 0)
-            return false;
+            return null;
+
+        int dotIndex = src.getName().lastIndexOf(".");
+        String name = src.getName().substring(0,dotIndex);
+        File dst = new File(path + "\\" + name + "_cropped.png");
+
         try {
+            dst.createNewFile();
             Thumbnails.of(src)
                     .sourceRegion(left, top, right - left, bottom - top)
                     .scale(ratio)
-                    .toFile(path + "\\" + src.getName() + "_croppedThumb.png");
+                    .toFile(dst);
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
-        return true;
+        return dst;
     }
 
     public static BufferedImage resizeScreenshot(BufferedImage src, int original_screen_width, int new_screen_width) {

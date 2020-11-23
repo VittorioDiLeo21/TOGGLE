@@ -230,12 +230,13 @@ public abstract class ToggleInteraction {
         return cropped_screenshot_file;
     }
 
-    public boolean manageScreenshotThumbnailator(String starting_folder,int originalWidth,int actualWidth) throws IOException {
-        return ImageManipulationTools
+    public File manageScreenshotThumbnailator(String starting_folder,int originalWidth,int actualWidth) throws IOException {
+        cropped_screenshot_file = ImageManipulationTools
                 .resizeScreenshotThumbnailator(
                         screen_capture,
                         left,top,right,bottom,
                         originalWidth,actualWidth,
                         starting_folder);
+        return cropped_screenshot_file;
     }
 }

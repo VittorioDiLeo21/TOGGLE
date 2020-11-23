@@ -88,7 +88,7 @@ public class ToggleTranslator {
         System.out.println("*           FILTER LOGCAT           *");
         System.out.println("*************************************");
 
-        Files.lines(Paths.get(starting_folder,filename),StandardCharsets.ISO_8859_1).forEach(System.out::println);
+        //Files.lines(Paths.get(starting_folder,filename),StandardCharsets.ISO_8859_1).forEach(System.out::println);
 
         return Files.lines(Paths.get(starting_folder,filename), StandardCharsets.ISO_8859_1)
                 .filter(line -> line.contains(filter))
@@ -398,10 +398,7 @@ public class ToggleTranslator {
         for (ToggleInteraction i:interactions) {
             //aggiungere campo booleano needs_cut_screenshot per gestire tutti questi casi
             if (i.needScreenshot()) {
-                if(i.manageScreenshotThumbnailator(starting_folder,screenResolution,actualWidth))
-                    System.out.println("Cropped image saved");
-                else
-                    System.out.println("Cropped image not saved");
+                File cropped_screenshot_file = i.manageScreenshotThumbnailator(starting_folder,screenResolution,actualWidth);
             }
         }
     }

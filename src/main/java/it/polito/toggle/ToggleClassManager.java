@@ -530,7 +530,7 @@ public class ToggleClassManager {
             //never comment
             if(deviceWidth > 0 && actualWidth > 0) {
                 translator.saveCroppedScreenshots(interactions, deviceWidth, actualWidth);
-                translator.saveCroppedScreenshotsThumbnailator(interactions,deviceWidth,actualWidth);
+                //translator.saveCroppedScreenshotsThumbnailator(interactions,deviceWidth,actualWidth);
             }else
                 translator.saveCroppedScreenshots(interactions);
             translator.createEyeStudioScript(interactions);

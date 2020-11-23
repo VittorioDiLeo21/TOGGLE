@@ -7,10 +7,12 @@ import it.polito.toggle.exceptions.ToggleException;
 import it.polito.toggle.utils.Emulators;
 import it.polito.toggle.utils.EspressoTestFinder;
 import it.polito.toggle.utils.ToggleToolFinder;
+import it.windowUtils.ResizeException;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.xml.sax.SAXException;
 
+import javax.naming.NameNotFoundException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.awt.*;
@@ -94,28 +96,28 @@ public class Toggle {
         //1
 
         Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath); //todo : fa l'enhance anche di altre classi di test nella directory
-        injectToggleTool(testDirectoryPath);
+        //injectToggleTool(testDirectoryPath);
         //2 build and install the apk
 
-        try {
+        /*try {
             //buildProject(appProjectPath);
             installApp();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }
+        }*/
         //3 get the test Instrumentation
 
-        String instrumentation = getInstrumentation();
+        /*String instrumentation = getInstrumentation();
         if(instrumentation.isEmpty())
-            return false;
+            return false;*/
         //4
         //getDeviceDensity<-- da toggleGUI.EspressoGUI
         //4.5
         //eventually resize the emulator
         //5
 
-        executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
+        //executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
         //6
         for(String testClassName : tests.keySet()){
             ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolution(),windowUtils.getEmulatorScreenPixelsWidth(this.device));
@@ -131,6 +133,15 @@ public class Toggle {
             } catch (ToggleException e) {
                 e.printStackTrace();
             }
+        }
+        //8
+        try {
+            //todo
+            windowUtils.resizeWindow(339,Emulators.NEXUS_5);
+        } catch (NameNotFoundException e) {
+            e.printStackTrace();
+        } catch (ResizeException e) {
+            e.printStackTrace();
         }
         return true;
     }

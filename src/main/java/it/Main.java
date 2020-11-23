@@ -45,7 +45,7 @@ public class Main {
                 rect = desktopWindow.getLocAndSize();
                 String device = desktopWindow.getTitle().split(" - ")[1];
                 System.out.println(device + " : " + rect.width + " x " + rect.height);
-                it.windowUtils.WindowUtils.resizeWindow(desktopWindow.getHWND(),rect.x,rect.y,600,1054,true);
+                //it.windowUtils.WindowUtils.resizeWindow(desktopWindow.getHWND(),rect.x,rect.y,600,1054,true);
             }
         }
     }

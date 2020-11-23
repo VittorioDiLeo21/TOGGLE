@@ -35,7 +35,7 @@ public class WindowUtils {
         double ratio;
         switch (DEVICE){
             case NEXUS_5:
-                ratio = 0.6707317073170732;
+                ratio = 0.6605691056910569;
                 break;
             case NEXUS_5X:
                 ratio = 0.6714876033057852;
@@ -113,7 +113,7 @@ public class WindowUtils {
         return -1;
     }
 
-    public synchronized static void resizeWindow(HWND hWnd, int x, int y, int width, int height, boolean show)
+    public synchronized void resizeWindow(HWND hWnd, int x, int y, int width, int height, boolean show)
             throws NameNotFoundException, ResizeException {
         final User32 user32 = User32.INSTANCE;
         if (hWnd == null) {
@@ -132,7 +132,19 @@ public class WindowUtils {
         }
     }
 
-    public synchronized static void minimizeWindow(String lpWindowName, MinimizeOption mimimizeOption)
+    public synchronized void resizeWindow(int width, Emulators device)
+            throws NameNotFoundException, ResizeException {
+        final User32 user32 = User32.INSTANCE;
+        Rectangle rect = null;
+        for (DesktopWindow desktopWindow : com.sun.jna.platform.WindowUtils.getAllWindows(true)) {
+            if (desktopWindow.getTitle().contains("Android Emulator")) {
+                rect = desktopWindow.getLocAndSize();
+                resizeWindow(desktopWindow.getHWND(),rect.x,rect.y,width,603,true);
+            }
+        }
+    }
+
+    public synchronized void minimizeWindow(String lpWindowName, MinimizeOption mimimizeOption)
             throws NameNotFoundException {
         final User32 user32 = User32.INSTANCE;
         HWND hWnd = user32.FindWindow(null, lpWindowName);
