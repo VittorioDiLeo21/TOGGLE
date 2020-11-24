@@ -4,6 +4,9 @@ import it.polito.toggle.utils.Emulators;
 
 import java.io.IOException;
 
+/**
+ * TODO : al momento funzionano i test GUI se lo zoom del pc è a 100% e non a 125%, potrebbe essere necessario ridimensionare la finestra
+ */
 public class Main {
     public static void main(String[] args){
         Toggle toggle = new Toggle(

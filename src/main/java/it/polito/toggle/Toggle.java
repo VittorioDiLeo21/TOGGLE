@@ -135,14 +135,14 @@ public class Toggle {
             }
         }
         //8
-        try {
+        /*try {
             //todo
             windowUtils.resizeWindow(339,Emulators.NEXUS_5);
         } catch (NameNotFoundException e) {
             e.printStackTrace();
         } catch (ResizeException e) {
             e.printStackTrace();
-        }
+        }*/
         return true;
     }
 

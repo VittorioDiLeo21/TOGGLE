@@ -4,7 +4,9 @@ import javax.naming.NameNotFoundException;
 
 import com.sun.jna.Native;
 import com.sun.jna.platform.DesktopWindow;
+import com.sun.jna.platform.win32.GDI32;
 import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinUser;
 import it.polito.toggle.utils.Emulators;
@@ -13,15 +15,47 @@ import java.awt.*;
 
 public class WindowUtils {
     private Toolkit t = null;
-    private double pxPerInch = 0;
-    private double pxPerCm = 0;
+    private double dotsPerInch = 0;
+    private double dotsPerCm = 0;
+    private int widthPxs;
+    private int heightPxs;
+    private double diagonalPxs;
+    private double pxPerInch;
+    private double pxPerCm;
+    private double dotPerPx;
+    private double pxPerDot;
+    private double zoom;
+
+    private double diagonalInInches = 15.513451; // the only thing needed from the user
 
     private static final int SWP_SHOWWINDOW = 0x0040;
 
     public WindowUtils(){
         this.t = Toolkit.getDefaultToolkit();
-        this.pxPerInch = t.getScreenResolution();
+        this.zoom = getScaleFactor();
+        this.widthPxs = (int) (t.getScreenSize().getWidth()*this.zoom);
+        this.heightPxs = (int) (t.getScreenSize().getHeight()*this.zoom);
+        this.diagonalPxs = Math.sqrt(this.widthPxs*this.widthPxs + this.heightPxs*this.heightPxs);
+        this.dotsPerInch = t.getScreenResolution();
+        this.dotsPerCm = dotsPerInch/2.54;
+        this.pxPerInch = diagonalPxs/diagonalInInches;
         this.pxPerCm = pxPerInch/2.54;
+        this.dotPerPx = dotsPerInch/pxPerInch;
+        this.pxPerDot = pxPerInch/dotsPerInch;
+    }
+
+    public double getScaleFactor() {
+        WinDef.HDC hdc = GDI32.INSTANCE.CreateCompatibleDC(null);
+        if (hdc != null) {
+            float actual = GDI32.INSTANCE.GetDeviceCaps(hdc, 10 /* VERTRES */);
+            float logical = GDI32.INSTANCE.GetDeviceCaps(hdc, 117 /* DESKTOPVERTRES */);
+            GDI32.INSTANCE.DeleteDC(hdc);
+            // JDK11 seems to always return 1, use fallback below
+            if (logical != 0 && logical/actual > 1) {
+                return logical/actual;
+            }
+        }
+        return /*(int)*/(Toolkit.getDefaultToolkit().getScreenResolution() / 96.0);
     }
 
     public int getEmulatorScreenPixelsWidth(Emulators DEVICE){
@@ -35,7 +69,11 @@ public class WindowUtils {
         double ratio;
         switch (DEVICE){
             case NEXUS_5:
-                ratio = 0.6605691056910569;
+                //ratio = 0.6626315940449212;
+
+                ratio = 0.7964376590330788;
+                //ratio = 0.8253832136349019;
+                //ratio = 0.9796334012219959;
                 break;
             case NEXUS_5X:
                 ratio = 0.6714876033057852;
@@ -99,7 +137,7 @@ public class WindowUtils {
     public int getWindowWidth(String windowName) throws NameNotFoundException, ResizeException {
         Rectangle rect = null;
         for (DesktopWindow desktopWindow : com.sun.jna.platform.WindowUtils.getAllWindows(true)) {
-            if (desktopWindow.getTitle().contains("Android Emulator")) {
+            if (desktopWindow.getTitle().contains(windowName)) {
                 rect = desktopWindow.getLocAndSize();
                 String device = desktopWindow.getTitle().split(" - ")[1];
                 System.out.println(device + " : " + rect.width + " x " + rect.height + " " + rect.width + "-" + rect.height);
@@ -110,6 +148,20 @@ public class WindowUtils {
                 return rect.width;
             }
         }
+        /*Rectangle rect = null;
+        for (DesktopWindow desktopWindow : com.sun.jna.platform.WindowUtils.getAllWindows(true)) {
+            if (desktopWindow.getTitle().contains(windowName)) {
+                rect = desktopWindow.getLocAndSize();
+                String device = desktopWindow.getTitle().split(" - ")[1];
+                System.out.println(device + " : " + rect.width + " x " + rect.height + " " + rect.width + "-" + rect.height);
+                /*if(rect.width<600){
+                    resizeWindow(desktopWindow.getHWND(),rect.x,rect.y,600,1054,true);
+                    return 600;
+                }*/
+
+                /*return (int) (rect.width/dotPerPx);
+            }
+        }*/
         return -1;
     }
 

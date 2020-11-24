@@ -64,6 +64,8 @@ public class ImageManipulationTools {
 
         float ratio = new_screen_width / (float) original_screen_width;
 
+        //ratio = (float) (ratio*1.2);
+
         int new_width = (int) (current_img_width*ratio);
         int new_height = (int) (current_img_height*ratio);
 
