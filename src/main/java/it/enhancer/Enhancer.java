@@ -229,9 +229,13 @@ public class Enhancer {
     private void changeConstructorsName(){
         ClassOrInterfaceDeclaration classOrInterfaceDeclaration = Navigator.findNodeOfGivenClass(compilationUnit,ClassOrInterfaceDeclaration.class);
         List<ConstructorDeclaration> constructors = classOrInterfaceDeclaration.getConstructors();
+        boolean shouldSet = true;
         for(ConstructorDeclaration constructor : constructors){
             constructor.setName(constructor.getName() + "Enhanced");
-            this.currentClass = constructor.getName().asString();
+            if(shouldSet) {
+                this.currentClass = constructor.getName().asString();
+                shouldSet = false;
+            }
            /* constructor.getBody().asBlockStmt().addStatement(
                     JavaParser.parseStatement("TOGGLETools.setLogFileName(\""+constructor.getName().+"\");")
             );*/
@@ -706,7 +710,6 @@ public class Enhancer {
     }
 
     private int parseStatement(BlockStmt block, String methodName, Statement stmt, int i){
-
         //System.out.println("parsing statement + " + block.toString() + " from row " + i);
         System.out.println(stmt);
         int index = i;
@@ -980,29 +983,42 @@ public class Enhancer {
             // onData(customMatcher(...)).inAdapterView(withId(R.id.'someId')
             String listId = getIdInAdapterView(inAdapterView);
 
-            TryStmt populateDataFromList = (TryStmt) JavaParser.parseStatement("try {\r\n"
+            TryStmt populateDataFromList = (TryStmt) JavaParser.parseStatement(
+                                "try {\r\n"
                     + "            ListView l = activityTOGGLETools.findViewById(R.id." + listId + ");\r\n"
                     + "            int position = l.getFirstVisiblePosition() - firstVisiblePosition;\r\n"
                     + "            firstVisiblePosition = l.getFirstVisiblePosition();\r\n"
-                    + "            View c = l.getChildAt(0);\r\n" + "            View v = l.getSelectedView();\r\n"
-                    + "            offset = v.getTop();\r\n" + "            height = c.getHeight();\r\n"
+                    + "            View c = l.getChildAt(0);\r\n"
+                    + "            View v = l.getSelectedView();\r\n"
+                    + "            offset = v.getTop();\r\n"
+                    + "            height = c.getHeight();\r\n"
                     + "            scrolly" + listId + "= -c.getTop() + position * height;\r\n"
-                    + "        } catch (Exception e) {\r\n" + "            try {\r\n"
+                    + "        } catch (Exception e) {\r\n"
+                    + "            try {\r\n"
                     + "                GridView l = activityTOGGLETools.findViewById(R.id." + listId + ");\r\n"
                     + "                int position = l.getFirstVisiblePosition() - firstVisiblePosition;\r\n"
                     + "                firstVisiblePosition = l.getFirstVisiblePosition();\r\n"
                     + "                View c = l.getChildAt(0);\r\n"
-                    + "                View v = l.getSelectedView();\r\n" + "                offset = v.getTop();\r\n"
-                    + "                height = c.getHeight();\r\n" + "                scrolly" + listId
-                    + " = -c.getTop() + position * height;\r\n" + "            } catch (Exception e1) {\r\n"
-                    + "                // try {\r\n" + "                // Spinner s = ...;\r\n"
-                    + "                // ...\r\n" + "                // } catch (Exception ei){\r\n"
-                    + "                // try {\r\n" + "                // ...\r\n" + "                // }\r\n"
-                    + "                // }\r\n" + "            }\r\n" + "        }");
+                    + "                View v = l.getSelectedView();\r\n"
+                    + "                offset = v.getTop();\r\n"
+                    + "                height = c.getHeight();\r\n"
+                    + "                scrolly" + listId + " = -c.getTop() + position * height;\r\n"
+                    + "            } catch (Exception e1) {\r\n"
+                    + "                // try {\r\n"
+                    + "                // Spinner s = ...;\r\n"
+                    + "                // ...\r\n"
+                    + "                // } catch (Exception ei){\r\n"
+                    + "                // try {\r\n"
+                    + "                // ...\r\n"
+                    + "                // }\r\n"
+                    + "                // }\r\n"
+                    + "            }\r\n"
+                    + "        }");
 
             addImportsOnData();
 
-            String scrollToString = inAdapterView.toString() + ".perform(scrollTo());";
+            String scrollToString =
+                    inAdapterView.toString() + ".perform(scrollTo());";
             Statement scrollToStatement = JavaParser.parseStatement(scrollToString);
 
             // remove test
