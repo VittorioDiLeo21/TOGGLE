@@ -24,6 +24,7 @@ public class EspressoTestFinder {
 			//if(file.getName().endsWith(".java")) {
 				boolean containsEspressoImports = false;
 				boolean containsOnView = false;
+				boolean containsOnData = false;
 				boolean isEnhanced = false;
 				try {
 					Scanner scanner = new Scanner(file);
@@ -40,6 +41,11 @@ public class EspressoTestFinder {
 							containsOnView = true;
 						}
 
+						if(line.matches("(.*)onData(.*)") &&
+							!line.matches("(.*)import(.*)")){
+							containsOnData = true;
+						}
+
 						if (line.matches("(.*)TOGGLETools(.*)")
 								&& !line.matches("(.*)//(.*)")) {
 							isEnhanced = true;
@@ -51,7 +57,7 @@ public class EspressoTestFinder {
 					e.printStackTrace();
 				}
 
-				if (containsEspressoImports && !isEnhanced && containsOnView) {
+				if (containsEspressoImports && !isEnhanced && (containsOnView || containsOnData)) {
 					String name = file.getName();
 					int dotIndex = name.lastIndexOf('.');
 					res.add(name.substring(0,dotIndex));

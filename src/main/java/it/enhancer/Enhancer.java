@@ -81,6 +81,7 @@ public class Enhancer {
         long time_begin = System.currentTimeMillis();
         List<String> testNames = new ArrayList<>();
         try {
+            this.currentClass = fileName;
             populateEmptyStatistic();
             FileInputStream in = new FileInputStream( folderPath + fileName + ".java" );
             compilationUnit = JavaParser.parse(in);
@@ -340,10 +341,11 @@ public class Enhancer {
 
                 //scan each statement
                 int i = 0;
-                while(i < nodes.size())
+                while(i < nodes.size()) {
                     //gets the new index because the method has been enhanced
-                    i = parseStatement(block,methodName,nodes.get(i),i);
+                    i = parseStatement(block, methodName, nodes.get(i), i);
 
+                }
                 //add fullcheck at the bottom of the method
                 if(!firstTest)
                     addFullCheck(block,methodName,i);
@@ -364,6 +366,9 @@ public class Enhancer {
 
                 //save occurrences for onView and onData
                 Integer oldStatistic = statistic.get(name);
+                //todo è corretto?
+                if(oldStatistic == null)
+                    oldStatistic = 0;
                 statistic.put(name, oldStatistic + 1);
             }
 
@@ -740,6 +745,13 @@ public class Enhancer {
 
             try {
                 JSONObject j = new JSONObject(json);
+                //************************************
+                File log = new File(methodName+".txt");
+                log.createNewFile();
+                FileWriter myWriter = new FileWriter(log);
+                myWriter.write(j.toString(4));
+                myWriter.close();
+                //*****************************
                 // System.out.println(j.toString());
                 j = j.getJSONObject("expression");
 
@@ -772,6 +784,9 @@ public class Enhancer {
                 //e.printStackTrace();
                 Utils.logException(e, "parseStatement");
 
+            } catch (IOException e) {
+                //************************************
+                e.printStackTrace();
             }
             //handling of independent Expresso actions
         } else {

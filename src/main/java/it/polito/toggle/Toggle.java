@@ -96,7 +96,7 @@ public class Toggle {
         //1
 
         Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath); //todo : fa l'enhance anche di altre classi di test nella directory
-        //injectToggleTool(testDirectoryPath);
+        injectToggleTool(testDirectoryPath);
         //2 build and install the apk
 
         /*try {
@@ -111,6 +111,7 @@ public class Toggle {
         /*String instrumentation = getInstrumentation();
         if(instrumentation.isEmpty())
             return false;*/
+
         //4
         //getDeviceDensity<-- da toggleGUI.EspressoGUI
         //4.5
@@ -118,11 +119,14 @@ public class Toggle {
         //5
 
         //executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
+
         //6
-        for(String testClassName : tests.keySet()){
+
+        /*for(String testClassName : tests.keySet()){
             ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolution(),windowUtils.getEmulatorScreenPixelsWidth(this.device));
             //7
             try {
+                it.polito.toggle.Utils.createJavaProjectFolder(guiTestsPath);
                 tcm.createClass(testClassName+".txt");
             } catch (XPathExpressionException e) {
                 e.printStackTrace();
@@ -133,7 +137,7 @@ public class Toggle {
             } catch (ToggleException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
         //8
         /*try {
             //todo
