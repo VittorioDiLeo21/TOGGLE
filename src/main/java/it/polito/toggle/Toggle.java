@@ -95,22 +95,22 @@ public class Toggle {
     public boolean executeFullProcess() throws IOException {
         //1
 
-        Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath); //todo : fa l'enhance anche di altre classi di test nella directory
-        injectToggleTool(testDirectoryPath);
+        //Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath); //todo : fa l'enhance anche di altre classi di test nella directory
+        //injectToggleTool(testDirectoryPath);
         //2 build and install the apk
 
-        /*try {
+        try {
             //buildProject(appProjectPath);
             installApp();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }*/
+        }
         //3 get the test Instrumentation
 
-        /*String instrumentation = getInstrumentation();
+        String instrumentation = getInstrumentation();
         if(instrumentation.isEmpty())
-            return false;*/
+            return false;
 
         //4
         //getDeviceDensity<-- da toggleGUI.EspressoGUI
@@ -138,6 +138,7 @@ public class Toggle {
                 e.printStackTrace();
             }
         }*/
+
         //8
         /*try {
             //todo
@@ -157,7 +158,6 @@ public class Toggle {
 
     public Map<String,ClassData> enhanceEspressoTestFolder(String testFolder){
         File folder = new File(testFolder);
-        //todo test this
         List<String> files = EspressoTestFinder.getEspressoTests(folder);
         Map<String,ClassData> result = new HashMap<>();
         for(String test: files){
@@ -166,27 +166,38 @@ public class Toggle {
             ClassData cd = new ClassData(methods,className+".txt");
             result.put(className,cd);
         }
-
-        /*FileFilter filter = new WildcardFileFilter("*.java", IOCase.INSENSITIVE);
-        File[] tests = folder.listFiles(filter);
-        if(tests == null)
-            return result;
-
-        for(File test : tests){
-            String name = test.getName();
-            int dotIndex = name.lastIndexOf('.');
-            List<String> methods = enhancer.generateEnhancedClassFrom(name.substring(0,dotIndex),testFolder);
-            String className = name.substring(0,dotIndex)+"Enhanced";
-            ClassData cd = new ClassData(methods,className+".txt");
-            result.put(className,cd);
-        }*/
         return result;
     }
 
+    public void clearApp(String targetPackage) throws IOException {
+        ProcessBuilder builder;
+        Process p;
+        BufferedReader r;
+
+        builder = new ProcessBuilder(
+                "cmd.exe", "/c", "adb shell pm clear " + targetPackage);
+
+        builder.redirectErrorStream(true);
+        builder.directory(new File(adbPath));
+        p = builder.start();
+        r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+
+        String line;
+        while ((line = r.readLine()) != null) {
+            System.out.println(line);
+        }
+    }
+
     public void executeAllEnhancedEspresso(List<String> testClasses, String instrumentation) throws IOException {
-        //installApp();
+        // Grant read/write permissions on the emulator
         grantPermissions();
+        // Clear sd card from previous dumps
+        removeOldDumps();
+        // Clear log files from previous executions
         resetLogFiles();
+        // Clear the app before the test is launched
+        //clearApp(this.appProjectPath); todo il parametro è corretto? vedi EspressGUI.java linea 1717
         ProcessBuilder builder;
         Process p;
         BufferedReader r;
@@ -273,7 +284,12 @@ public class Toggle {
 
 
     private void installApp() throws IOException {
-        ProcessBuilder builder = new ProcessBuilder(
+        ArrayList<String> installationTasks = getGradlewTasks();
+        for(String task : installationTasks){
+            gradlewInstall(task);
+        }
+
+        /*ProcessBuilder builder = new ProcessBuilder(
                 "cmd.exe", "/c\"", "gradlew\" installDebugAndroidTest");
 
         builder.redirectErrorStream(true);
@@ -284,7 +300,7 @@ public class Toggle {
         while ((line = r.readLine()) != null) {
             //if(line.contains("install")&&!line.contains("uninstall")&&!line.contains("tasks"))
             System.out.println(line);
-        }
+        }*/
     }
 
     public void executeEnhancedEspresso( String testName, String instrumentation) throws IOException {
@@ -447,7 +463,7 @@ public class Toggle {
             System.out.println(line);
         }
     }
-    //todo
+
     public ArrayList<String> getGradlewTasks() throws IOException {
         ArrayList<String> apks=new ArrayList<>();
         ProcessBuilder builder = new ProcessBuilder(
@@ -466,21 +482,18 @@ public class Toggle {
 
         return apks;
     }
-    //todo
-    public static void gradlewInstall(String task) throws IOException {
 
-        String projectPath = "";//todo ??
+    public void gradlewInstall(String task) throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
                 "cmd.exe", "/c\"", "gradlew\" "+task);
 
         builder.redirectErrorStream(true);
-        builder.directory(new File(projectPath));
+        builder.directory(new File(this.appProjectPath));
         Process p = builder.start();
         BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
         String line;
-        while (true) {
-            line = r.readLine();
-            if (line == null) { break; }
+        while ((line = r.readLine()) != null ) {
             System.out.println(line);
         }
 
@@ -665,5 +678,20 @@ public class Toggle {
             }
         }
         return false;
+    }
+
+    public void removeOldDumps() throws IOException {
+        ProcessBuilder builder = new ProcessBuilder(
+                "cmd.exe", "/c\"", adbPath + "\\adb\" shell rm sdcard/*.bmp sdcard/*.xml");
+
+        builder.redirectErrorStream(true);
+        Process p = builder.start();
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        while (true) {
+            line = r.readLine();
+            if (line == null) { break; }
+            System.out.println(line);
+        }
     }
 }

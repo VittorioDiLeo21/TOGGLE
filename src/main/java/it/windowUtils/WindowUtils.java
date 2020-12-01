@@ -71,39 +71,48 @@ public class WindowUtils {
             case NEXUS_5:
                 //ratio = 0.6626315940449212;
 
-                ratio = 0.7964376590330788;
-                //ratio = 0.8253832136349019;
-                //ratio = 0.9796334012219959;
+                //ratio = 0.7964376590330788;
+                ratio = 0.7947154471544715;
                 break;
             case NEXUS_5X:
-                ratio = 0.6714876033057852;
+                //ratio = 0.6714876033057852;
+                ratio = 0.7954545454545454;
                 break;
             case NEXUS_6:
-                ratio = 0.6436567164179104;
+                //ratio = 0.6436567164179104;
+                ratio = 0.7611940298507462;
                 break;
             case NEXUS_6P:
-                ratio = 0.6646216768916156;
+                //ratio = 0.6646216768916156;
+                ratio = 0.787321063394683;
                 break;
             case NEXUS_4:
-                ratio = 0.6795131845841785;
+                //ratio = 0.6795131845841785;
+                ratio = 0.8032454361054767;
                 break;
             case NEXUS_S:
-                ratio = 0.5695970695970696;
+                //ratio = 0.5695970695970696;
+                ratio = 0.6758241758241759;
                 break;
             case NEXUS_ONE:
-                ratio = 0.5597014925373134;
+                //ratio = 0.5597014925373134;
+                ratio = 0.6623134328358209;
                 break;
             case GALAXY_NEXUS:
-                ratio = 0.5547576301615799;
+                //ratio = 0.5547576301615799;
+                ratio = 0.6570915619389587;
                 break;
             case PIXEL:
+                //ratio = 0.6659528907922913;
                 ratio = 0.6659528907922913;
                 break;
             case PIXEL_3:
-                ratio = 0.7714987714987716;
+                //ratio = 0.7714987714987716;
+                ratio = 0.9115479115479116;
                 break;
             case PIXEL_XL:
-                ratio = 0.6597510373443983;
+                //ratio = 0.6597510373443983;
+                ratio = 0.7821576763485477;
                 break;
             default :
                 ratio = -1;
