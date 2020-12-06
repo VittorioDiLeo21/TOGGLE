@@ -1,12 +1,29 @@
 package it.enhancer;
 
 public enum ViewActions {
-    check("check"), clearText("cleartext"), click("click"), closeSoftKeyboard("closekeyboard"), doubleClick("doubleclick"),
-    fullcheck("fullcheck"), longClick("longclick"), openActionBarOverflowOrOptionsMenu("openactionbaroverfloworoptionsmenu"),
-    openContextualActionModeOverflowMenu("opencontextualactionmodeoverflowmenu"), perform("perform"), pressBack("pressback"),
-    pressBackUnconditionally("pressbackunconditionally"), pressImeActionButton("pressIme"), pressKey("presskey"),
-    pressMenuKey("pressmenukey"), replaceText("replacetext"), scrollTo("scrollto"),swipeDown("swipedown"),
-    swipeLeft("swipeleft"), swipeRight("swiperight"), swipeUp("swipeup"), typeText("typetext"),
+    check("check"),
+    clearText("cleartext"),
+    click("click"),
+    closeSoftKeyboard("closekeyboard"),
+    doubleClick("doubleclick"),
+    fullcheck("fullcheck"),
+    longClick("longclick"),
+    //openLink("openlink"),
+    openActionBarOverflowOrOptionsMenu("openactionbaroverfloworoptionsmenu"),
+    openContextualActionModeOverflowMenu("opencontextualactionmodeoverflowmenu"),
+    perform("perform"),
+    pressBack("pressback"),
+    pressBackUnconditionally("pressbackunconditionally"),
+    pressImeActionButton("pressIme"),
+    pressKey("presskey"),
+    pressMenuKey("pressmenukey"),
+    replaceText("replacetext"),
+    scrollTo("scrollto"),
+    swipeDown("swipedown"),
+    swipeLeft("swipeleft"),
+    swipeRight("swiperight"),
+    swipeUp("swipeup"),
+    typeText("typetext"),
     typeTextIntoFocusedView("typeintofocused");
 
     private String value;
@@ -39,12 +56,5 @@ public enum ViewActions {
         }
 
         return "";
-
-        /*
-         * for (Object o : va) if (((ViewActions) o).name().equals(matcher)) return
-         * ((ViewActions) o).getValue();
-         *
-         * return "";
-         */
     }
 }

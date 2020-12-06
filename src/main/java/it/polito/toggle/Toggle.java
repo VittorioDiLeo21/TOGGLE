@@ -95,22 +95,23 @@ public class Toggle {
     public boolean executeFullProcess() throws IOException {
         //1
 
-        //Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath); //todo : fa l'enhance anche di altre classi di test nella directory
-        //injectToggleTool(testDirectoryPath);
+        Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath); //todo : fa l'enhance anche di altre classi di test nella directory
+        injectToggleTool(testDirectoryPath);
+
         //2 build and install the apk
 
-        try {
+        /*try {
             //buildProject(appProjectPath);
             installApp();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }
+        }*/
         //3 get the test Instrumentation
 
-        String instrumentation = getInstrumentation();
+        /*String instrumentation = getInstrumentation();
         if(instrumentation.isEmpty())
-            return false;
+            return false;*/
 
         //4
         //getDeviceDensity<-- da toggleGUI.EspressoGUI

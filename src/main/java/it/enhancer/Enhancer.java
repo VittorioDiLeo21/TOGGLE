@@ -50,6 +50,11 @@ public class Enhancer {
     private Statement captureTaskValue = JavaParser.parseStatement("capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTask(now, activityTOGGLETools));");
     private Statement captureTaskValueProgressive = JavaParser.parseStatement("capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, activityTOGGLETools));");
 
+    private Statement firstPreScrollY = JavaParser.parseStatement("int preScrollYTOGGLE = 0;");
+    private Statement preScrollY = JavaParser.parseStatement("preScrollYTOGGLE = 0;");
+    private Statement firstPostScrollY = JavaParser.parseStatement("int postScrollYTOGGLE = 0;");
+    private Statement postScrollY = JavaParser.parseStatement("postScrollYTOGGLE = 0;");
+
     private TryStmt screenCapture = (TryStmt) JavaParser.parseStatement("try { runOnUiThread(capture_task); } catch (Throwable t) { t.printStackTrace(); }");
     //private Statement dumpScreen = JavaParser.parseStatement("TOGGLETools.DumpScreen(now, device);");
     private Statement dumpScreenProgressive = JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, device);");
@@ -60,6 +65,22 @@ public class Enhancer {
             "        } catch (Exception e) {\n" +
             "\n" +
             "        }");
+
+    private TryStmt findStartingCoord = (TryStmt) JavaParser.parseStatement(
+            "try {\r\n"
+                    + "            preScrollYTOGGLE = ScrollHandler.getActualOffsetFromTop(adapterView);\r\n"
+                    + "        } catch (Exception e) {\r\n"
+                    + "            e.printStackTrace();\r\n"
+                    + "        }"
+    );
+
+    private TryStmt findEndingCoord = (TryStmt) JavaParser.parseStatement(
+            "try {\r\n"
+                    + "            postScrollYTOGGLE = ScrollHandler.getActualOffsetFromTop(adapterView);\r\n"
+                    + "        } catch (Exception e) {\r\n"
+                    + "            e.printStackTrace();\r\n"
+                    + "        }"
+    );
 
     private String currentClass = "";
 
@@ -841,7 +862,8 @@ public class Enhancer {
 
         // if the test is with onData the handling is different
         if (operations.get(0).getName().equals("onData")) {
-            return enhanceMethodOnData(block, methodName, stmt, i);
+            //return enhanceMethodOnData(block, methodName, stmt, i);
+            return enhanceMethodOnDataInAdapterView(block, methodName, stmt, i);
         } else {
 
             if (operations.size() > 0) {
@@ -985,11 +1007,173 @@ public class Enhancer {
         return ++i;
     }
 
+    private int enhanceMethodOnDataInAdapterView(BlockStmt block, String methodName, Statement stmt, int i) {
+        try{
+            // get onData(customMatcher(...)).inAdapterView(withId(R.id.'someId')
+            Node inAdapterView = getOnDataInAdapterView(stmt);
+            //Node atPosition = getOnDatAtPosition(stmt);
+            // get 'someId' in
+            // onData(customMatcher(...)).inAdapterView(withId(R.id.'someId')
+            String listId = getIdInAdapterView(inAdapterView);
+            Statement firstAdapterView = JavaParser.parseStatement("AdapterView adapterViewTOGGLE = ScrollHandler.findAdapterView(activityTOGGLETools.findViewById(R.id." + listId + "));\r\n");
+            Statement adapterView = JavaParser.parseStatement("adapterViewTOGGLE = ScrollHandler.findAdapterView(activityTOGGLETools.findViewById(R.id." + listId + "));\r\n");
+
+            addImportsOnData();
+
+            // remove test
+            Statement st = stmt;
+            block.remove(stmt);
+
+            if (firstTest) {
+                firstTest = false;
+                block.addStatement(i, captureTask);
+                block.addStatement(++i, instrumentation);
+                block.addStatement(++i, device);
+                //b.addStatement(++i, firstTestDate);
+                block.addStatement(++i, firstLogNum);
+                block.addStatement(++i, firstTestActivity);
+                block.addStatement(++i, firstAdapterView);
+                block.addStatement(++i, firstPreScrollY);
+                block.addStatement(++i, firstPostScrollY);
+            } else {
+                //b.addStatement(i, date);
+                block.addStatement(i, logNum);
+                block.addStatement(++i, activity);
+                block.addStatement(++i, adapterView);
+                block.addStatement(++i, preScrollY);
+                block.addStatement(++i, postScrollY);
+            }
+
+
+            // first screen capture before scrolling
+            //	b.addStatement(++i, captureTaskValue);
+            block.addStatement(++i, JavaParser.parseStatement(
+                    "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
+
+            block.addStatement(++i, screenCapture);
+            //b.addStatement(++i, dumpScreen);
+            block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
+            //todo
+            LogCat log = new LogCat(methodName, "id", "\"" + listId + "\"", "onData", "");
+            i = addLogInteractionToCu(log, i, block);
+
+            // add scrollTo test
+            block.addStatement(++i, this.findStartingCoord);
+
+            //todo bisognerebbe prima capire se questa operazione fa un click o no
+            // e se fa un click bisogna prima fare un check(isDisplayed); poi si prende l'offset finale e poi si esegue il test originale
+            // quindi quanto sotto va cambiato
+            block.addStatement(stmt);
+            block.addStatement(tryStmt);
+            block.addStatement(++i, findEndingCoord);
+            block.addStatement(++i,logNum);
+            log = new LogCat(methodName, "id", "\"" + listId + "\"", "scrollto",
+                    "scrolly" + listId + "+\";\"+preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
+            i = addLogInteractionToCu(log,i,block);
+            block.addStatement(++i, JavaParser.parseStatement(
+                    "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
+
+            block.addStatement(++i, screenCapture);
+
+            int numberOfOperations = operations.size();
+            String interaction = operations.get(numberOfOperations - 1).getName();
+            String interactionType = ViewActions.getSearchType(interaction);
+            String interactionParams = operations.get(numberOfOperations - 1).getParameter();
+
+            // if it's empty could be a check
+            if (interactionType.isEmpty()) {
+                // if it's not empty it is a check
+                if (!ViewAssertions.getSearchType(interaction).isEmpty()) {
+                    interactionType = "check";
+                    interactionParams = "";
+                }
+            } else if( interactionType.equals("click") ||
+                        interactionType.equals("doubleClick")){
+
+            }
+
+            //todo vedere cosa succede se invece è un perform
+
+            // if the interaction is scrollTo, it is ignored because the generated code
+            // already does it
+            if (!interactionType.equals("scrollto")) {
+                log = new LogCat(methodName, "id", "\"" + listId + "\"", interactionType, interactionParams);
+                i = addLogInteractionToCu(log, i, block);
+
+                //b.addStatement(++i, dumpScreen);
+                block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
+                block.addStatement(++i, st);
+                block.addStatement(++i, tryStmt);
+            }
+
+            //log = new LogCat(methodName, "id", "\"" + listId + "\"", interactionType, interactionParams);
+            i = addLogInteractionToCu(log, i, block);
+
+            block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
+            block.addStatement(++i, st);
+            block.addStatement(++i, tryStmt);
+
+            //TODO QUESTE SOTTO MI SA CHE NON SERVONO
+            //*********************************************************
+            block.addStatement(++i, logNum);
+            // log scrollTo interaction with parameters
+            log = new LogCat(methodName, "id", "\"" + listId + "\"", "scrollto",
+                    "scrolly" + listId + "+\";\"+height+\";\"+offset");
+            i = addLogInteractionToCu(log, i, block);
+
+            // second screen capture after scrolling
+
+            block.addStatement(++i, JavaParser.parseStatement(
+                    "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
+
+            block.addStatement(++i, screenCapture);
+
+
+            //***********************************************************
+            // take the interaction to perform on the list
+            /*int numberOfOperations = operations.size();
+            String interaction = operations.get(numberOfOperations - 1).getName();
+            String interactionType = ViewActions.getSearchType(interaction);
+            String interactionParams = operations.get(numberOfOperations - 1).getParameter();
+
+            // if it's empty could be a check
+            if (interactionType.isEmpty()) {
+                // if it's not empty it is a check
+                if (!ViewAssertions.getSearchType(interaction).isEmpty()) {
+                    interactionType = "check";
+                    interactionParams = "";
+                }
+            }
+
+            //todo vedere cosa succede se invece è un perform
+
+            // if the interaction is scrollTo, it is ignored because the generated code
+            // already does it
+            if (!interactionType.equals("scrollto")) {
+                log = new LogCat(methodName, "id", "\"" + listId + "\"", interactionType, interactionParams);
+                i = addLogInteractionToCu(log, i, block);
+
+                //b.addStatement(++i, dumpScreen);
+                block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
+                block.addStatement(++i, st);
+                block.addStatement(++i, tryStmt);
+            }*/
+        } catch (Exception e) {
+            // TODO: handle exception
+            System.out.println("EXCEPTION IN ENHANCER!");
+            Utils.logException(e, "enhanceMethodOnData");
+        }
+        return ++i;
+    }
+
     private int enhanceMethodOnData(BlockStmt block, String methodName, Statement stmt, int i) {
         Statement firstVisiblePosition = JavaParser.parseStatement("int firstVisiblePosition = 0;");
         Statement height = JavaParser.parseStatement("int height = 0;");
         Statement offset = JavaParser.parseStatement("int offset = 0;");
-
+        Statement firstPreScrollY = JavaParser.parseStatement("int preScrollYTOGGLE = 0");
+        Statement preScrollY = JavaParser.parseStatement("preScrollYTOGGLE = 0");
+        Statement firstPostScrollY = JavaParser.parseStatement("int postScrollYTOGGLE = 0");
+        Statement postScrollY = JavaParser.parseStatement("postScrollYTOGGLE = 0");
         try {
             // get onData(customMatcher(...)).inAdapterView(withId(R.id.'someId')
             Node inAdapterView = getOnDataInAdapterView(stmt);
@@ -997,6 +1181,24 @@ public class Enhancer {
             // get 'someId' in
             // onData(customMatcher(...)).inAdapterView(withId(R.id.'someId')
             String listId = getIdInAdapterView(inAdapterView);
+            Statement firstAdapterView = JavaParser.parseStatement("AdapterView adapterViewTOGGLE = ScrollHandler.findAdapterView(activityTOGGLETools.findViewById(R.id." + listId + "));\r\n");
+            Statement adapterView = JavaParser.parseStatement("adapterViewTOGGLE = ScrollHandler.findAdapterView(activityTOGGLETools.findViewById(R.id." + listId + "));\r\n");
+
+            TryStmt findStartingCoord = (TryStmt) JavaParser.parseStatement(
+                    "try {\r\n"
+                            + "            preScrollYTOGGLE = ScrollHandler.getActualOffsetFromTop(adapterView);\r\n"
+                            + "        } catch (Exception e) {\r\n"
+                            + "            e.printStackTrace();\r\n"
+                            + "        }"
+            );
+
+            TryStmt findEndingCoord = (TryStmt) JavaParser.parseStatement(
+                    "try {\r\n"
+                            + "            postScrollYTOGGLE = ScrollHandler.getActualOffsetFromTop(adapterView);\r\n"
+                            + "        } catch (Exception e) {\r\n"
+                            + "            e.printStackTrace();\r\n"
+                            + "        }"
+            );
 
             TryStmt populateDataFromList = (TryStmt) JavaParser.parseStatement(
                                 "try {\r\n"
@@ -1048,10 +1250,16 @@ public class Enhancer {
                 //b.addStatement(++i, firstTestDate);
                 block.addStatement(++i, firstLogNum);
                 block.addStatement(++i, firstTestActivity);
+                //block.addStatement(++i, firstAdapterView);
+                //block.addStatement(++i, firstPreScrollY);
+                //block.addStatement(++i, firstPostScrollY);
             } else {
                 //b.addStatement(i, date);
                 block.addStatement(i, logNum);
                 block.addStatement(++i, activity);
+                //block.addStatement(++i, adapterView);
+                //block.addStatement(++i, preScrollY);
+                //block.addStatement(++i, postScrollY);
             }
 
             // first screen capture before scrolling
@@ -1146,6 +1354,33 @@ public class Enhancer {
         Node resourceIdNode = withIdNode.getChildNodes().get(1);
         Node idNode = resourceIdNode.getChildNodes().get(1);
         return idNode.toString();
+    }
+
+    private Node getOnDatAtPosition(Statement stmt) {
+        List<Node> children = stmt.getChildNodes();
+        Node precPrec = null;
+        Node prec = null;
+        Node c = null;
+
+        // take the node with the correct 'structure' from
+        // onData(customMatcher(...)).inAdapterView(withId(R.id.'someId').perform(...)
+        while (true) {
+            children = children.get(0).getChildNodes();
+
+            // onData(customMatcher(...)).inAdapterView(withId(R.id.'someId')
+            precPrec = prec;
+
+            // onData(customMatcher(...))
+            prec = c;
+
+            // onData
+            c = children.get(0);
+
+            if (!children.get(0).getClass().toString().endsWith("MethodCallExpr"))
+                break;
+        }
+
+        return precPrec;
     }
 
     private Node getOnDataInAdapterView(Statement s) throws Exception {

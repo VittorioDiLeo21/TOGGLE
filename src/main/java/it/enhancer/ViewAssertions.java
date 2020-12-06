@@ -1,8 +1,20 @@
 package it.enhancer;
 
 public enum ViewAssertions {
-    isAbove("isabove"), isBelow("isbelow"), isBottomAlignedWith("isbottomalignedwith"), isLeftAlignedWith("isleftalignedwith"), isLeftOf("isleftof"),
-    isRightAlignedWith("isrightalignedwith"), isRightOf("isrightof"), isTopAlignedWith("istopalignedwith"), matches("matches");
+    isAbove("isabove"),
+    isBelow("isbelow"),
+    isBottomAlignedWith("isbottomalignedwith"),
+    isLeftAlignedWith("isleftalignedwith"),
+    isLeftOf("isleftof"),
+    isRightAlignedWith("isrightalignedwith"),
+    isRightOf("isrightof"),
+    isTopAlignedWith("istopalignedwith"),
+    //doesNotExist("doesnotexist"),
+    //selectedDescendantsMatch("selecteddescendantsmatch"),
+    //noEllipseizedText("noellipseizedtext"),
+    //noMultilineButtons("nomultilinebuttons"),
+    //noOverlaps("nooverlaps"),
+    matches("matches");
 
     private String value;
 

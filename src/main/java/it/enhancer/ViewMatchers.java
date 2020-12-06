@@ -1,7 +1,27 @@
 package it.enhancer;
 
 public enum ViewMatchers {
-    blank("-"), withContentDescription("content-desc"), withHint("text"), withId("id"), withText("text");
+    blank("-"),
+    //hasContentDescription("hascontentdescription"),
+    //hasDescendant("hasdescendant"),
+    //hasEllipsizedText("hasellipsizedtext"),
+    //hasLinks("haslinks"),
+    //hasMultilineTest("hasmultilinetest"),
+    //hasSibling("hassibling"),
+    //isDescendantOfA("isdescendantofa"),
+    //isDisplayed("isdisplayed"),*
+    //isCompletelyDisplayed("iscompletelydisplayed"),*
+    //isEnabled("isenabled"),
+    //isRoot("isroot"),
+    //withChild("withchild"),*
+    withContentDescription("content-desc"),
+    withHint("text"),
+    withId("id"),
+    //withParent("withparent"),
+    //withSpinnerText("withspinnertext")
+    //withTagKey("withtagkey"),
+    //withTagValue("withtagvalue"),
+    withText("text");
 
     private String value;
 
@@ -33,12 +53,5 @@ public enum ViewMatchers {
         }
 
         return "";
-
-        /*
-         * for (Object o : vm) if (((ViewMatchers) o).name().equals(matcher)) return
-         * ((ViewMatchers) o).getValue();
-         *
-         * return "";
-         */
     }
 }
