@@ -124,7 +124,8 @@ public class Toggle {
         //6
 
         /*for(String testClassName : tests.keySet()){
-            ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolution(),windowUtils.getEmulatorScreenPixelsWidth(this.device));
+            //ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolution(),windowUtils.getEmulatorScreenPixelsWidth(this.device));
+            ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolutionAndHeight(),windowUtils.getEmulatorScreenPixelsWidth(this.device));
             //7
             try {
                 it.polito.toggle.Utils.createJavaProjectFolder(guiTestsPath);
@@ -411,6 +412,25 @@ public class Toggle {
             }
         }
         return ret;
+    }
+
+    public String getEmulatorResolutionAndHeight() throws IOException {
+        ProcessBuilder builder = new ProcessBuilder(
+                "cmd.exe", "/c\"", adbPath + "\\adb\" shell wm size");
+
+        builder.redirectErrorStream(true);
+        Process p = builder.start();
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        int ret = -1;
+        String line;
+        while ((line = r.readLine()) != null) {
+            System.out.println(line);
+            String[] strings = line.split(": ");
+            if(strings.length>=2){
+                return strings[1];
+            }
+        }
+        return null;
     }
 
     public void resetLogFiles() throws IOException {

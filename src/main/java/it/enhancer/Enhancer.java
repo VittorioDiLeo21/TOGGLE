@@ -59,6 +59,7 @@ public class Enhancer {
     //private Statement dumpScreen = JavaParser.parseStatement("TOGGLETools.DumpScreen(now, device);");
     private Statement dumpScreenProgressive = JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, device);");
 
+    private Statement scrollHandlerSetup = JavaParser.parseStatement("ScrollHandler.getItemsHeight(adapterViewTOGGLE);");
     private TryStmt tryStmt = (TryStmt) JavaParser.parseStatement(
             "try {\n" +
             "            Thread.sleep(1000);\n" +
@@ -68,7 +69,7 @@ public class Enhancer {
 
     private TryStmt findStartingCoord = (TryStmt) JavaParser.parseStatement(
             "try {\r\n"
-                    + "            preScrollYTOGGLE = ScrollHandler.getActualOffsetFromTop(adapterView);\r\n"
+                    + "            preScrollYTOGGLE = ScrollHandler.getActualOffsetFromTop(adapterViewTOGGLE);\r\n"
                     + "        } catch (Exception e) {\r\n"
                     + "            e.printStackTrace();\r\n"
                     + "        }"
@@ -76,7 +77,7 @@ public class Enhancer {
 
     private TryStmt findEndingCoord = (TryStmt) JavaParser.parseStatement(
             "try {\r\n"
-                    + "            postScrollYTOGGLE = ScrollHandler.getActualOffsetFromTop(adapterView);\r\n"
+                    + "            postScrollYTOGGLE = ScrollHandler.getActualOffsetFromTop(adapterViewTOGGLE);\r\n"
                     + "        } catch (Exception e) {\r\n"
                     + "            e.printStackTrace();\r\n"
                     + "        }"
@@ -1029,21 +1030,19 @@ public class Enhancer {
                 block.addStatement(i, captureTask);
                 block.addStatement(++i, instrumentation);
                 block.addStatement(++i, device);
-                //b.addStatement(++i, firstTestDate);
                 block.addStatement(++i, firstLogNum);
                 block.addStatement(++i, firstTestActivity);
                 block.addStatement(++i, firstAdapterView);
                 block.addStatement(++i, firstPreScrollY);
                 block.addStatement(++i, firstPostScrollY);
             } else {
-                //b.addStatement(i, date);
                 block.addStatement(i, logNum);
                 block.addStatement(++i, activity);
                 block.addStatement(++i, adapterView);
                 block.addStatement(++i, preScrollY);
                 block.addStatement(++i, postScrollY);
             }
-
+            block.addStatement(++i, scrollHandlerSetup);
 
             // first screen capture before scrolling
             //	b.addStatement(++i, captureTaskValue);
@@ -1052,112 +1051,60 @@ public class Enhancer {
 
             block.addStatement(++i, screenCapture);
             //b.addStatement(++i, dumpScreen);
-            block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
-            //todo
+
             LogCat log = new LogCat(methodName, "id", "\"" + listId + "\"", "onData", "");
             i = addLogInteractionToCu(log, i, block);
-
-            // add scrollTo test
+            block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
             block.addStatement(++i, this.findStartingCoord);
 
             //todo bisognerebbe prima capire se questa operazione fa un click o no
             // e se fa un click bisogna prima fare un check(isDisplayed); poi si prende l'offset finale e poi si esegue il test originale
             // quindi quanto sotto va cambiato
-            block.addStatement(stmt);
-            block.addStatement(tryStmt);
-            block.addStatement(++i, findEndingCoord);
-            block.addStatement(++i,logNum);
-            log = new LogCat(methodName, "id", "\"" + listId + "\"", "scrollto",
-                    "scrolly" + listId + "+\";\"+preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
-            i = addLogInteractionToCu(log,i,block);
-            block.addStatement(++i, JavaParser.parseStatement(
-                    "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
-
-            block.addStatement(++i, screenCapture);
-
+            // if it's empty could be a check
             int numberOfOperations = operations.size();
             String interaction = operations.get(numberOfOperations - 1).getName();
             String interactionType = ViewActions.getSearchType(interaction);
             String interactionParams = operations.get(numberOfOperations - 1).getParameter();
-
-            // if it's empty could be a check
             if (interactionType.isEmpty()) {
                 // if it's not empty it is a check
                 if (!ViewAssertions.getSearchType(interaction).isEmpty()) {
                     interactionType = "check";
                     interactionParams = "";
                 }
-            } else if( interactionType.equals("click") ||
-                        interactionType.equals("doubleClick")){
+            } else {
+                //it is not a check so we should split the espresso interaction
+                int index = stmt.toString().lastIndexOf(".perform(");
+                String substmt = stmt.toString().substring(0,index);
+                substmt = substmt+".check(matches(isDisplayed()));";
+                Statement stmt2 = JavaParser.parseStatement(substmt);
+                block.addStatement(++i,stmt2);
+                block.addStatement(++i,tryStmt);
+                block.addStatement(++i, findEndingCoord);
+                block.addStatement(++i,logNum);
 
-            }
-
-            //todo vedere cosa succede se invece è un perform
-
-            // if the interaction is scrollTo, it is ignored because the generated code
-            // already does it
-            if (!interactionType.equals("scrollto")) {
-                log = new LogCat(methodName, "id", "\"" + listId + "\"", interactionType, interactionParams);
-                i = addLogInteractionToCu(log, i, block);
-
-                //b.addStatement(++i, dumpScreen);
+                block.addStatement(++i, JavaParser.parseStatement(
+                        "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
+                block.addStatement(++i, screenCapture);
+                log = new LogCat(methodName, "id", "\"" + listId + "\"", "scrollto",
+                        //"scrolly" + listId + "+\";\"+preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
+                        "preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
+                i = addLogInteractionToCu(log,i,block);
                 block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
-                block.addStatement(++i, st);
-                block.addStatement(++i, tryStmt);
             }
 
-            //log = new LogCat(methodName, "id", "\"" + listId + "\"", interactionType, interactionParams);
-            i = addLogInteractionToCu(log, i, block);
-
-            block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
-            block.addStatement(++i, st);
-            block.addStatement(++i, tryStmt);
-
-            //TODO QUESTE SOTTO MI SA CHE NON SERVONO
-            //*********************************************************
-            block.addStatement(++i, logNum);
-            // log scrollTo interaction with parameters
-            log = new LogCat(methodName, "id", "\"" + listId + "\"", "scrollto",
-                    "scrolly" + listId + "+\";\"+height+\";\"+offset");
-            i = addLogInteractionToCu(log, i, block);
-
-            // second screen capture after scrolling
-
+            block.addStatement(++i,stmt);
+            block.addStatement(++i,tryStmt);
+            block.addStatement(++i, findEndingCoord);
+            block.addStatement(++i,logNum);
             block.addStatement(++i, JavaParser.parseStatement(
                     "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
 
             block.addStatement(++i, screenCapture);
-
-
-            //***********************************************************
-            // take the interaction to perform on the list
-            /*int numberOfOperations = operations.size();
-            String interaction = operations.get(numberOfOperations - 1).getName();
-            String interactionType = ViewActions.getSearchType(interaction);
-            String interactionParams = operations.get(numberOfOperations - 1).getParameter();
-
-            // if it's empty could be a check
-            if (interactionType.isEmpty()) {
-                // if it's not empty it is a check
-                if (!ViewAssertions.getSearchType(interaction).isEmpty()) {
-                    interactionType = "check";
-                    interactionParams = "";
-                }
-            }
-
-            //todo vedere cosa succede se invece è un perform
-
-            // if the interaction is scrollTo, it is ignored because the generated code
-            // already does it
-            if (!interactionType.equals("scrollto")) {
-                log = new LogCat(methodName, "id", "\"" + listId + "\"", interactionType, interactionParams);
-                i = addLogInteractionToCu(log, i, block);
-
-                //b.addStatement(++i, dumpScreen);
-                block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
-                block.addStatement(++i, st);
-                block.addStatement(++i, tryStmt);
-            }*/
+            log = new LogCat(methodName, "id", "\"" + listId + "\"", "scrollto",
+                    //"scrolly" + listId + "+\";\"+preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
+                    "preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
+            i = addLogInteractionToCu(log,i,block);
+            block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
         } catch (Exception e) {
             // TODO: handle exception
             System.out.println("EXCEPTION IN ENHANCER!");

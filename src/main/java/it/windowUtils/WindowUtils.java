@@ -123,6 +123,51 @@ public class WindowUtils {
         return (int) screenPx;
     }
 
+    public int getEmulatorScreenPixelHeight(Emulators DEVICE){
+        int totalWidth;
+        try {
+            totalWidth = getWindowHeight("Android Emulator");
+        } catch (NameNotFoundException | ResizeException e) {
+            e.printStackTrace();
+            return -1;
+        }
+        double ratio=-1;
+        //TODO
+        switch (DEVICE){
+            case NEXUS_5:
+                ratio = 0.8014492753623188;
+                break;
+            case NEXUS_5X:
+                break;
+            case NEXUS_6:
+                break;
+            case NEXUS_6P:
+                break;
+            case NEXUS_4:
+                break;
+            case NEXUS_S:
+                break;
+            case NEXUS_ONE:
+                break;
+            case GALAXY_NEXUS:
+                break;
+            case PIXEL:
+                break;
+            case PIXEL_3:
+                ratio = 0.8587962962962963;
+                break;
+            case PIXEL_XL:
+                ratio = 0.7754629629629629;
+                break;
+            default :
+                ratio = -1;
+        }
+        if(ratio == -1)
+            return -1;
+        double screenPx = ratio*totalWidth;
+        return (int) screenPx;
+    }
+
     public double getCmFromPixels(int pixels){
         return (double)pixels/pxPerCm;
     }
@@ -171,6 +216,19 @@ public class WindowUtils {
                 /*return (int) (rect.width/dotPerPx);
             }
         }*/
+        return -1;
+    }
+
+    public int getWindowHeight(String windowName) throws NameNotFoundException, ResizeException {
+        Rectangle rect = null;
+        for (DesktopWindow desktopWindow : com.sun.jna.platform.WindowUtils.getAllWindows(true)) {
+            if (desktopWindow.getTitle().contains(windowName)) {
+                rect = desktopWindow.getLocAndSize();
+                String device = desktopWindow.getTitle().split(" - ")[1];
+                System.out.println(device + " : " + rect.width + " x " + rect.height + " " + rect.width + "-" + rect.height);
+                return rect.height;
+            }
+        }
         return -1;
     }
 

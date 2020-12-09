@@ -128,8 +128,7 @@ public class ToggleTranslator {
         String args;
         if (separated2.length==6) {
             args = separated2[5];
-        }
-        else {
+        } else {
             args = "";
         }
 
@@ -167,6 +166,12 @@ public class ToggleTranslator {
             case "opencontextualactionmodeoverflowmenu": return new OpenOptionsMenu(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
             case "dialogescape": return new DialogEscape(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
 
+            //*********************************************************************************
+            //case "scrollDown": return new ScrollDown(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            //case "scrollDown": return new ScrollUp(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            //case "scrollDown": return new ScrollLeft(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            //case "scrollDown": return new ScrollRight(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            //*********************************************************************************
             default: throw new ToggleException("Interaction not found: " + interaction_type);
         }
     }
