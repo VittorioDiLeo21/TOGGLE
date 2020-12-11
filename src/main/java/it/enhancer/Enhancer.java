@@ -52,6 +52,14 @@ public class Enhancer {
 
     private Statement firstPreScrollY = JavaParser.parseStatement("int preScrollYTOGGLE = 0;");
     private Statement preScrollY = JavaParser.parseStatement("preScrollYTOGGLE = 0;");
+    private Statement firstSingleItemFirstH = JavaParser.parseBlock("int heightFirstTOGGLE = 0;");
+    private Statement singleItemFirstH = JavaParser.parseBlock("heightFirstTOGGLE = 0;");
+    private Statement firstSingleItemH = JavaParser.parseBlock("int heightTOGGLE = 0;");
+    private Statement singleItemH = JavaParser.parseBlock("heightTOGGLE = 0;");
+    private Statement firstSingleItemLastH = JavaParser.parseBlock("int heightLastTOGGLE = 0;");
+    private Statement singleItemLastH = JavaParser.parseBlock("heightLastTOGGLE = 0;");
+    private Statement firstScrollDirectionStr = JavaParser.parseStatement("String scrollDirTOGGLE = \"\";");
+    private Statement scrollDirectionStr = JavaParser.parseStatement("scrollDirTOGGLE = \"\";");
     private Statement firstPostScrollY = JavaParser.parseStatement("int postScrollYTOGGLE = 0;");
     private Statement postScrollY = JavaParser.parseStatement("postScrollYTOGGLE = 0;");
 
@@ -60,6 +68,17 @@ public class Enhancer {
     private Statement dumpScreenProgressive = JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, device);");
 
     private Statement scrollHandlerSetup = JavaParser.parseStatement("ScrollHandler.getItemsHeight(adapterViewTOGGLE);");
+    private Statement getSingleItemHeightFirst = JavaParser.parseStatement("heightFirstTOGGLE = ScrollHandler.getSingleItemHeightIn(adapterView,true);");
+    private Statement getSingleItemHeightLast = JavaParser.parseStatement("heightLastTOGGLE = ScrollHandler.getSingleItemHeightIn(adapterView,false);");
+    private IfStmt dirScrollStmt = (IfStmt) JavaParser.parseStatement(
+            "if(preScrollYTOGGLE <= postScrollYTOGGLE){\r\n"
+                    + "         scrollDirTOGGLE = \"scrolldown\";\r\n"
+                    + "         heightTOGGLE = heightLastTOGGLE;"
+                    + "     } else {\r\n"
+                    + "         scrollDirTOGGLE =\"scrollup\";\r\n"
+                    + "         heightTOGGLE = heightFirstTOGGLE;"
+                    + "     }"
+    );
     private TryStmt tryStmt = (TryStmt) JavaParser.parseStatement(
             "try {\n" +
             "            Thread.sleep(1000);\n" +
@@ -1035,12 +1054,20 @@ public class Enhancer {
                 block.addStatement(++i, firstAdapterView);
                 block.addStatement(++i, firstPreScrollY);
                 block.addStatement(++i, firstPostScrollY);
+                block.addStatement(++i, firstScrollDirectionStr);
+                block.addStatement(++i, firstSingleItemFirstH);
+                block.addStatement(++i, firstSingleItemLastH);
+                block.addStatement(++i, firstSingleItemH);
             } else {
                 block.addStatement(i, logNum);
                 block.addStatement(++i, activity);
                 block.addStatement(++i, adapterView);
                 block.addStatement(++i, preScrollY);
                 block.addStatement(++i, postScrollY);
+                block.addStatement(++i, scrollDirectionStr);
+                block.addStatement(++i, singleItemFirstH);
+                block.addStatement(++i, singleItemLastH);
+                block.addStatement(++i, singleItemH);
             }
             block.addStatement(++i, scrollHandlerSetup);
 
@@ -1065,6 +1092,8 @@ public class Enhancer {
             String interaction = operations.get(numberOfOperations - 1).getName();
             String interactionType = ViewActions.getSearchType(interaction);
             String interactionParams = operations.get(numberOfOperations - 1).getParameter();
+            block.addStatement(++i,getSingleItemHeightFirst);
+            block.addStatement(++i,getSingleItemHeightLast);
             if (interactionType.isEmpty()) {
                 // if it's not empty it is a check
                 if (!ViewAssertions.getSearchType(interaction).isEmpty()) {
@@ -1077,6 +1106,7 @@ public class Enhancer {
                 String substmt = stmt.toString().substring(0,index);
                 substmt = substmt+".check(matches(isDisplayed()));";
                 Statement stmt2 = JavaParser.parseStatement(substmt);
+
                 block.addStatement(++i,stmt2);
                 block.addStatement(++i,tryStmt);
                 block.addStatement(++i, findEndingCoord);
@@ -1085,9 +1115,10 @@ public class Enhancer {
                 block.addStatement(++i, JavaParser.parseStatement(
                         "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
                 block.addStatement(++i, screenCapture);
-                log = new LogCat(methodName, "id", "\"" + listId + "\"", "scrollto",
+                block.addStatement(++i,dirScrollStmt);
+                log = new LogCat(methodName, "id-adapterView", "\"" + listId + "\"", "scrollDirTOGGLE",
                         //"scrolly" + listId + "+\";\"+preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
-                        "preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
+                        "preScrollYTOGGLE+\";\"+postScrollYTOGGLE+\";\"+heightTOGGLE+\";\"+adapterViewTOGGLE.getHeight()+\";\"+adapterViewTOGGLE.getWidth()");
                 i = addLogInteractionToCu(log,i,block);
                 block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
             }
@@ -1100,9 +1131,10 @@ public class Enhancer {
                     "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
 
             block.addStatement(++i, screenCapture);
-            log = new LogCat(methodName, "id", "\"" + listId + "\"", "scrollto",
+            block.addStatement(++i,dirScrollStmt);
+            log = new LogCat(methodName, "id-adapterView", "\"" + listId + "\"", "scrollto",
                     //"scrolly" + listId + "+\";\"+preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
-                    "preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
+                    "preScrollYTOGGLE+\";\"+postScrollYTOGGLE+\";\"+heightTOGGLE+\";\"+adapterViewTOGGLE.getHeight()+\";\"+adapterViewTOGGLE.getWidth()");
             i = addLogInteractionToCu(log,i,block);
             block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
         } catch (Exception e) {

@@ -167,10 +167,10 @@ public class ToggleTranslator {
             case "dialogescape": return new DialogEscape(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
 
             //*********************************************************************************
-            //case "scrollDown": return new ScrollDown(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
-            //case "scrollDown": return new ScrollUp(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
-            //case "scrollDown": return new ScrollLeft(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
-            //case "scrollDown": return new ScrollRight(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            //case "scrolldown": return new ScrollDown(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            //case "scrollup": return new ScrollUp(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            //case "scrollleft": return new ScrollLeft(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            //case "scrollright": return new ScrollRight(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
             //*********************************************************************************
             default: throw new ToggleException("Interaction not found: " + interaction_type);
         }

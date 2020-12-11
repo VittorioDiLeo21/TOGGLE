@@ -23,6 +23,7 @@ public class ToggleClassManager {
     private int deviceWidth;
     private int deviceHeight;
     private int actualWidth;
+    private int actualHeight;
 
     public ToggleClassManager(String class_name,String package_name,String starting_folder,ArrayList<String> testNames) {
         super();
@@ -35,6 +36,7 @@ public class ToggleClassManager {
         this.deviceWidth = -1;
         this.deviceHeight = -1;
         this.actualWidth = -1;
+        this.actualHeight = -1;
     }
 
     public ToggleClassManager(String class_name,String package_name,String starting_folder,ArrayList<String> testNames,int deviceWidth, int actualWidth) {
@@ -48,9 +50,17 @@ public class ToggleClassManager {
         this.deviceWidth = deviceWidth;
         this.deviceHeight = -1;
         this.actualWidth = actualWidth;
+        this.actualHeight = -1;
     }
 
-    public ToggleClassManager(String class_name,String package_name,String starting_folder,ArrayList<String> testNames,String deviceMeasures, int actualWidth) {
+    public ToggleClassManager(
+            String class_name,
+            String package_name,
+            String starting_folder,
+            ArrayList<String> testNames,
+            String deviceMeasures,
+            int actualWidth,
+            int actualHeight) {
         super();
 
         this.class_name = class_name;
@@ -61,6 +71,7 @@ public class ToggleClassManager {
         this.deviceWidth = Integer.parseInt(deviceMeasures.split("x")[0]);
         this.deviceHeight = Integer.parseInt(deviceMeasures.split("x")[1]);
         this.actualWidth = actualWidth;
+        this.actualHeight = actualHeight;
     }
 
     public String getClass_name() {

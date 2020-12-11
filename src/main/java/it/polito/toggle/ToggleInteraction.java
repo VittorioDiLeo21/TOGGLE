@@ -187,6 +187,10 @@ public abstract class ToggleInteraction {
                 expr = xPath.compile(new StringBuilder().append("//node[@content-desc=\"").append(search_keyword).append("\"]").toString());
                 //expr = xPath.compile("//node[@content-desc=\"" + search_keyword + "\"]");
                 break;
+            case "id-adapterView":
+                expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]/node[last()]").toString());
+                //expr = xPath.compile("//node[@content-desc=\"" + search_keyword + "\"]");
+                break;
         }
 
         assert expr != null;

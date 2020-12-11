@@ -131,27 +131,34 @@ public class WindowUtils {
             e.printStackTrace();
             return -1;
         }
-        double ratio=-1;
-        //TODO
+        double ratio;
         switch (DEVICE){
             case NEXUS_5:
                 ratio = 0.8014492753623188;
                 break;
             case NEXUS_5X:
+                ratio = 0.7902665121668598;
                 break;
             case NEXUS_6:
+                ratio = 0.8402777777777778;
                 break;
             case NEXUS_6P:
+                ratio = 0.7916666666666666;
                 break;
             case NEXUS_4:
+                ratio = 0.7650462962962963;
                 break;
             case NEXUS_S:
+                ratio = 0.707514450867052;
                 break;
             case NEXUS_ONE:
+                ratio = 0.6825028968713789;
                 break;
             case GALAXY_NEXUS:
+                ratio = 0.7526011560693642;
                 break;
             case PIXEL:
+                ratio = 0.7592592592592593;
                 break;
             case PIXEL_3:
                 ratio = 0.8587962962962963;
