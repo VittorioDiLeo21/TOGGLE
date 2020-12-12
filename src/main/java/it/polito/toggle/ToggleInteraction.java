@@ -188,8 +188,15 @@ public abstract class ToggleInteraction {
                 //expr = xPath.compile("//node[@content-desc=\"" + search_keyword + "\"]");
                 break;
             case "id-adapterView":
-                expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]/node[last()]").toString());
-                //expr = xPath.compile("//node[@content-desc=\"" + search_keyword + "\"]");
+                String node="";
+                if(interaction_type.equals("scrollup")){
+                    node = "1";
+                } else if( interaction_type.equals("scrolldown")){
+                    node = "last()";
+                }
+                //expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]/node[last()]").toString());
+                expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]/node[").append(node).append("]").toString());
+
                 break;
         }
 
@@ -203,7 +210,7 @@ public abstract class ToggleInteraction {
         }
         System.out.println("bounds = " + bounds);
         String[] splitted_string = bounds.split("(\\[)|(\\])|((,))");
-
+//todo debug this
         left = Integer.parseInt(splitted_string[1]);
         top = Integer.parseInt(splitted_string[2]);
 

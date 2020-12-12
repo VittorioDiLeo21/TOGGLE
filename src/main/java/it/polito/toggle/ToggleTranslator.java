@@ -178,8 +178,8 @@ public class ToggleTranslator {
             case "dialogescape": return new DialogEscape(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
 
             //*********************************************************************************
-            case "scrolldown": return new ScrollDown(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile,ratioH);
-            //case "scrollup": return new ScrollUp(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "scrolldown": return new ScrollDown(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH);
+            case "scrollup": return new ScrollUp(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH);
             //case "scrollleft": return new ScrollLeft(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
             //case "scrollright": return new ScrollRight(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
             //*********************************************************************************
