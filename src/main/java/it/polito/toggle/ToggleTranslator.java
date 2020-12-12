@@ -26,11 +26,22 @@ public class ToggleTranslator {
     private int screen_size_height = 0;
     private int screen_size_width = 0;
 
+    private float ratioH;
+
     public ToggleTranslator(String starting_folder, String package_name, String class_name, String test_name) {
         this.starting_folder = starting_folder;
         this.package_name = package_name;
         this.test_name = test_name;
         this.class_name = class_name;
+        this.ratioH = 1;
+    }
+
+    public ToggleTranslator(String starting_folder, String package_name, String class_name, String test_name,float ratioH) {
+        this.starting_folder = starting_folder;
+        this.package_name = package_name;
+        this.test_name = test_name;
+        this.class_name = class_name;
+        this.ratioH = ratioH;
     }
 
     public String getStarting_folder() { return starting_folder; }
@@ -167,7 +178,7 @@ public class ToggleTranslator {
             case "dialogescape": return new DialogEscape(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
 
             //*********************************************************************************
-            //case "scrolldown": return new ScrollDown(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "scrolldown": return new ScrollDown(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile,ratioH);
             //case "scrollup": return new ScrollUp(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
             //case "scrollleft": return new ScrollLeft(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
             //case "scrollright": return new ScrollRight(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);

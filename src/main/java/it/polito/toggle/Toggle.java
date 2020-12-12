@@ -100,18 +100,18 @@ public class Toggle {
 
         //2 build and install the apk
 
-        /*try {
-            //buildProject(appProjectPath);
+        try {
             installApp();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }*/
+        }
+
         //3 get the test Instrumentation
 
-        /*String instrumentation = getInstrumentation();
+        String instrumentation = getInstrumentation();
         if(instrumentation.isEmpty())
-            return false;*/
+            return false;
 
         //4
         //getDeviceDensity<-- da toggleGUI.EspressoGUI
@@ -119,17 +119,19 @@ public class Toggle {
         //eventually resize the emulator
         //5
 
-        //executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
+        executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
 
         //6
 
-        /*for(String testClassName : tests.keySet()){
+        for(String testClassName : tests.keySet()){
             //ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolution(),windowUtils.getEmulatorScreenPixelsWidth(this.device));
-            ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolutionAndHeight(),windowUtils.getEmulatorScreenPixelsWidth(this.device));
+            String className = testClassName.replace("Enhanced","");
+            //ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolutionAndHeight(),windowUtils.getEmulatorScreenPixelsWidth(this.device),windowUtils.getEmulatorScreenPixelHeight(this.device));
+            ToggleClassManager tcm = new ToggleClassManager(className,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolutionAndHeight(),windowUtils.getEmulatorScreenPixelsWidth(this.device),windowUtils.getEmulatorScreenPixelHeight(this.device));
             //7
             try {
                 it.polito.toggle.Utils.createJavaProjectFolder(guiTestsPath);
-                tcm.createClass(testClassName+".txt");
+                tcm.createClass(className+".txt");
             } catch (XPathExpressionException e) {
                 e.printStackTrace();
             } catch (SAXException e) {
@@ -139,7 +141,7 @@ public class Toggle {
             } catch (ToggleException e) {
                 e.printStackTrace();
             }
-        }*/
+        }
 
         //8
         /*try {
@@ -218,7 +220,7 @@ public class Toggle {
         endEspressoExecution = System.currentTimeMillis();
         testClasses.forEach(testName -> {
             try {
-                pullLogFile(testName+".txt");
+                pullLogFile(testName.replace("Enhanced","")+".txt");
             } catch (IOException e) {
                 e.printStackTrace();
             }

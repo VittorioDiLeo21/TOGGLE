@@ -30,7 +30,7 @@ public class ScrollDown extends ToggleInteraction {
         int sizeBottom = Integer.parseInt(coords[4]);
         int deviceSize = sizeBottom - sizeTop;
         offset = (int)(offset*screenRatio);
-        this.toBeScrolled = (int)(to-from*screenRatio);
+        this.toBeScrolled = (int)((to-from)*screenRatio);
         if((to-from) > deviceSize)
             this.scrollStep = (int)(deviceSize*screenRatio) - offset;
         else{

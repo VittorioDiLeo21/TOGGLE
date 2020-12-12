@@ -124,9 +124,9 @@ public class WindowUtils {
     }
 
     public int getEmulatorScreenPixelHeight(Emulators DEVICE){
-        int totalWidth;
+        int totalHeight;
         try {
-            totalWidth = getWindowHeight("Android Emulator");
+            totalHeight = getWindowHeight("Android Emulator");
         } catch (NameNotFoundException | ResizeException e) {
             e.printStackTrace();
             return -1;
@@ -171,7 +171,7 @@ public class WindowUtils {
         }
         if(ratio == -1)
             return -1;
-        double screenPx = ratio*totalWidth;
+        double screenPx = ratio*totalHeight;
         return (int) screenPx;
     }
 
