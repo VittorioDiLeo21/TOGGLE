@@ -89,6 +89,7 @@ public class Toggle {
         if(!ToggleToolFinder.findToggleTools(folder)){
             ToggleToolFinder.copyToggleTools(path,toggleInjectionPath);
             ToggleToolFinder.copyBitmapSaver(path,toggleInjectionPath);
+            ToggleToolFinder.copyScrollHandler(path,toggleInjectionPath);
         }
     }
 
@@ -96,22 +97,22 @@ public class Toggle {
         //1
 
         Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath); //todo : fa l'enhance anche di altre classi di test nella directory
-        injectToggleTool(testDirectoryPath);
+        //injectToggleTool(testDirectoryPath);
 
         //2 build and install the apk
 
-        try {
+        /*try {
             installApp();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }
+        }*/
 
         //3 get the test Instrumentation
 
-        String instrumentation = getInstrumentation();
-        if(instrumentation.isEmpty())
-            return false;
+        //String instrumentation = getInstrumentation();
+        //if(instrumentation.isEmpty())
+            //return false;
 
         //4
         //getDeviceDensity<-- da toggleGUI.EspressoGUI
@@ -119,7 +120,7 @@ public class Toggle {
         //eventually resize the emulator
         //5
 
-        executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
+        //executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
 
         //6
 

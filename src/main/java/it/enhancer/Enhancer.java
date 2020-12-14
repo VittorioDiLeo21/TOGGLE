@@ -30,6 +30,7 @@ public class Enhancer {
     private CompilationUnit compilationUnit;
     private List<Operation> operations;
     private boolean firstTest;
+    private boolean firstOnDataTest;
     private StringBuilder parameters;
     private StringBuilder field;
 
@@ -377,6 +378,7 @@ public class Enhancer {
             body.contains("intending")){
                 NodeList<Statement> nodes = block.getStatements();
                 firstTest = true;
+                firstOnDataTest = true;
                 parameters = new StringBuilder("");
                 field = new StringBuilder("");
 
@@ -402,8 +404,17 @@ public class Enhancer {
 
             //gets onView or onData and all nested performs and checks but the last one
             String name = j.getJSONObject("name").getString("identifier");
-            if(!name.equals("intended") && !name.equals("intending") && !name.equals("perform") && !name.equals("check")){
-                operations.add(new Operation(name,""));
+            if(!name.equals("intended") &&
+                    !name.equals("intending") &&
+                    !name.equals("perform") &&
+                    !name.equals("check") ){
+                String parameter = "";
+                if(name.equals("atPosition")){
+                    parseJsonArgument(j,null,0);
+                    parameter = parameters.toString();
+                    parameters = new StringBuilder();
+                }
+                operations.add(new Operation(name,parameter));
 
                 //save occurrences for onView and onData
                 Integer oldStatistic = statistic.get(name);
@@ -411,8 +422,9 @@ public class Enhancer {
                 if(oldStatistic == null)
                     oldStatistic = 0;
                 statistic.put(name, oldStatistic + 1);
+                if(name.equals("atPosition"))
+                    return;
             }
-
             parseJsonArgument(j,null,0);
         } catch (JSONException exc){
             // TODO: handle exception
@@ -1051,6 +1063,12 @@ public class Enhancer {
                 block.addStatement(++i, device);
                 block.addStatement(++i, firstLogNum);
                 block.addStatement(++i, firstTestActivity);
+            } else {
+                block.addStatement(i, logNum);
+                block.addStatement(++i, activity);
+            }
+            if(firstOnDataTest){
+                firstOnDataTest = false;
                 block.addStatement(++i, firstAdapterView);
                 block.addStatement(++i, firstPreScrollY);
                 block.addStatement(++i, firstPostScrollY);
@@ -1059,8 +1077,6 @@ public class Enhancer {
                 block.addStatement(++i, firstSingleItemLastH);
                 block.addStatement(++i, firstSingleItemH);
             } else {
-                block.addStatement(i, logNum);
-                block.addStatement(++i, activity);
                 block.addStatement(++i, adapterView);
                 block.addStatement(++i, preScrollY);
                 block.addStatement(++i, postScrollY);
@@ -1097,6 +1113,7 @@ public class Enhancer {
             String interactionParams = operations.get(numberOfOperations - 1).getParameter();
             block.addStatement(++i,getSingleItemHeightFirst);
             block.addStatement(++i,getSingleItemHeightLast);
+            Statement stmt2 = null;
             if (interactionType.isEmpty()) {
                 // if it's not empty it is a check
                 if (!ViewAssertions.getSearchType(interaction).isEmpty()) {
@@ -1108,7 +1125,11 @@ public class Enhancer {
                 int index = stmt.toString().lastIndexOf(".perform(");
                 String substmt = stmt.toString().substring(0,index);
                 substmt = substmt+".check(matches(isDisplayed()));";
-                Statement stmt2 = JavaParser.parseStatement(substmt);
+                //**
+                stmt2 = stmt;
+                //**
+                stmt = JavaParser.parseStatement(substmt);
+                /*Statement stmt2 = JavaParser.parseStatement(substmt);
 
                 block.addStatement(++i,stmt2);
                 block.addStatement(++i,tryStmt);
@@ -1123,7 +1144,7 @@ public class Enhancer {
                         "preScrollYTOGGLE+\";\"+postScrollYTOGGLE+\";\"+heightTOGGLE+\";\"+adapterViewTOGGLE.getHeight()+\";\"+adapterViewTOGGLE.getWidth()");
                 i = addLogInteractionToCu(log,i,block);
                 block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
-                block.addStatement(++i,logNum);
+                block.addStatement(++i,logNum);*/
             }
 
             block.addStatement(++i,stmt);
@@ -1139,7 +1160,23 @@ public class Enhancer {
                     "preScrollYTOGGLE+\";\"+postScrollYTOGGLE+\";\"+heightTOGGLE+\";\"+adapterViewTOGGLE.getHeight()+\";\"+adapterViewTOGGLE.getWidth()");
             i = addLogInteractionToCu(log,i,block);
             block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
-            block.addStatement(++i,logNum);
+            //block.addStatement(++i,logNum);
+
+            if(stmt2 != null){
+                block.addStatement(++i, logNum);
+                block.addStatement(++i, stmt2);
+                block.addStatement(++i, tryStmt);
+                block.addStatement(++i, JavaParser.parseStatement(
+                        "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
+
+                block.addStatement(++i, screenCapture);
+                log = new LogCat(methodName, "position-adapterView", "\""+listId+"_\"+ScrollHandler.getAdapterViewPosFrom(postScrollYTOGGLE,adapterViewTOGGLE)", interactionType,
+                        interactionParams);
+                i = addLogInteractionToCu(log,i,block);
+                block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
+                //todo if I uncomment this we will have 2 lognum++
+                //block.addStatement(++i,logNum);
+            }
         } catch (Exception e) {
             // TODO: handle exception
             System.out.println("EXCEPTION IN ENHANCER!");
@@ -1329,6 +1366,7 @@ public class Enhancer {
         compilationUnit.addImport("android.widget.GridView", false, false);
         compilationUnit.addImport("android.view.View", false, false);
         compilationUnit.addImport(version + "test.espresso.action.ViewActions.scrollTo", true, false);
+        //todo
     }
 
     private String getIdInAdapterView(Node inAdapterView) throws Exception {

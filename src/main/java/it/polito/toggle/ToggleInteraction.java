@@ -198,6 +198,11 @@ public abstract class ToggleInteraction {
                 expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]/node[").append(node).append("]").toString());
 
                 break;
+            case "position-adapterView":
+                String id = search_keyword.split("_")[0];
+                String nodeCoords = search_keyword.split("_")[1];
+                expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(id).append("\"]/node[contains(@bounds,'").append(nodeCoords).append("')]").toString());
+                break;
         }
 
         assert expr != null;

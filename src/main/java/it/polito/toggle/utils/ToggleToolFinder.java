@@ -41,9 +41,35 @@ public class ToggleToolFinder extends Thread {
 		return false;
 	}
 
+	public static void copyScrollHandler(String scrollHandlerDstPath, String testClassPackage){
+		try {
+			String content = "package "+testClassPackage+";\r\n";
+			try(BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir")+"\\src\\main\\java\\it\\polito\\toggle\\utils\\ScrollHandler.java"))) {
+				StringBuilder sb = new StringBuilder();
+				String line;
+
+
+				while ((line = br.readLine()) != null) {
+					if(line.contains("package")) {
+						continue;
+					}
+					sb.append(line);
+					sb.append(System.lineSeparator());
+				}
+				content += sb.toString();
+			}
+
+			FileWriter toggleTools=new FileWriter(scrollHandlerDstPath+"\\ScrollHandler.java");
+			toggleTools.write(content);
+			toggleTools.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static void copyBitmapSaver(String bitmapSaverDestPath, String testClassPackage){
 		try {
-			String content="package "+testClassPackage+";\n";
+			String content="package "+testClassPackage+";\r\n";
 
 			try(BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir")+"\\src\\main\\java\\it\\polito\\toggle\\utils\\BitmapSaver.java"))) {
 				StringBuilder sb = new StringBuilder();
