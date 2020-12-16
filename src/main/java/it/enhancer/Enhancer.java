@@ -123,7 +123,7 @@ public class Enhancer {
         long time_begin = System.currentTimeMillis();
         List<String> testNames = new ArrayList<>();
         try {
-            this.currentClass = fileName;
+            this.currentClass = fileName+"TOGGLE";
             populateEmptyStatistic();
             FileInputStream in = new FileInputStream( folderPath + fileName + ".java" );
             compilationUnit = JavaParser.parse(in);
@@ -275,10 +275,10 @@ public class Enhancer {
         boolean shouldSet = true;
         for(ConstructorDeclaration constructor : constructors){
             constructor.setName(constructor.getName() + "Enhanced");
-            if(shouldSet) {
-                this.currentClass = constructor.getName().asString();
+            /*if(shouldSet) {
+                this.currentClass = constructor.getName().asString() + "TOGGLE";
                 shouldSet = false;
-            }
+            }*/
            /* constructor.getBody().asBlockStmt().addStatement(
                     JavaParser.parseStatement("TOGGLETools.setLogFileName(\""+constructor.getName().+"\");")
             );*/
@@ -1146,25 +1146,30 @@ public class Enhancer {
                 block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
                 block.addStatement(++i,logNum);*/
             }
+            //take a screenshot of the starting screen and dump the view hierarchy
+            block.addStatement(++i, JavaParser.parseStatement(
+                    "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
+            block.addStatement(++i, screenCapture);
+            block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
 
+            //execute the statement
             block.addStatement(++i,stmt);
             block.addStatement(++i,tryStmt);
             block.addStatement(++i, findEndingCoord);
-            block.addStatement(++i, JavaParser.parseStatement(
+            /*block.addStatement(++i, JavaParser.parseStatement(
                     "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
 
-            block.addStatement(++i, screenCapture);
+            block.addStatement(++i, screenCapture);*/
             block.addStatement(++i,dirScrollStmt);
             log = new LogCat(methodName, "id-adapterView", "\"" + listId + "\"", "scrollDirTOGGLE",
                     //"scrolly" + listId + "+\";\"+preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
                     "preScrollYTOGGLE+\";\"+postScrollYTOGGLE+\";\"+heightTOGGLE+\";\"+adapterViewTOGGLE.getHeight()+\";\"+adapterViewTOGGLE.getWidth()");
             i = addLogInteractionToCu(log,i,block);
-            block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
-            //block.addStatement(++i,logNum);
+            //block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
+
 
             if(stmt2 != null){
                 block.addStatement(++i, logNum);
-                block.addStatement(++i, stmt2);
                 block.addStatement(++i, tryStmt);
                 block.addStatement(++i, JavaParser.parseStatement(
                         "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
@@ -1174,8 +1179,8 @@ public class Enhancer {
                         interactionParams);
                 i = addLogInteractionToCu(log,i,block);
                 block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
-                //todo if I uncomment this we will have 2 lognum++
-                //block.addStatement(++i,logNum);
+
+                block.addStatement(++i, stmt2);
             }
         } catch (Exception e) {
             // TODO: handle exception
@@ -1366,6 +1371,7 @@ public class Enhancer {
         compilationUnit.addImport("android.widget.GridView", false, false);
         compilationUnit.addImport("android.view.View", false, false);
         compilationUnit.addImport(version + "test.espresso.action.ViewActions.scrollTo", true, false);
+        compilationUnit.addImport("android.widget.AdapterView",false,false);
         //todo
     }
 

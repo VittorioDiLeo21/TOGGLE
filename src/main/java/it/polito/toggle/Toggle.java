@@ -97,22 +97,22 @@ public class Toggle {
         //1
 
         Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath); //todo : fa l'enhance anche di altre classi di test nella directory
-        //injectToggleTool(testDirectoryPath);
+        injectToggleTool(testDirectoryPath);
 
         //2 build and install the apk
 
-        /*try {
+        try {
             installApp();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }*/
+        }
 
         //3 get the test Instrumentation
 
-        //String instrumentation = getInstrumentation();
-        //if(instrumentation.isEmpty())
-            //return false;
+        String instrumentation = getInstrumentation();
+        if(instrumentation.isEmpty())
+            return false;
 
         //4
         //getDeviceDensity<-- da toggleGUI.EspressoGUI
@@ -120,7 +120,7 @@ public class Toggle {
         //eventually resize the emulator
         //5
 
-        //executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
+        executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
 
         //6
 
@@ -132,7 +132,7 @@ public class Toggle {
             //7
             try {
                 it.polito.toggle.Utils.createJavaProjectFolder(guiTestsPath);
-                tcm.createClass(className+".txt");
+                tcm.createClass(className+"TOGGLE.txt");
             } catch (XPathExpressionException e) {
                 e.printStackTrace();
             } catch (SAXException e) {
@@ -221,7 +221,7 @@ public class Toggle {
         endEspressoExecution = System.currentTimeMillis();
         testClasses.forEach(testName -> {
             try {
-                pullLogFile(testName.replace("Enhanced","")+".txt");
+                pullLogFile(testName.replace("Enhanced","TOGGLE")+".txt");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -438,7 +438,7 @@ public class Toggle {
 
     public void resetLogFiles() throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                "cmd.exe", "/c\"", adbPath + "\\adb\" shell rm -f /sdcard/*Enhanced.txt");
+                "cmd.exe", "/c\"", adbPath + "\\adb\" shell rm -f /sdcard/*TOGGLE.txt");
 
         builder.redirectErrorStream(true);
         Process p = builder.start();
@@ -712,9 +712,7 @@ public class Toggle {
         Process p = builder.start();
         BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
         String line;
-        while (true) {
-            line = r.readLine();
-            if (line == null) { break; }
+        while ((line = r.readLine())!=null) {
             System.out.println(line);
         }
     }

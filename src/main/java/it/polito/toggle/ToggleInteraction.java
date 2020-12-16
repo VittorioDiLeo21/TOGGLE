@@ -1,5 +1,6 @@
 package it.polito.toggle;
 
+import it.polito.toggle.exceptions.ToggleException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -37,7 +38,7 @@ public abstract class ToggleInteraction {
 
     protected int interaction_number;   //used for translations that require variable instances
 
-    public ToggleInteraction(String packagename, String search_type, String search_keyword, String timestamp, String interaction_type, String args, File screen_capture, File dump) throws XPathExpressionException, SAXException, IOException, ParserConfigurationException{
+    public ToggleInteraction(String packagename, String search_type, String search_keyword, String timestamp, String interaction_type, String args, File screen_capture, File dump) throws XPathExpressionException, SAXException, IOException, ParserConfigurationException, ToggleException {
         this.packagename = packagename;
         this.search_type = search_type;
         this.search_keyword = search_keyword;
@@ -47,6 +48,7 @@ public abstract class ToggleInteraction {
         this.args = args;
         this.dump = dump;
         this.need_screenshot = true;
+
         this.extractBounds();
 
         interaction_number = 1;
@@ -151,7 +153,7 @@ public abstract class ToggleInteraction {
     }
 
     //EXTRACT THE BOUNDS FROM THE IMAGE
-    public void extractBounds() throws XPathExpressionException, SAXException, IOException, ParserConfigurationException {
+    public void extractBounds() throws XPathExpressionException, SAXException, IOException, ParserConfigurationException, ToggleException {
 
         if(interaction_type.equals("fullcheck")
                 || interaction_type.equals("pressback")
@@ -188,16 +190,18 @@ public abstract class ToggleInteraction {
                 //expr = xPath.compile("//node[@content-desc=\"" + search_keyword + "\"]");
                 break;
             case "id-adapterView":
-                String node="";
+                /*String node="";
                 if(interaction_type.equals("scrollup")){
                     node = "1";
                 } else if( interaction_type.equals("scrolldown")){
                     node = "last()";
-                }
+                }*/
+                String node = "1";
                 //expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]/node[last()]").toString());
-                expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]/node[").append(node).append("]").toString());
-
-                break;
+                //expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]/node[").append(node).append("]").toString());
+                expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]/node").toString());
+                handleIdAdapterView(expr,document);
+                return;
             case "position-adapterView":
                 String id = search_keyword.split("_")[0];
                 String nodeCoords = search_keyword.split("_")[1];
@@ -221,6 +225,39 @@ public abstract class ToggleInteraction {
 
         right = Integer.parseInt(splitted_string[4]);
         bottom = Integer.parseInt(splitted_string[5]);
+    }
+
+    protected void handleIdAdapterView(XPathExpression expr,Document document) throws XPathExpressionException, ToggleException {
+        NodeList nodes = (NodeList) expr.evaluate(document,XPathConstants.NODESET);
+        if(nodes != null){
+            int top,left,right,bottom;
+            int maxT = 0, maxL = 0, maxR = 0, maxB = 0;
+            int area,maxA=-1;
+            for(int i = 0; i < nodes.getLength();i++){
+                String bounds = (nodes.item(i).getAttributes().getNamedItem("bounds").toString());
+                String[] splitted_string = bounds.split("(\\[)|(\\])|((,))");
+                left = Integer.parseInt(splitted_string[1]);
+                top = Integer.parseInt(splitted_string[2]);
+
+                right = Integer.parseInt(splitted_string[4]);
+                bottom = Integer.parseInt(splitted_string[5]);
+                area = (right-left)*(bottom-top);
+                if(area > maxA){
+                    maxA = area;
+                    maxT = top;
+                    maxL = left;
+                    maxR = right;
+                    maxB = bottom;
+                }
+            }
+            this.left = maxL;
+            this.right = maxR;
+            this.top = maxT;
+            this.bottom = maxB;
+        } else {
+            //ERROR CONDITION, SHOULD THROW AN EXCEPTION
+            throw new ToggleException("Invalid xml dump, no node is present in adapter view");
+        }
     }
 
     public File manageScreenshot(String starting_folder) throws IOException {

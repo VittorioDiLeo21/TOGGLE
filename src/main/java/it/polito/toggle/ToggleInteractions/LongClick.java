@@ -1,6 +1,7 @@
 package it.polito.toggle.ToggleInteractions;
 
 import it.polito.toggle.ToggleInteraction;
+import it.polito.toggle.exceptions.ToggleException;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,7 +15,7 @@ public class LongClick extends ToggleInteraction {
 
 	public LongClick(String packagename, String search_type, String search_keyword, String timestamp,
 			String interaction_type, String args, File screen_capture, File dump)
-			throws XPathExpressionException, SAXException, IOException, ParserConfigurationException {
+			throws XPathExpressionException, SAXException, IOException, ParserConfigurationException, ToggleException {
 		super(packagename, search_type, search_keyword, timestamp, interaction_type, args, screen_capture, dump);
 		// TODO Auto-generated constructor stub
 	}
