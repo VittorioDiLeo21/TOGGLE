@@ -507,6 +507,8 @@ public class ToggleClassManager {
 
         int method_interactions = 0;
 
+        float ratioH = this.actualHeight / (float) this.deviceHeight;
+
         ArrayList<String> test_class_code = new ArrayList<>();
 
         ArrayList<String> eyeautomate_only = new ArrayList<>();
@@ -542,7 +544,7 @@ public class ToggleClassManager {
         //add the methods
         for(String test_name: testNames){
             method_interactions = 0;
-            ToggleTranslator translator = new ToggleTranslator(starting_folder, package_name, class_name, test_name);
+            ToggleTranslator translator = new ToggleTranslator(starting_folder, package_name, class_name, test_name, ratioH);
 
             //translator.readLogcatToFile(logcat_filename);
 
