@@ -53,6 +53,10 @@ public class Enhancer {
 
     private Statement firstPreScrollY = JavaParser.parseStatement("int preScrollYTOGGLE = 0;");
     private Statement preScrollY = JavaParser.parseStatement("preScrollYTOGGLE = 0;");
+    private Statement firstScrollY = JavaParser.parseStatement("int[] scrollYTOGGLE = new int[2];");
+    private Statement scrollY = JavaParser.parseStatement("scrollYTOGGLE = new int[2];");
+    private Statement firstScrollX = JavaParser.parseStatement("int[] scrollXTOGGLE = new int[2];");
+    private Statement scrollX = JavaParser.parseStatement("scrollXTOGGLE = new int[2];");
     private Statement firstSingleItemFirstH = JavaParser.parseStatement("int heightFirstTOGGLE = 0;");
     private Statement singleItemFirstH = JavaParser.parseStatement("heightFirstTOGGLE = 0;");
     private Statement firstSingleItemH = JavaParser.parseStatement("int heightTOGGLE = 0;");
@@ -898,75 +902,52 @@ public class Enhancer {
 
         // if the test is with onData the handling is different
         if (operations.get(0).getName().equals("onData")) {
-            //return enhanceMethodOnData(block, methodName, stmt, i);
             return enhanceMethodOnDataInAdapterView(block, methodName, stmt, i);
         } else {
-
             if (operations.size() > 0) {
-
                 searchType = ViewMatchers.getSearchType(operations.get(1).getName());
                 searchKw = operations.get(1).getParameter();
                 System.out.println("searchtype = " + searchType + "; - searchKw = " + searchKw);
-
             }
-
 
             if (operations.size() == 2) {
                 //management of cases like pressback
                 System.out.println("operation type = " + operations.get(1).getName());
                 String interactionType = ViewActions.getSearchType(operations.get(1).getName());
                 String interactionParams = operations.get(1).getParameter();
-
                 System.out.println("interaction type = " + interactionType);
                 System.out.println("interaction params = " + interactionParams);
-
                 if (interactionType.equals("pressback") || interactionType.equals("typeintofocused") || interactionType.equals("closekeyboard") ||
                         interactionType.equals("pressbackunconditionally") || interactionType.equals("openactionbaroverfloworoptionsmenu") ||
                         interactionType.equals("opencontextualactionmodeoverflowmenu") || interactionType.equals("pressmenukey")) {
-
                     searchType = "-";
                     searchKw = "-";
                     System.out.println("methodName = " + methodName + "; searchType = " + searchType + "; searchKw = " + searchKw + "; interactionType = " + interactionType + "; interactionParams = " + interactionParams);
                     LogCat log = new LogCat(methodName, searchType, searchKw, interactionType, interactionParams);
-
-
                     String stmtString = stmt.toString();
                     Statement st = JavaParser.parseStatement(stmtString);
-
                     //b.addStatement(i, date);
                     block.addStatement(i, logNum);
                     block.addStatement(++i, activity);
-                    //	b.addStatement(++i, captureTaskValue);
+                    //b.addStatement(++i, captureTaskValue);
                     block.addStatement(++i, JavaParser.parseStatement(
                             "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
-
-
                     block.addStatement(++i, screenCapture);
                     i = addLogInteractionToCu(log, i, block);
                     //b.addStatement(++i, dumpScreen);
                     block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
                     block.addStatement(++i, st);
                     block.addStatement(++i, tryStmt);
-
-
                 }
-
             }
 
-
-
             if (!searchType.isEmpty() || searchType.equals("-")) {
-
                 String stmtString = stmt.toString();
                 Statement st = JavaParser.parseStatement(stmtString);
-
                 if (operations.size() > 1) {
                     block.remove(stmt);
                 }
-
-
                 for (int j = 2; j < operations.size(); j++) {
-
                     String interactionType = ViewActions.getSearchType(operations.get(j).getName());
                     String interactionParams = operations.get(j).getParameter();
                     /*
@@ -978,12 +959,10 @@ public class Enhancer {
 
                     if (interactionType.isEmpty()) {
                         interactionType = ViewAssertions.getSearchType(operations.get(j).getName());
-
                         if (searchType.isEmpty() || interactionType.isEmpty()) {
                             block.addStatement(i, st);
                             break;
                         }
-
                         // log only if the assertion is 'matches'. Leave out isLeft, isRight ecc... for
                         // now.
                         if (interactionType.equals("matches") && canItBeAnAssertionParameter(operations.get(++j)))
@@ -994,13 +973,8 @@ public class Enhancer {
                         }
 
                     }
-
-
                     System.out.println("logcatting: methodname = " + methodName + "; searchType = " + searchType + "; searchKw = " + searchKw + "; interactionType = " + interactionType + "; interactionParams = " + interactionParams);
                     LogCat log = new LogCat(methodName, searchType, searchKw, interactionType, interactionParams);
-
-
-
                     if (firstTest) {
                         firstTest = false;
                         block.addStatement(i, captureTask);
@@ -1013,7 +987,6 @@ public class Enhancer {
                         block.addStatement(i, logNum);
                         //b.addStatement(i, date);
                         block.addStatement(++i, activity);
-
                         // this makes it work on test cases with multiple interactions avoiding the try
                         // statements to stay to the bottom
                     } else {

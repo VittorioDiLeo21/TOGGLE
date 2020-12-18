@@ -36,7 +36,7 @@ public class ScrollDown extends ToggleInteraction {
         if((to-from) > AVHeight){
             tmpStep = AVHeight - offset;
         } else {
-            tmpStep = to-from - offset;
+            tmpStep = (to-from) - offset;
         }
         if((this.top + tmpStep + offFromTop) > (AVTop + AVHeight)){
             //todo non hardoccare quel 10, potremmo ottenere dalla super classe l'ampiezza dell'ultimo nodo
@@ -127,7 +127,7 @@ public class ScrollDown extends ToggleInteraction {
         for(int i = 0; i < this.toBeScrolled/this.scrollStep;i++){
             res.add("MouseLeftPress");
             res.add("Sleep 500");
-            res.add("MoveRelative \"" + this.scrollStep + "\" \"0\"");
+            res.add("MoveRelative \"0\" \"-" + this.scrollStep + "\"");
             res.add("Sleep 1000");
             res.add("MouseLeftRelease");
             res.add("Sleep 500");

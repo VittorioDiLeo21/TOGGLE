@@ -10,18 +10,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class ScrollUp extends ToggleInteraction {
+public class ScrollLeft extends ToggleInteraction {
 
-
-    //TODO : SCREENSHOT DELL'ULTIMO NODO MOSTRATO SPECIFICANDO CHE STO CERCANDO IL NODO N. NEGLI ARGS LOGGARE ANCHE LE COORD TOP E LEFT DEL PRIMO NODO MOSTRATO
-    //       SUCCESSIVAMENTE SI TROVA IL CENTRO E SI SCROLLA DAL CENTRO VERSO L'ALTO DI (TOPUltimo-TOPPrimo).
-    //       SI CONTINUA FINO A RAGGIUNGERE IL NUMERO DI STEP NECESSARI.
     private int scrollStep;
     private int toBeScrolled;
 
-    public ScrollUp(String packagename, String search_type, String search_keyword, String timestamp,
-                      String interaction_type, String args, File screen_capture, File dump, double screenRatio)
-            throws XPathExpressionException, SAXException, IOException, ParserConfigurationException, ToggleException {
+    public ScrollLeft(String packagename, String search_type, String search_keyword,
+                      String timestamp, String interaction_type, String args,
+                      File screen_capture, File dump, double screenRatio) throws XPathExpressionException, SAXException, IOException, ParserConfigurationException, ToggleException {
         super(packagename, search_type, search_keyword, timestamp, interaction_type, args, screen_capture, dump);
         String[] coords = args.split(";");
         int from = Integer.parseInt(coords[0]);
@@ -32,54 +28,47 @@ public class ScrollUp extends ToggleInteraction {
         int AVLeft = Integer.parseInt(coords[5]);
         int AVTop = Integer.parseInt(coords[6]);
         int tmpStep;
-        int offFromTop = (this.bottom-this.top)/2;
-        if(-(to-from) > AVHeight){
-            tmpStep = AVHeight - offset;
+        int offFromStart = (this.right-this.left)/2;
+        if(-(to-from) > AVWidth){
+            tmpStep = AVWidth - offset;
         } else {
             tmpStep = -(to-from) - offset;
         }
-        if((this.top + tmpStep + offFromTop) > (AVTop + AVHeight)){
+        if((this.left + tmpStep + offFromStart) > (AVLeft + AVWidth)){
             //todo non hardoccare quel 10, potremmo ottenere dalla super classe l'ampiezza dell'ultimo nodo
-            tmpStep = tmpStep-((this.top + tmpStep + offFromTop) - (AVTop + AVHeight + 10));
+            tmpStep = tmpStep-((this.left + tmpStep + offFromStart) -(AVLeft + AVWidth + 10));
         }
-        //int deviceSize = sizeBottom - sizeTop;
         tmpStep = (int)(tmpStep*screenRatio);
-        //offset = (int)(offset*screenRatio);
         this.toBeScrolled = (int)((to-from)*screenRatio*(-1));
         this.scrollStep = tmpStep;
-        /*if(-(to-from) > AVHeight)
-            this.scrollStep = (int)(AVHeight*screenRatio) - offset;
-        else{
-            this.scrollStep = this.toBeScrolled - offset;
-        }*/
     }
 
     @Override
-    public ArrayList<String> generateSikuliLines() {
+    public ArrayList<String> generateSikuliLines(){
         ArrayList<String> res = new ArrayList<>();
         res.add("sleep(1)");
         res.add("wait(\"" + timestamp + "_cropped.png\", 30)");
         res.add("r = find(\"" + timestamp + "_cropped.png\")");
-        res.add("stepY = "+this.scrollStep);
+        res.add("stepX = "+this.scrollStep);
         res.add("start = r.getCenter()");
         res.add("run = start");
         int last = toBeScrolled%this.scrollStep;
         for(int i = 0; i < this.toBeScrolled/this.scrollStep; i++) {
             res.add("mouseMove(start); wait(0.5)");
             res.add("mouseDown(Button.LEFT); wait(0.5)");
-            res.add("start = run.below(stepY)");
+            res.add("start = run.right(stepX)");
             res.add("wait(0.5)");//
             res.add("mouseMove(run)");
             res.add("wait(1)");
             res.add("mouseUp()");
             res.add("wait(0.5)");
-            res.add("run = run.above(stepY)");
+            res.add("run = run.left(stepX)");
             res.add("wait(0.5)");//
         }
         if(last > 0){
             res.add("mouseMove(start); wait(0.5)");
             res.add("mouseDown(Button.LEFT); wait(0.5)");
-            res.add("run = run.below("+last+")");
+            res.add("run = run.right("+last+")");
             res.add("wait(0.5)");//
             res.add("mouseMove(run)");
             res.add("wait(1)");
@@ -99,17 +88,17 @@ public class ScrollUp extends ToggleInteraction {
         for(int i = 0; i < this.toBeScrolled/this.scrollStep;i++){
             res.add("MouseLeftPress");
             res.add("Sleep 500");//
-            res.add("MoveRelative \"0\" \"" + this.scrollStep + "\"");
+            res.add("MoveRelative \"" + this.scrollStep + "\" \"0\"");
             res.add("Sleep 1000");
             res.add("MouseLeftRelease");
             res.add("Sleep 500");//
-            res.add("MoveRelative \"0\" \"-" + this.scrollStep + "\"");
+            res.add("MoveRelative \"-" + this.scrollStep + "\" \"0\"");
             res.add("Sleep 500");//
         }
         if(last > 0){
             res.add("MouseLeftPress");
             res.add("Sleep 500");//
-            res.add("MoveRelative \"0\" \"" + last + "\"");
+            res.add("MoveRelative \"" + last +"\" \"0\"");
             res.add("Sleep 1000");
             res.add("MouseLeftRelease");
             res.add("Sleep 500");//
@@ -131,12 +120,12 @@ public class ScrollUp extends ToggleInteraction {
             res.add("\tsikuli_screen.wait(0.5);");
             res.add("\tsikuli_screen.mouseDown(Button.LEFT);");
             res.add("\tsikuli_screen.wait(0.5);");
-            res.add("\tl = l.below("+this.scrollStep+");");
+            res.add("\tl = l.right("+this.scrollStep+");");
             res.add("\tsikuli_screen.mouseMove(l);");
             res.add("\tsikuli_screen.wait(1);");
             res.add("\tsikuli_screen.mouseUp();");
             res.add("\tsikuli_screen.wait(0.5);");
-            res.add("\tl = l.above("+this.scrollStep+");");
+            res.add("\tl = l.left("+this.scrollStep+");");
             res.add("\tsikuli_screen.wait(0.5);");
         }
         if(last > 0){
@@ -144,7 +133,7 @@ public class ScrollUp extends ToggleInteraction {
             res.add("\tsikuli_screen.wait(0.5);");
             res.add("\tsikuli_screen.mouseDown(Button.LEFT);");
             res.add("\tsikuli_screen.wait(0.5);");
-            res.add("\tl = l.below("+last+");");
+            res.add("\tl = l.right("+last+");");
             res.add("\tsikuli_screen.mouseMove(l);");
             res.add("\tsikuli_screen.wait(1);");
             res.add("\tsikuli_screen.mouseUp();");
@@ -158,6 +147,7 @@ public class ScrollUp extends ToggleInteraction {
 
         return res;
     }
+
 
     @Override
     public ArrayList<String> generateEyeAutomateJavaLines(String starting_folder) {
@@ -176,17 +166,17 @@ public class ScrollUp extends ToggleInteraction {
         for (int i = 0 ; i < (this.toBeScrolled/this.scrollStep); i++){
             res.add("		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(match.getCenterLocation().getY() + " + this.scrollStep +"));\r\n");
+            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + this.scrollStep + "),(int)(match.getCenterLocation().getY()));\r\n");
             res.add("		Thread.sleep(1000);\r\n");
             res.add("		bot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)match.getCenterLocation().getX(),(int)match.getCenterLocation().getY());\r\n");
+            res.add("       bot.mouseMove((int)(match.getCenterLocation().getX()),(int)match.getCenterLocation().getY());\r\n");
             res.add("		Thread.sleep(500);\r\n");
         }
         if(last > 0){
             res.add("		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(match.getCenterLocation().getY() + " + last +"));");
+            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + last + "),(int)(match.getCenterLocation().getY()));");
             res.add("		Thread.sleep(1000);\r\n");
             res.add("		bot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
             res.add("		Thread.sleep(500);\r\n");
@@ -222,12 +212,12 @@ public class ScrollUp extends ToggleInteraction {
             res.add("\t\t\tsikuli_screen.wait(0.5);");
             res.add("\t\t\tsikuli_screen.mouseDown(Button.LEFT);");
             res.add("\t\t\tsikuli_screen.wait(0.5);");
-            res.add("\t\t\tl = l.below(" + this.scrollStep + ");");
+            res.add("\t\t\tl = l.right(" + this.scrollStep + ");");
             res.add("\t\t\tsikuli_screen.mouseMove(l);");
             res.add("\t\t\tsikuli_screen.wait(1);");
             res.add("\t\t\tsikuli_screen.mouseUp();");
             res.add("\t\t\tsikuli_screen.wait(0.5);");
-            res.add("\t\t\tl = l.above(" + this.scrollStep + ");");
+            res.add("\t\t\tl = l.left(" + this.scrollStep + ");");
             res.add("\t\t\tsikuli_screen.wait(0.5);");
         }
         if(last > 0){
@@ -235,7 +225,7 @@ public class ScrollUp extends ToggleInteraction {
             res.add("\tsikuli_screen.wait(0.5);");
             res.add("\tsikuli_screen.mouseDown(Button.LEFT);");
             res.add("\tsikuli_screen.wait(0.5);");
-            res.add("\tl = l.below("+last+");");
+            res.add("\tl = l.right("+last+");");
             res.add("\tsikuli_screen.mouseMove(l);");
             res.add("\t\t\tsikuli_screen.wait(1);");
             res.add("\tsikuli_screen.mouseUp();");
@@ -255,7 +245,7 @@ public class ScrollUp extends ToggleInteraction {
         for (int i = 0 ; i < (this.toBeScrolled/this.scrollStep); i++){
             res.add("		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(match.getCenterLocation().getY() + " + this.scrollStep +"));");
+            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + this.scrollStep + "),(int)(match.getCenterLocation().getY()));");
             res.add("		Thread.sleep(1000);\r\n");
             res.add("		bot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
             res.add("		Thread.sleep(500);\r\n");
@@ -265,7 +255,7 @@ public class ScrollUp extends ToggleInteraction {
         if(last > 0){
             res.add("		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(match.getCenterLocation().getY() + " + last +"));");
+            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + last + "),(int)(match.getCenterLocation().getY()));");
             res.add("		Thread.sleep(1000);\r\n");
             res.add("		bot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
             res.add("		Thread.sleep(500);\r\n");
@@ -294,12 +284,12 @@ public class ScrollUp extends ToggleInteraction {
             res.add("\t\t\tsikuli_screen.wait(0.5);");
             res.add("\t\t\tsikuli_screen.mouseDown(Button.LEFT);");
             res.add("\t\t\tsikuli_screen.wait(0.5);");
-            res.add("\t\t\tl = l.below(" + this.scrollStep + ");");
+            res.add("\t\t\tl = l.right(" + this.scrollStep + ");");
             res.add("\t\t\tsikuli_screen.mouseMove(l);");
             res.add("\t\t\tsikuli_screen.wait(1);");
             res.add("\t\t\tsikuli_screen.mouseUp();");
             res.add("\t\t\tsikuli_screen.wait(0.5);");
-            res.add("\t\t\tl = l.above(" + this.scrollStep + ");");
+            res.add("\t\t\tl = l.left(" + this.scrollStep + ");");
             res.add("\t\t\tsikuli_screen.wait(0.5);");
         }
         if(last > 0){
@@ -307,7 +297,7 @@ public class ScrollUp extends ToggleInteraction {
             res.add("\tsikuli_screen.wait(0.5);");
             res.add("\tsikuli_screen.mouseDown(Button.LEFT);");
             res.add("\tsikuli_screen.wait(0.5);");
-            res.add("\tl = l.below("+last+");");
+            res.add("\tl = l.right("+last+");");
             res.add("\tsikuli_screen.mouseMove(l);");
             res.add("\t\t\tsikuli_screen.wait(1);");
             res.add("\tsikuli_screen.mouseUp();");
@@ -328,7 +318,7 @@ public class ScrollUp extends ToggleInteraction {
         for (int i = 0 ; i < (this.toBeScrolled/this.scrollStep); i++){
             res.add("		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(match.getCenterLocation().getY() + " + this.scrollStep +"));");
+            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + this.scrollStep +"),(int)(match.getCenterLocation().getY()));");
             res.add("		Thread.sleep(1000);\r\n");
             res.add("		bot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
             res.add("		Thread.sleep(500);\r\n");
@@ -338,7 +328,7 @@ public class ScrollUp extends ToggleInteraction {
         if(last > 0){
             res.add("		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(match.getCenterLocation().getY() + " + last +"));");
+            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + last + "),(int)(match.getCenterLocation().getY()));");
             res.add("		Thread.sleep(1000);\r\n");
             res.add("		bot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
             res.add("		Thread.sleep(500);\r\n");
