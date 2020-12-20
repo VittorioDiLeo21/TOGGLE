@@ -2,11 +2,14 @@ package it.polito.toggle.utils;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.WindowManager;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -14,9 +17,14 @@ import android.widget.HorizontalScrollView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import androidx.test.rule.ActivityTestRule;
 
+import com.example.ondatatestapp.TOGGLETools;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 import static androidx.core.widget.ListViewCompat.scrollListBy;
@@ -54,6 +62,12 @@ public class ScrollHandler {
         View child = av.getChildAt(posDisplayed);
         int[] coords = new int[2];
         child.getLocationInWindow(coords);
+        return "["+coords[0]+","+coords[1]+"]";
+    }
+
+    public static String getScrollableCoords(View v){
+        int[] coords = new int[2];
+        v.getLocationInWindow(coords);
         return "["+coords[0]+","+coords[1]+"]";
     }
 
@@ -128,8 +142,9 @@ public class ScrollHandler {
         return m_nItemOffY[pos] - nItemY;
     }
 
-    public static int getActualOffsetFromStart(AdapterView v,int pos){
-        View view = v.getChildAt(pos);
+    public static int getActualOffsetFromStart(AdapterView v){
+        int pos = v.getFirstVisiblePosition();
+        View view = v.getChildAt(0);
         int nItemX = view.getLeft();
         return m_nItemOffX[pos] - nItemX;
     }
@@ -241,20 +256,82 @@ public class ScrollHandler {
                 v instanceof NestedScrollView*/;
     }
 
-    public static ViewParent getScrollableParent(View v){
+    public static String getScrollableClass(View v){
+        if(v instanceof ScrollView)
+            return "ScrollView";
+        else if(v instanceof HorizontalScrollView)
+            return "HorizontalScrollView";
+        else if(v instanceof ListView)
+            return "ListView";
+        else
+            return "";
+    }
+
+    public static View findScrollableFromText(Activity activity,String text,boolean isHint) throws ClassNotFoundException, IllegalAccessException, NoSuchFieldException {
+        WindowManager windowManager = (WindowManager)activity.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+        Field globalField = Class.forName("android.view.WindowManagerImpl").getDeclaredField("mGlobal");
+        globalField.setAccessible(true);
+        Object globalFieldValue = globalField.get(windowManager);
+        ArrayList<View> views = (ArrayList<View>) TOGGLETools.getViews(globalFieldValue);
+        ViewGroup v = (ViewGroup)views.get(views.size()-1);
+
+        int scrollId = findScrollableInHierarchy(v,text,isHint);
+        if(scrollId == -1)
+            return null;
+        return activity.findViewById(scrollId);
+    }
+
+    /**
+     * If return value == -1 --> all the child views do not contain a view with given id
+     * if return value == id --> one of the child views is actually the required view and we are going up to find a scrollable parent
+     * if return value != -1 && != id --> we found the required scrollable view, we are leaving this method
+     * @param v
+     * @param txt
+     * @param isHint
+     * @return
+     */
+    public static int findScrollableInHierarchy(View v,String txt,boolean isHint){
+        if(v == null)
+            return -1;
+        if(!(v instanceof ViewGroup)){
+            if(v instanceof TextView){
+                if(isHint)
+                    return ((TextView)v).getHint().equals(txt) ? v.getId() : -1;
+                else
+                    return ((TextView)v).getText().equals(txt) ? v.getId() : -1;
+            } else {
+                return -1;
+            }
+        }
+        ViewGroup vg = (ViewGroup) v;
+        if(vg.getChildCount() == 0){
+            return -1;
+        }
+        for(int i = 0 ; i < vg.getChildCount(); i++){
+            int res = findScrollableInHierarchy((View)vg.getChildAt(i),txt,isHint);
+            if(res != -1) { // view found
+                if(isScrollable(vg.getChildAt(i)))
+                    return vg.getChildAt(i).getId();
+                return res;
+            }
+        }
+        return -1;
+    }
+
+    public static View getScrollableParent(View v){
         if(isScrollable(v)){
-            return (ViewParent) v;
+            return v;
         } else {
             ViewParent vg = v.getParent();
             do {
                 if(isScrollable((View)vg))
-                    return vg;
+                    return (View)vg;
             } while((vg = vg.getParent()) != null);
             return null;
         }
     }
 
-    public static int getScrollXFromScrollable(ViewParent scrollable) {
+    public static int getScrollXFromScrollable(View scrollable) {
         if(scrollable == null)
             return 0;
         if(scrollable instanceof ScrollView){
@@ -269,7 +346,7 @@ public class ScrollHandler {
         return 0;
     }
 
-    public static int getScrollYFromScrollable(ViewParent scrollable) {
+    public static int getScrollYFromScrollable(View scrollable) {
         if(scrollable == null)
             return 0;
         if(scrollable instanceof ScrollView){
