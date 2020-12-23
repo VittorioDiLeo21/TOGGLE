@@ -207,6 +207,16 @@ public abstract class ToggleInteraction {
                 String nodeCoords = search_keyword.split("_")[1];
                 expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(id).append("\"]/node[contains(@bounds,'").append(nodeCoords).append("')]").toString());
                 break;
+            case "atposition":
+                String[] parameters = search_keyword.split("_");
+                Integer pos = Integer.parseInt(parameters[1]);
+                Integer offset = Integer.parseInt(parameters[2]);
+                pos = pos-offset;
+                expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(parameters[0]).append("\"]/node[@index=\"").append(pos).append("\"]").toString());
+                break;
+            case "text_adapterView":
+                expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword.split("_")[0]).append("\"]/node[@text=\"").append(search_keyword.split("_")[1]).append("\"]").toString());
+                break;
         }
 
         assert expr != null;

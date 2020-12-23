@@ -16,7 +16,7 @@ public class Main {
                 "androidTest",
                 "C:\\Users\\vitto\\OneDrive\\Desktop\\onDataTests",
                 "com.example.ondatatestapp",
-                "C:\\Users\\vitto\\AndroidStudioProjects\\OnDataTestApp\\app\\src\\androidTest\\java\\com\\example\\ondatatestapp\\testScroll\\",
+                "C:\\Users\\vitto\\AndroidStudioProjects\\OnDataTestApp\\app\\src\\androidTest\\java\\com\\example\\ondatatestapp\\test\\",
                 Emulators.NEXUS_5);
         try {
             toggle.executeFullProcess();

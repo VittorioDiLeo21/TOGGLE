@@ -499,18 +499,25 @@ public class Enhancer {
             if(a == null) {
                 parseJsonArgument(j, a = j.getJSONArray("arguments"), 0);
             } else {
-                parseJsonArgument(j, a = ((JSONObject) a.get(i)).getJSONArray("arguments"),0);
+                parseJsonArgument(j, a = ((JSONObject) a.get(i)).getJSONArray("arguments"), 0);
 
                 // check followed by perform or vice versa
-                if (((JSONObject) a.get(0)).getString("type").equals("EnclosedExpr"))
-                    a = new JSONArray().put(((JSONObject) a.get(0)).getJSONObject("inner"));
+                if (((JSONObject) a.get(0)).has("typeC")) {
+                    JSONObject type = (JSONObject) ((JSONObject) a.get(0)).get("type");
+                    parseLeftInArgument(type);
+                    parseRightInArgument(type);
+                    parseScopeInArgument(type);
+                } else {
+                    if (((JSONObject) a.get(0)).getString("type").equals("EnclosedExpr"))
+                        a = new JSONArray().put(((JSONObject) a.get(0)).getJSONObject("inner"));
 
-                // parse left and right are used if there is a concatenation of strings
-                parseLeftInArgument((JSONObject) a.get(0));
-                parseRightInArgument((JSONObject) a.get(0));
+                    // parse left and right are used if there is a concatenation of strings
+                    parseLeftInArgument((JSONObject) a.get(0));
+                    parseRightInArgument((JSONObject) a.get(0));
 
-                // used when there are FieldAccessExpr
-                parseScopeInArgument((JSONObject) a.get(0));
+                    // used when there are FieldAccessExpr
+                    parseScopeInArgument((JSONObject) a.get(0));
+                }
             }
 
             // field is empty if the parameter is not a FieldAccessExpr otherwise contains
@@ -597,10 +604,18 @@ public class Enhancer {
 
     private void methodOverloading(JSONArray a, int i) {
         try {
-            String type = a.getJSONObject(i).getString("type");
+            String type;
             String name = "";
+            if(a.getJSONObject(i).has("typeC")){
+                type = a.getJSONObject(i).getString("typeC");
+                name = a.getJSONObject(i).getJSONObject("type").getJSONObject("name").getString("identifier");
+            } else {
+                type = a.getJSONObject(i).getString("type");
+                name = a.getJSONObject(i).getJSONObject("name").getString("identifier");
+            }
 
-            name = a.getJSONObject(i).getJSONObject("name").getString("identifier");
+
+            //name = a.getJSONObject(i).getJSONObject("name").getString("identifier");
 
             if (!field.toString().isEmpty() && !field.toString().startsWith("R.id.")
                     // && !field.toString().startsWith("ViewMatchers.") &&
@@ -639,6 +654,8 @@ public class Enhancer {
 
                 parameters = new StringBuilder("");
                 field = new StringBuilder("");
+            } else if (type.equals("ClassExpr") && isNotAnEspressoCommand(name)){
+                parameters.append(name);
             }
 
             parseJsonArgument(null, a, ++i);
@@ -844,7 +861,17 @@ public class Enhancer {
 
             JsonPrinter printer = new JsonPrinter(true);
             String json = printer.output(stmt);
-
+            try {
+                //************************************
+                File log = new File(methodName + ".txt");
+                log.createNewFile();
+                FileWriter myWriter = new FileWriter(log);
+                myWriter.write(json);
+                myWriter.close();
+                //*****************************
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             // TEST CASES like : ViewInteraction vi = onView(withId(...)).perform(...);
             if(json.contains("VariableDeclarator")) {
                 String type = "type";
@@ -858,15 +885,20 @@ public class Enhancer {
                 }
             }
 
+            if(json.contains("ClassExpr")){
+                String type = "type";
+                for(int j = -1; (j=json.indexOf(type,j+1)) != -1; j++){
+                    String old = json.substring(j,j+17);
+                    if(old.equals("type\":\"ClassExpr\"")){
+                        json = json.substring(0, j) + "typeC\": \"ClassExpr\"" + json.substring(j + 17);
+                        break;
+                    }
+                }
+            }
+
             try {
                 JSONObject j = new JSONObject(json);
-                //************************************
-                File log = new File(methodName+".txt");
-                log.createNewFile();
-                FileWriter myWriter = new FileWriter(log);
-                myWriter.write(j.toString(4));
-                myWriter.close();
-                //*****************************
+
                 // System.out.println(j.toString());
                 j = j.getJSONObject("expression");
 
@@ -899,10 +931,10 @@ public class Enhancer {
                 //e.printStackTrace();
                 Utils.logException(e, "parseStatement");
 
-            } catch (IOException e) {
+            } /*catch (IOException e) {
                 //************************************
                 e.printStackTrace();
-            }
+            }*/
             //handling of independent Expresso actions
         } else {
             String op = "";
@@ -1203,18 +1235,6 @@ public class Enhancer {
 
             LogCat log;
 
-            // ******** first screen capture before scrolling
-
-            //block.addStatement(++i, JavaParser.parseStatement(
-                    //"capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
-
-            //block.addStatement(++i, screenCapture);
-
-            //LogCat log = new LogCat(methodName, "id", "\"" + listId + "\"", "onData", "");
-            //i = addLogInteractionToCu(log, i, block);
-            //block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
-            //**********
-
             block.addStatement(++i, this.findStartingCoordY);
             block.addStatement(++i, this.findAdapterViewTopLeft);
             //todo bisognerebbe prima capire se questa operazione fa un click o no
@@ -1239,26 +1259,8 @@ public class Enhancer {
                 int index = stmt.toString().lastIndexOf(".perform(");
                 String substmt = stmt.toString().substring(0,index);
                 substmt = substmt+".check(matches(isDisplayed()));";
-                //**
                 stmt2 = stmt;
-                //**
                 stmt = JavaParser.parseStatement(substmt);
-                /*Statement stmt2 = JavaParser.parseStatement(substmt);
-
-                block.addStatement(++i,stmt2);
-                block.addStatement(++i,tryStmt);
-                block.addStatement(++i, findEndingCoord);
-
-                block.addStatement(++i, JavaParser.parseStatement(
-                        "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
-                block.addStatement(++i, screenCapture);
-                block.addStatement(++i,dirScrollStmt);
-                log = new LogCat(methodName, "id-adapterView", "\"" + listId + "\"", "scrollDirTOGGLE",
-                        //"scrolly" + listId + "+\";\"+preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
-                        "preScrollYTOGGLE+\";\"+postScrollYTOGGLE+\";\"+heightTOGGLE+\";\"+adapterViewTOGGLE.getHeight()+\";\"+adapterViewTOGGLE.getWidth()");
-                i = addLogInteractionToCu(log,i,block);
-                block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
-                block.addStatement(++i,logNum);*/
             }
             //take a screenshot of the starting screen and dump the view hierarchy
             block.addStatement(++i, JavaParser.parseStatement(
@@ -1270,16 +1272,36 @@ public class Enhancer {
             block.addStatement(++i,stmt);
             block.addStatement(++i,tryStmt);
             block.addStatement(++i, findEndingCoordY);
-            /*block.addStatement(++i, JavaParser.parseStatement(
-                    "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
-
-            block.addStatement(++i, screenCapture);*/
             block.addStatement(++i, dirScrollStmt1);
             log = new LogCat(methodName, "id-adapterView", "\"" + listId + "\"", "scrollYDirTOGGLE",
                     //"scrolly" + listId + "+\";\"+preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
                     "preScrollYTOGGLE+\";\"+postScrollYTOGGLE+\";\"+heightTOGGLE+\";\"+adapterViewTOGGLE.getHeight()+\";\"+adapterViewTOGGLE.getWidth()+\";\"+locTOGGLE[0]+\";\"+locTOGGLE[1]");
             i = addLogInteractionToCu(log,i,block);
             //block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
+            String searchType = "";
+            String searchKw = "";
+            for(int j = 1; j < operations.size(); j++){
+                if(operations.get(j).getName().equals("is")){
+                    searchType = "text_adapterView";
+                    searchKw = "\""+listId+"_"+operations.get(j).getParameter()+"\"";
+                    break;
+                }else if(operations.get(j).getName().equals("atPosition")){
+                    searchType = "atposition";
+                    searchKw = "\""+listId +"_"+operations.get(j).getParameter()+"_\"+adapterViewTOGGLE.getFirstVisiblePosition()+\"_\"+adapterViewTOGGLE.getLastVisiblePosition()";
+                    break;
+                }/*else if(){
+
+                }*/
+            }
+            block.addStatement(++i, logNum);
+            block.addStatement(++i, JavaParser.parseStatement(
+                    "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
+
+
+            block.addStatement(++i, screenCapture);
+            block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
+            log = new LogCat(methodName, searchType, searchKw, "check","");
+            i = addLogInteractionToCu(log,i,block);
 
 
             if(stmt2 != null){
