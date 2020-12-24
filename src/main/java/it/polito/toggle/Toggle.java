@@ -101,18 +101,18 @@ public class Toggle {
 
         //2 build and install the apk
 
-        /*try {
+        try {
             installApp();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }*/
+        }
 
         //3 get the test Instrumentation
 
-        /*String instrumentation = getInstrumentation();
+        String instrumentation = getInstrumentation();
         if(instrumentation.isEmpty())
-            return false;*/
+            return false;
 
         //4
         //getDeviceDensity<-- da toggleGUI.EspressoGUI
@@ -120,11 +120,11 @@ public class Toggle {
         //eventually resize the emulator
         //5
 
-        //executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
+        executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
 
         //6
 
-        /*for(String testClassName : tests.keySet()){
+        for(String testClassName : tests.keySet()){
             //ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolution(),windowUtils.getEmulatorScreenPixelsWidth(this.device));
             String className = testClassName.replace("Enhanced","");
             //ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolutionAndHeight(),windowUtils.getEmulatorScreenPixelsWidth(this.device),windowUtils.getEmulatorScreenPixelHeight(this.device));
@@ -142,7 +142,7 @@ public class Toggle {
             } catch (ToggleException e) {
                 e.printStackTrace();
             }
-        }*/
+        }
 
         //8
         /*try {

@@ -1186,11 +1186,24 @@ public class Enhancer {
     private int enhanceMethodOnDataInAdapterView(BlockStmt block, String methodName, Statement stmt, int i) {
         try{
             // get onData(customMatcher(...)).inAdapterView(withId(R.id.'someId')
-            Node inAdapterView = getOnDataInAdapterView(stmt);
-            //Node atPosition = getOnDatAtPosition(stmt);
+            int listIdIndex = 0;
+            boolean found = false;
+            while(!found && listIdIndex < (operations.size()-1)){
+                if(operations.size() > (listIdIndex+1) &&
+                        operations.get(listIdIndex).getName().equals("inAdapterView") &&
+                        operations.get(listIdIndex+1).getName().equals("withId")){
+                    found = true;
+                }
+                listIdIndex++;
+            }
+            if(!found){
+                return ++i;
+            }
+            String listId = operations.get(listIdIndex).getParameter().replace("\"","");
+            //Node inAdapterView = getOnDataInAdapterView(stmt);
             // get 'someId' in
             // onData(customMatcher(...)).inAdapterView(withId(R.id.'someId')
-            String listId = getIdInAdapterView(inAdapterView);
+            //String listId = getIdInAdapterView(inAdapterView);
             Statement firstAdapterView = JavaParser.parseStatement("AdapterView adapterViewTOGGLE = ScrollHandler.findAdapterView(activityTOGGLETools.findViewById(R.id." + listId + "));\r\n");
             Statement adapterView = JavaParser.parseStatement("adapterViewTOGGLE = ScrollHandler.findAdapterView(activityTOGGLETools.findViewById(R.id." + listId + "));\r\n");
 
@@ -1274,7 +1287,6 @@ public class Enhancer {
             block.addStatement(++i, findEndingCoordY);
             block.addStatement(++i, dirScrollStmt1);
             log = new LogCat(methodName, "id-adapterView", "\"" + listId + "\"", "scrollYDirTOGGLE",
-                    //"scrolly" + listId + "+\";\"+preScrollYTOGGLE+\";\"+postScrollYTOGGLE");
                     "preScrollYTOGGLE+\";\"+postScrollYTOGGLE+\";\"+heightTOGGLE+\";\"+adapterViewTOGGLE.getHeight()+\";\"+adapterViewTOGGLE.getWidth()+\";\"+locTOGGLE[0]+\";\"+locTOGGLE[1]");
             i = addLogInteractionToCu(log,i,block);
             //block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
@@ -1283,7 +1295,7 @@ public class Enhancer {
             for(int j = 1; j < operations.size(); j++){
                 if(operations.get(j).getName().equals("is")){
                     searchType = "text_adapterView";
-                    searchKw = "\""+listId+"_"+operations.get(j).getParameter()+"\"";
+                    searchKw = "\""+listId+"_"+operations.get(j).getParameter().replace("\"","")+"\"";
                     break;
                 }else if(operations.get(j).getName().equals("atPosition")){
                     searchType = "atposition";
@@ -1782,7 +1794,7 @@ public class Enhancer {
                 //l = JavaParser.parseStatement("TOGGLETools.LogInteraction(now, " + "\"" + log.getMethodName() + "\","
                 //		+ "\"-\", \"-\"," + "\"" + log.getInteractionType() + "\", \"" + log.getInteractionParams() + "\"" + ");");
                 break;
-            case "scrollDirTOGGLE":
+            case "scrollYDirTOGGLE":
             case "scrollableYDirTOGGLE":
                 System.out.println(log.getInteractionParams());
                 l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName() + "\","
