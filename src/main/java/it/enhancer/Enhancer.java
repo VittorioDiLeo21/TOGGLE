@@ -54,30 +54,40 @@ public class Enhancer {
 
     private Statement firstPreScrollY = JavaParser.parseStatement("int preScrollYTOGGLE = 0;");
     private Statement preScrollY = JavaParser.parseStatement("preScrollYTOGGLE = 0;");
+    private Statement firstPreScrollX = JavaParser.parseStatement("int preScrollXTOGGLE = 0;");
+    private Statement preScrollX = JavaParser.parseStatement("preScrollXTOGGLE = 0;");
     private Statement firstScrollY = JavaParser.parseStatement("int[] scrollYTOGGLE = new int[2];");
     private Statement scrollY = JavaParser.parseStatement("scrollYTOGGLE = new int[2];");
     private Statement firstScrollX = JavaParser.parseStatement("int[] scrollXTOGGLE = new int[2];");
     private Statement scrollX = JavaParser.parseStatement("scrollXTOGGLE = new int[2];");
     private Statement firstScrollableClass = JavaParser.parseStatement("String scrollableClassTOGGLE = \"\";");
     private Statement scrollableClass = JavaParser.parseStatement("scrollableClassTOGGLE = \"\";");
-    private Statement firstSingleItemFirstH = JavaParser.parseStatement("int heightFirstTOGGLE = 0;");
+    /*private Statement firstSingleItemFirstH = JavaParser.parseStatement("int heightFirstTOGGLE = 0;");
     private Statement singleItemFirstH = JavaParser.parseStatement("heightFirstTOGGLE = 0;");
+    private Statement firstSingleItemFirstW = JavaParser.parseStatement("int widthFirstTOGGLE = 0;");
+    private Statement singleItemFirstW = JavaParser.parseStatement("widthFirstTOGGLE = 0;");*/
     private Statement firstSingleItemH = JavaParser.parseStatement("int heightTOGGLE = 0;");
     private Statement singleItemH = JavaParser.parseStatement("heightTOGGLE = 0;");
+    private Statement firstSingleItemW = JavaParser.parseStatement("int widthTOGGLE = 0;");
+    private Statement singleItemW = JavaParser.parseStatement("widthTOGGLE = 0;");
     private Statement firstLoc = JavaParser.parseStatement("int[] locTOGGLE = new int[2];");
     private Statement loc = JavaParser.parseStatement("locTOGGLE = new int[2];");
-    private Statement firstSingleItemLastH = JavaParser.parseStatement("int heightLastTOGGLE = 0;");
+
+    /*private Statement firstSingleItemLastH = JavaParser.parseStatement("int heightLastTOGGLE = 0;");
     private Statement singleItemLastH = JavaParser.parseStatement("heightLastTOGGLE = 0;");
-    private Statement firstScrollYDirectionStr = JavaParser.parseStatement("String scrollYDirTOGGLE = \"\";");
-    private Statement scrollYDirectionStr = JavaParser.parseStatement("scrollYDirTOGGLE = \"\";");
-    private Statement firstScrollXDirectionStr = JavaParser.parseStatement("String scrollXDirTOGGLE = \"\";");
-    private Statement scrollXDirectionStr = JavaParser.parseStatement("scrollXDirTOGGLE = \"\";");
+    private Statement firstSingleItemLastW = JavaParser.parseStatement("int widthLastTOGGLE = 0;");
+    private Statement singleItemLastW = JavaParser.parseStatement("widthLastTOGGLE = 0;");*/
+
+    private Statement firstScrollDirectionStr = JavaParser.parseStatement("String scrollDirTOGGLE = \"\";");
+    private Statement scrollDirectionStr = JavaParser.parseStatement("scrollDirTOGGLE = \"\";");
     private Statement firstScrollableYDirectionStr = JavaParser.parseStatement("String scrollableYDirTOGGLE = \"\";");
     private Statement scrollableYDirectionStr = JavaParser.parseStatement("scrollableYDirTOGGLE = \"\";");
     private Statement firstScrollableXDirectionStr = JavaParser.parseStatement("String scrollableXDirTOGGLE = \"\";");
     private Statement scrollableXDirectionStr = JavaParser.parseStatement("scrollableXDirTOGGLE = \"\";");
     private Statement firstPostScrollY = JavaParser.parseStatement("int postScrollYTOGGLE = 0;");
     private Statement postScrollY = JavaParser.parseStatement("postScrollYTOGGLE = 0;");
+    private Statement firstPostScrollX = JavaParser.parseStatement("int postScrollXTOGGLE = 0;");
+    private Statement postScrollX = JavaParser.parseStatement("postScrollXTOGGLE = 0;");
 
 
     private TryStmt screenCapture = (TryStmt) JavaParser.parseStatement("try { runOnUiThread(capture_task); } catch (Throwable t) { t.printStackTrace(); }");
@@ -85,8 +95,13 @@ public class Enhancer {
     private Statement dumpScreenProgressive = JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, device);");
 
     private Statement scrollHandlerSetup = JavaParser.parseStatement("ScrollHandler.getItemsHeight(adapterViewTOGGLE);");
-    private Statement getSingleItemHeightFirst = JavaParser.parseStatement("heightFirstTOGGLE = ScrollHandler.getSingleItemHeightIn(adapterViewTOGGLE,true);");
+    /*private Statement getSingleItemHeightFirst = JavaParser.parseStatement("heightFirstTOGGLE = ScrollHandler.getSingleItemHeightIn(adapterViewTOGGLE,true);");
     private Statement getSingleItemHeightLast = JavaParser.parseStatement("heightLastTOGGLE = ScrollHandler.getSingleItemHeightIn(adapterViewTOGGLE,false);");
+    private Statement getSingleItemWidthFirst = JavaParser.parseStatement("widthFirstTOGGLE = ScrollHandler.getSingleItemHeightIn(adapterViewTOGGLE,true);");
+    private Statement getSingleItemWidthLast = JavaParser.parseStatement("widthLastTOGGLE = ScrollHandler.getSingleItemHeightIn(adapterViewTOGGLE,false);");*/
+    private Statement getSingleItemHeightFirst = JavaParser.parseStatement("heightTOGGLE = ScrollHandler.getSingleItemHeightIn(adapterViewTOGGLE,true);");
+    private Statement getSingleItemWidthFirst = JavaParser.parseStatement("widthTOGGLE = ScrollHandler.getSingleItemWidthIn(adapterViewTOGGLE,true);");
+
     private Statement findAdapterViewTopLeft = JavaParser.parseStatement("adapterViewTOGGLE.getLocationOnScreen(locTOGGLE);");
     private Statement getStartScrollXFromScrollable = JavaParser.parseStatement("scrollXTOGGLE[0] = ScrollHandler.getScrollXFromScrollable(scrollableTOGGLE);");
     private Statement getStartScrollYFromScrollable = JavaParser.parseStatement("scrollYTOGGLE[0] = ScrollHandler.getScrollYFromScrollable(scrollableTOGGLE);");
@@ -96,19 +111,19 @@ public class Enhancer {
     private IfStmt dirScrollStmt1 = (IfStmt) JavaParser.parseStatement(
             "if(preScrollYTOGGLE <= postScrollYTOGGLE){\r\n"
                     + "         scrollYDirTOGGLE = \"scrolldown\";\r\n"
-                    + "         heightTOGGLE = heightLastTOGGLE;"
+                    //+ "         heightTOGGLE = heightLastTOGGLE;"
                     + "     } else {\r\n"
                     + "         scrollYDirTOGGLE =\"scrollup\";\r\n"
-                    + "         heightTOGGLE = heightFirstTOGGLE;"
+                    //+ "         heightTOGGLE = heightFirstTOGGLE;"
                     + "     }"
     );
     private IfStmt dirScrollStmt2 = (IfStmt) JavaParser.parseStatement(
             "if(preScrollXTOGGLE <= postScrollXTOGGLE){\r\n"
-                    + "         scrollXDirTOGGLE = \"scrollright\";\r\n"
-                    + "         widthTOGGLE = widthLastTOGGLE;"
+                    + "         scrollXDirTOGGLE += \"right\";\r\n"
+                    //+ "         widthTOGGLE = widthLastTOGGLE;"
                     + "     } else {\r\n"
-                    + "         scrollXDirTOGGLE =\"scrollleft\";\r\n"
-                    + "         widthTOGGLE = widthFirstTOGGLE;"
+                    + "         scrollXDirTOGGLE += \"left\";\r\n"
+                    //+ "         widthTOGGLE = widthFirstTOGGLE;"
                     + "     }"
     );
     private IfStmt dirScrollableStmt1 = (IfStmt) JavaParser.parseStatement(
@@ -1228,20 +1243,30 @@ public class Enhancer {
                 firstOnDataTest = false;
                 block.addStatement(++i, firstAdapterView);
                 block.addStatement(++i, firstPreScrollY);
+                block.addStatement(++i, firstPreScrollX);
                 block.addStatement(++i, firstPostScrollY);
-                block.addStatement(++i, firstScrollYDirectionStr);
-                block.addStatement(++i, firstSingleItemFirstH);
-                block.addStatement(++i, firstSingleItemLastH);
+                block.addStatement(++i, firstPostScrollX);
+                block.addStatement(++i, firstScrollDirectionStr);
+                //block.addStatement(++i, firstSingleItemFirstH);
+                //block.addStatement(++i, firstSingleItemFirstW);
+                //block.addStatement(++i, firstSingleItemLastH);
+                //block.addStatement(++i, firstSingleItemLastW);
                 block.addStatement(++i, firstSingleItemH);
+                block.addStatement(++i, firstSingleItemW);
                 block.addStatement(++i, firstLoc);
             } else {
                 block.addStatement(++i, adapterView);
                 block.addStatement(++i, preScrollY);
+                block.addStatement(++i, preScrollX);
                 block.addStatement(++i, postScrollY);
-                block.addStatement(++i, scrollYDirectionStr);
-                block.addStatement(++i, singleItemFirstH);
+                block.addStatement(++i, postScrollX);
+                block.addStatement(++i, scrollDirectionStr);
+                /*block.addStatement(++i, singleItemFirstH);
+                block.addStatement(++i, singleItemFirstW);
                 block.addStatement(++i, singleItemLastH);
+                block.addStatement(++i, singleItemLastW);*/
                 block.addStatement(++i, singleItemH);
+                block.addStatement(++i, singleItemW);
                 block.addStatement(++i, loc);
             }
             block.addStatement(++i, scrollHandlerSetup);
@@ -1249,6 +1274,7 @@ public class Enhancer {
             LogCat log;
 
             block.addStatement(++i, this.findStartingCoordY);
+            block.addStatement(++i, this.findStartingCoordX);
             block.addStatement(++i, this.findAdapterViewTopLeft);
             //todo bisognerebbe prima capire se questa operazione fa un click o no
             // e se fa un click bisogna prima fare un check(isDisplayed); poi si prende l'offset finale e poi si esegue il test originale
@@ -1259,7 +1285,9 @@ public class Enhancer {
             String interactionType = ViewActions.getSearchType(interaction);
             String interactionParams = operations.get(numberOfOperations - 1).getParameter();
             block.addStatement(++i,getSingleItemHeightFirst);
-            block.addStatement(++i,getSingleItemHeightLast);
+            //block.addStatement(++i,getSingleItemHeightLast);
+            block.addStatement(++i,getSingleItemWidthFirst);
+            //block.addStatement(++i,getSingleItemWidthLast);
             Statement stmt2 = null;
             if (interactionType.isEmpty()) {
                 // if it's not empty it is a check
@@ -1285,9 +1313,11 @@ public class Enhancer {
             block.addStatement(++i,stmt);
             block.addStatement(++i,tryStmt);
             block.addStatement(++i, findEndingCoordY);
+            block.addStatement(++i, findEndingCoordX);
             block.addStatement(++i, dirScrollStmt1);
-            log = new LogCat(methodName, "id-adapterView", "\"" + listId + "\"", "scrollYDirTOGGLE",
-                    "preScrollYTOGGLE+\";\"+postScrollYTOGGLE+\";\"+heightTOGGLE+\";\"+adapterViewTOGGLE.getHeight()+\";\"+adapterViewTOGGLE.getWidth()+\";\"+locTOGGLE[0]+\";\"+locTOGGLE[1]");
+            block.addStatement(++i, dirScrollStmt2);
+            log = new LogCat(methodName, "id-adapterView", "\"" + listId + "\"", "scrollDirTOGGLE",
+                    "preScrollYTOGGLE+\";\"+postScrollYTOGGLE+\";\"+preScrollXTOGGLE+\";\"+postScrollXTOGGLE+\";\"+heightTOGGLE+\";\"+widthTOGGLE+\";\"+adapterViewTOGGLE.getHeight()+\";\"+adapterViewTOGGLE.getWidth()+\";\"+locTOGGLE[0]+\";\"+locTOGGLE[1]");
             i = addLogInteractionToCu(log,i,block);
             //block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
             String searchType = "";
@@ -1794,7 +1824,7 @@ public class Enhancer {
                 //l = JavaParser.parseStatement("TOGGLETools.LogInteraction(now, " + "\"" + log.getMethodName() + "\","
                 //		+ "\"-\", \"-\"," + "\"" + log.getInteractionType() + "\", \"" + log.getInteractionParams() + "\"" + ");");
                 break;
-            case "scrollYDirTOGGLE":
+            case "scrollDirTOGGLE":
             case "scrollableYDirTOGGLE":
                 System.out.println(log.getInteractionParams());
                 l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName() + "\","

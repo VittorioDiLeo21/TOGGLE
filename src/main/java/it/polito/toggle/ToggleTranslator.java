@@ -27,6 +27,7 @@ public class ToggleTranslator {
     private int screen_size_width = 0;
 
     private float ratioH;
+    private float ratioW;
 
     public ToggleTranslator(String starting_folder, String package_name, String class_name, String test_name) {
         this.starting_folder = starting_folder;
@@ -34,14 +35,16 @@ public class ToggleTranslator {
         this.test_name = test_name;
         this.class_name = class_name;
         this.ratioH = 1;
+        this.ratioW = 1;
     }
 
-    public ToggleTranslator(String starting_folder, String package_name, String class_name, String test_name,float ratioH) {
+    public ToggleTranslator(String starting_folder, String package_name, String class_name, String test_name,float ratioH, float ratioW) {
         this.starting_folder = starting_folder;
         this.package_name = package_name;
         this.test_name = test_name;
         this.class_name = class_name;
         this.ratioH = ratioH;
+        this.ratioW = ratioW;
     }
 
     public String getStarting_folder() { return starting_folder; }
@@ -178,10 +181,12 @@ public class ToggleTranslator {
             case "dialogescape": return new DialogEscape(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
 
             //*********************************************************************************
-            case "scrolldown": return new ScrollDown(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH);
-            case "scrollup": return new ScrollUp(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH);
-            //case "scrollleft": return new ScrollLeft(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
-            //case "scrollright": return new ScrollRight(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            //case "scrolldown": return new ScrollDown(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH);
+            case "scrolldownright": return new ScrollDownRight(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH, ratioW);
+            case "scrolldownleft": return new ScrollDownLeft(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH, ratioW);
+            //case "scrollup": return new ScrollUp(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH);
+            case "scrollupright": return new ScrollUpRight(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH, ratioW);
+            case "scrollupleft": return new ScrollUpLeft(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH, ratioW);
             //*********************************************************************************
             default: throw new ToggleException("Interaction not found: " + interaction_type);
         }

@@ -350,6 +350,7 @@ public class ToggleClassManager {
         int method_interactions = 0;
 
         float ratioH = this.actualHeight / (float) this.deviceHeight;
+        float ratioW = this.actualWidth / (float) this.deviceWidth;
 
         ArrayList<String> test_class_code = new ArrayList<>();
 
@@ -386,7 +387,7 @@ public class ToggleClassManager {
         //add the methods
         for(String test_name: testNames){
             method_interactions = 0;
-            ToggleTranslator translator = new ToggleTranslator(starting_folder, package_name, class_name, test_name, ratioH);
+            ToggleTranslator translator = new ToggleTranslator(starting_folder, package_name, class_name, test_name, ratioH, ratioW);
 
             //translator.readLogcatToFile(logcat_filename);
 
@@ -451,53 +452,14 @@ public class ToggleClassManager {
 
 
         writeOnFile(starting_folder + "\\JavaTranslatedProject\\src\\" + class_name + "EyeAutomate.java",eyeautomate_only);
-        /*File foutjava_eyeautomate = new File(starting_folder + "\\JavaTranslatedProject\\src\\" + class_name + "EyeAutomate.java");
-        FileOutputStream fos = new FileOutputStream(foutjava_eyeautomate);
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-        for (String instruction:eyeautomate_only) {
-            bw.write(instruction);
-            bw.newLine();
-        }
-        bw.close();*/
-
-
         writeOnFile(starting_folder + "\\JavaTranslatedProject\\src\\" + class_name + "Sikuli.java",sikuli_only);
-        /*File foutjava_sikuli = new File(starting_folder + "\\JavaTranslatedProject\\src\\" + class_name + "Sikuli.java");
-        fos = new FileOutputStream(foutjava_sikuli);
-        bw = new BufferedWriter(new OutputStreamWriter(fos));
-        for (String instruction:sikuli_only) {
-            bw.write(instruction);
-            bw.newLine();
-        }
-        bw.close();*/
-
-
         writeOnFile(starting_folder + "\\JavaTranslatedProject\\src\\" + class_name + "EyeAutomateSikuli.java",eyeautomate_sikuli);
-        /*File foutjava_eyeautomate_sikuli = new File(starting_folder + "\\JavaTranslatedProject\\src\\" + class_name + "EyeAutomateSikuli.java");
-        fos = new FileOutputStream(foutjava_eyeautomate_sikuli);
-        bw = new BufferedWriter(new OutputStreamWriter(fos));
-        for (String instruction:eyeautomate_sikuli) {
-            bw.write(instruction);
-            bw.newLine();
-        }
-        bw.close();*/
-
-
         writeOnFile(starting_folder + "\\JavaTranslatedProject\\src\\" + class_name + "SikuliEyeAutomate.java",sikuli_eyeautomate);
-        /*File foutjava_sikuli_eyeautomate = new File(starting_folder + "\\JavaTranslatedProject\\src\\" + class_name + "SikuliEyeAutomate.java");
-        fos = new FileOutputStream(foutjava_sikuli_eyeautomate);
-        bw = new BufferedWriter(new OutputStreamWriter(fos));
-        for (String instruction:sikuli_eyeautomate) {
-            bw.write(instruction);
-            bw.newLine();
-        }
-        bw.close();*/
 
         return test_class_code;
     }
 
     public ArrayList<String> createClass(String logName) throws IOException, XPathExpressionException, SAXException, ParserConfigurationException, ToggleException {
-        //TODO
         //FUNZIONAMENTO: si aggiunge al logger come primo parametro dopo TOGGLETOOL il nome del test;
         //createClass lancia per ogni nome di test ricevuto un toggle translator.
         //gli script sikuli ed eyeautomate vengono salvati direttamente all'interno della cartella con le giuste immagini
@@ -508,6 +470,7 @@ public class ToggleClassManager {
         int method_interactions = 0;
 
         float ratioH = this.actualHeight / (float) this.deviceHeight;
+        float ratioW = this.actualWidth / (float) this.deviceWidth;
 
         ArrayList<String> test_class_code = new ArrayList<>();
 
@@ -544,7 +507,7 @@ public class ToggleClassManager {
         //add the methods
         for(String test_name: testNames){
             method_interactions = 0;
-            ToggleTranslator translator = new ToggleTranslator(starting_folder, package_name, class_name, test_name, ratioH);
+            ToggleTranslator translator = new ToggleTranslator(starting_folder, package_name, class_name, test_name, ratioH, ratioW);
 
             //translator.readLogcatToFile(logcat_filename);
 
@@ -561,13 +524,10 @@ public class ToggleClassManager {
             //never comment
             if(deviceWidth > 0 && actualWidth > 0) {
                 translator.saveCroppedScreenshots(interactions, deviceWidth, actualWidth);
-                //translator.saveCroppedScreenshotsThumbnailator(interactions,deviceWidth,actualWidth);
             }else
                 translator.saveCroppedScreenshots(interactions);
             translator.createEyeStudioScript(interactions);
             translator.createSikuliScript(interactions);
-            //translator.createSikuliJavaMethod(interactions);
-            //translator.createCombinedJavaMethod(interactions);
 
             eyeautomate_only.addAll(translator.createEyeAutomateJavaMethod(interactions));
             sikuli_only.addAll(translator.createSikuliJavaMethod(interactions));
@@ -588,10 +548,7 @@ public class ToggleClassManager {
         ArrayList<String> eyeAutomateOrSiculiMain = this.createEyeAutomateOrSikuliJavaMain();
         eyeautomate_only.addAll(eyeAutomateOrSiculiMain);
         sikuli_only.addAll(eyeAutomateOrSiculiMain);
-        /*for (String main_line: this.createEyeAutomateOrSikuliJavaMain()) {
-            eyeautomate_only.add(main_line);
-            sikuli_only.add(main_line);
-        }*/
+
         eyeautomate_sikuli.addAll(this.createCombinedMainEyeAutomateFirst());
         sikuli_eyeautomate.addAll(this.createCombinedMainSikuliFirst());
 
@@ -617,8 +574,6 @@ public class ToggleClassManager {
         return test_class_code;
     }
 
-
-    //todo cosa fare con le eccezioni
     private void writeOnFile(String filename, ArrayList<String> toBeWritten) throws IOException {
         File fout = new File(filename);
         FileOutputStream fos = new FileOutputStream(fout);
