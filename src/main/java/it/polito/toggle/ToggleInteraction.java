@@ -217,6 +217,9 @@ public abstract class ToggleInteraction {
             case "text_adapterView":
                 expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword.split("_")[0]).append("\"]//node[@text=\"").append(search_keyword.split("_")[1]).append("\"]").toString());
                 break;
+            case "class-scrollTo" :
+                expr = xPath.compile(new StringBuilder().append("//node[@class=\"android.widget.").append(search_keyword.split("_")[0]).append("\" and contains(@bounds,'").append(search_keyword.split("_")[1]).append("')]").toString());
+                break;
         }
 
         assert expr != null;

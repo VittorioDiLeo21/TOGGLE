@@ -50,10 +50,18 @@ public class ScrollHandler {
         return elementHeight;
     }
 
-    public static String getAdapterViewPosFrom(int offset, AdapterView av){
+    //TODO AGGIUNGERE PER CERCARE SIA SU MATRICE Y CHE X
+
+    public static String getAdapterViewPosFrom(int offsetY, int offsetX, AdapterView av){
         int pos = 0,posDisplayed = 0;
-        while(m_nItemOffY[pos] < offset)
-            pos++;
+        for(; pos < m_nItemCount; pos++){
+            if(m_nItemOffY[pos] >= offsetY &&
+                m_nItemOffX[pos] >= offsetX)
+                break;
+        }
+
+        /*while(m_nItemOffY[pos] < offsetY)
+            pos++;*/
 
         for(int i = av.getFirstVisiblePosition(); i <= av.getLastVisiblePosition(); i++,posDisplayed++){
             if(i==pos)
@@ -148,7 +156,7 @@ public class ScrollHandler {
         int nItemX = view.getLeft();
         return m_nItemOffX[pos] - nItemX;
     }
-
+//todo
     public static int getActualOffsetFrom(AdapterView v, int pos ){
         int actual = v.getFirstVisiblePosition();
         View view = v.getChildAt(pos);
@@ -162,10 +170,20 @@ public class ScrollHandler {
             pos = v.getFirstVisiblePosition();
         else
             pos = v.getLastVisiblePosition();
-        //View view = v.getChildAt(pos);
         View view = v.getAdapter().getView(pos,null,v);
         view.measure(UNBOUNDED,UNBOUNDED);
-        return view.getMeasuredHeight();/*view.getBottom() - view.getTop();*///view.getHeight();
+        return view.getMeasuredHeight();
+    }
+
+    public static int getSingleItemWidthIn(AdapterView v,boolean first){
+        int pos = 0;
+        if(first)
+            pos = v.getFirstVisiblePosition();
+        else
+            pos = v.getLastVisiblePosition();
+        View view = v.getAdapter().getView(pos,null,v);
+        view.measure(UNBOUNDED,UNBOUNDED);
+        return view.getMeasuredWidth();
     }
 
     public static int[] getListFirstVisiblePx(ListView v){

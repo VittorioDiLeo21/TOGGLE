@@ -33,12 +33,32 @@ public class ScrollUpLeft extends ToggleInteraction {
         int toY = Integer.parseInt(coords[1]);
         int fromX = Integer.parseInt(coords[2]);//
         int toX = Integer.parseInt(coords[3]);//
-        int singleItemH = Integer.parseInt(coords[4]);
-        int singleItemW = Integer.parseInt(coords[5]);//
-        int AVHeight = Integer.parseInt(coords[5]);
-        int AVWidth = Integer.parseInt(coords[6]);
-        int AVLeft = Integer.parseInt(coords[7]);
-        int AVTop = Integer.parseInt(coords[8]);
+        //int singleItemH = Integer.parseInt(coords[4]);
+        //int singleItemW = Integer.parseInt(coords[5]);//
+        int singleItemH = this.bottom - this.top;
+        int singleItemW = this.right - this.left;//
+        int AVHeight = Integer.parseInt(coords[6]);
+        if(AVHeight <= singleItemH){
+            singleItemH = (AVHeight)/2;
+            for(int i = 10; i >= 0; i--){
+                if((singleItemH-i)>0){
+                    singleItemH-=i;
+                    break;
+                }
+            }
+        }
+        int AVWidth = Integer.parseInt(coords[7]);
+        if(AVWidth <= singleItemW) {
+            singleItemW = (AVWidth)/2;
+            for(int i = 10; i >= 0; i--){
+                if((singleItemW-i)>0){
+                    singleItemW-=i;
+                    break;
+                }
+            }
+        }
+        int AVLeft = Integer.parseInt(coords[8]);
+        int AVTop = Integer.parseInt(coords[9]);
         int tmpStepY,tmpStepX;
         int offFromTop = (this.bottom-this.top)/2;
         int offFromStart = (this.right-this.left)/2;
@@ -47,7 +67,7 @@ public class ScrollUpLeft extends ToggleInteraction {
         if(-(toY-fromY) > AVHeight){
             tmpStepY = AVHeight - singleItemH;
         } else {
-            tmpStepY = -(toY-fromY) - singleItemH;
+            tmpStepY = Math.max(-(toY - fromY) - singleItemH, 0);
         }
         if((this.top + tmpStepY + offFromTop) > (AVTop + AVHeight)){
             //todo non hardoccare quel 10, potremmo ottenere dalla super classe l'ampiezza dell'ultimo nodo
@@ -61,7 +81,7 @@ public class ScrollUpLeft extends ToggleInteraction {
         if(-(toX-fromX) > AVWidth){
             tmpStepX = AVWidth - singleItemW;
         } else {
-            tmpStepX = -(toX-fromX) - singleItemW;
+            tmpStepX = Math.max(-(toX-fromX) - singleItemW,0);
         }
         if((this.left + tmpStepX + offFromStart) > (AVLeft + AVWidth)){
             //todo non hardoccare quel 10, potremmo ottenere dalla super classe l'ampiezza dell'ultimo nodo

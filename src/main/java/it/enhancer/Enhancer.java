@@ -80,10 +80,10 @@ public class Enhancer {
 
     private Statement firstScrollDirectionStr = JavaParser.parseStatement("String scrollDirTOGGLE = \"\";");
     private Statement scrollDirectionStr = JavaParser.parseStatement("scrollDirTOGGLE = \"\";");
-    private Statement firstScrollableYDirectionStr = JavaParser.parseStatement("String scrollableYDirTOGGLE = \"\";");
-    private Statement scrollableYDirectionStr = JavaParser.parseStatement("scrollableYDirTOGGLE = \"\";");
-    private Statement firstScrollableXDirectionStr = JavaParser.parseStatement("String scrollableXDirTOGGLE = \"\";");
-    private Statement scrollableXDirectionStr = JavaParser.parseStatement("scrollableXDirTOGGLE = \"\";");
+    private Statement firstScrollableDirectionStr = JavaParser.parseStatement("String scrollableDirTOGGLE = \"\";");
+    private Statement scrollableDirectionStr = JavaParser.parseStatement("scrollableDirTOGGLE = \"\";");
+    /*private Statement firstScrollableXDirectionStr = JavaParser.parseStatement("String scrollableXDirTOGGLE = \"\";");
+    private Statement scrollableXDirectionStr = JavaParser.parseStatement("scrollableXDirTOGGLE = \"\";");*/
     private Statement firstPostScrollY = JavaParser.parseStatement("int postScrollYTOGGLE = 0;");
     private Statement postScrollY = JavaParser.parseStatement("postScrollYTOGGLE = 0;");
     private Statement firstPostScrollX = JavaParser.parseStatement("int postScrollXTOGGLE = 0;");
@@ -110,34 +110,34 @@ public class Enhancer {
     private Statement getScrollableClass = JavaParser.parseStatement("scrollableClassTOGGLE = ScrollHandler.getScrollableClass(scrollableTOGGLE);");
     private IfStmt dirScrollStmt1 = (IfStmt) JavaParser.parseStatement(
             "if(preScrollYTOGGLE <= postScrollYTOGGLE){\r\n"
-                    + "         scrollYDirTOGGLE = \"scrolldown\";\r\n"
+                    + "         scrollDirTOGGLE = \"scrolldown\";\r\n"
                     //+ "         heightTOGGLE = heightLastTOGGLE;"
                     + "     } else {\r\n"
-                    + "         scrollYDirTOGGLE =\"scrollup\";\r\n"
+                    + "         scrollDirTOGGLE =\"scrollup\";\r\n"
                     //+ "         heightTOGGLE = heightFirstTOGGLE;"
                     + "     }"
     );
     private IfStmt dirScrollStmt2 = (IfStmt) JavaParser.parseStatement(
             "if(preScrollXTOGGLE <= postScrollXTOGGLE){\r\n"
-                    + "         scrollXDirTOGGLE += \"right\";\r\n"
+                    + "         scrollDirTOGGLE += \"right\";\r\n"
                     //+ "         widthTOGGLE = widthLastTOGGLE;"
                     + "     } else {\r\n"
-                    + "         scrollXDirTOGGLE += \"left\";\r\n"
+                    + "         scrollDirTOGGLE += \"left\";\r\n"
                     //+ "         widthTOGGLE = widthFirstTOGGLE;"
                     + "     }"
     );
     private IfStmt dirScrollableStmt1 = (IfStmt) JavaParser.parseStatement(
             "if(scrollYTOGGLE[0] <= scrollXTOGGLE[1]){\r\n"
-                    + "         scrollableYDirTOGGLE = \"scrolldown\";\r\n"
+                    + "         scrollableDirTOGGLE = \"scrolldown\";\r\n"
                     + "     } else {\r\n"
-                    + "         scrollableYDirTOGGLE =\"scrollup\";\r\n"
+                    + "         scrollableDirTOGGLE =\"scrollup\";\r\n"
                     + "     }"
     );
     private IfStmt dirScrollableStmt2 = (IfStmt) JavaParser.parseStatement(
             "if(scrollXTOGGLE[0] <= scrollXTOGGLE[1]){\r\n"
-                    + "         scrollableXDirTOGGLE = \"scrollright\";\r\n"
+                    + "         scrollableDirTOGGLE += \"right\";\r\n"
                     + "     } else {\r\n"
-                    + "         scrollableXDirTOGGLE =\"scrollleft\";\r\n"
+                    + "         scrollableDirTOGGLE += \"left\";\r\n"
                     + "     }"
     );
     private TryStmt tryStmt = (TryStmt) JavaParser.parseStatement(
@@ -1118,44 +1118,46 @@ public class Enhancer {
                                 block.addStatement(++i,firstScrollY);
                                 block.addStatement(++i, firstScrollable);
                                 block.addStatement(++i, firstScrollableClass);
-                                block.addStatement(++i,firstScrollableYDirectionStr);
-                                block.addStatement(++i,firstScrollableXDirectionStr);
+                                //block.addStatement(++i,firstScrollableYDirectionStr);
+                                block.addStatement(++i,firstScrollableDirectionStr);
+                                //block.addStatement(++i,firstScrollableXDirectionStr);
                             } else {
                                 block.addStatement(++i,scrollX);
                                 block.addStatement(++i,scrollY);
                                 block.addStatement(++i, scrollableClass);
                                 block.addStatement(++i, scrollable);
-                                block.addStatement(++i,scrollableYDirectionStr);
-                                block.addStatement(++i,scrollableXDirectionStr);
+                                //block.addStatement(++i,scrollableYDirectionStr);
+                                block.addStatement(++i,scrollableDirectionStr);
+                                //block.addStatement(++i,scrollableXDirectionStr);
                             }
 
-                            // 1 screenshot alla pagina pre onView
+                            // 1 screenshot pre onView
                             block.addStatement(++i, JavaParser.parseStatement(
                                     "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
 
                             block.addStatement(++i, screenCapture);
 
-                            // 2 prendere l'offset iniziale nella scrollView
+                            // 2 take the initial offset from the start of the scrollView
                             block.addStatement(++i,getStartScrollXFromScrollable);
                             block.addStatement(++i,getStartScrollYFromScrollable);
 
-                            // 3 fare il dump dello schermo pre scroll
+                            // 3 take the pre scroll dump of the screen
                             block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" + methodName + "\", device);"));
 
-                            // 4 fare operazione scroll
+                            // 4 scroll
                             block.addStatement(++i,st);
                             block.addStatement(++i,tryStmt);
 
-                            // 5 prendere offset finale nella scrollView
+                            // 5 take the final offset inside the scrollView
                             block.addStatement(++i,getEndScrollXFromScrollable);
                             block.addStatement(++i,getEndScrollYFromScrollable);
 
-                            // 6 loggare con dei searchType che permettano di capire che c'è uno scrollto
+                            // 6 log with the appropriate searchType
                             block.addStatement(++i,getScrollableClass);
                             block.addStatement(++i,dirScrollableStmt1);
-                            //block.addStatement(++i,dirScrollableStmt2);
-                            LogCat log = new LogCat(methodName, "class-scrollTo", "scrollableClassTOGGLE+\"_\"+ScrollHandler.getScrollableCoords(scrollableTOGGLE)", "scrollableYDirTOGGLE",
-                                    "scrollYTOGGLE[0]+\";\"+scrollYTOGGLE[1]+\";-1;\"+scrollableTOGGLE.getHeight()+\";\"+scrollableTOGGLE.getWidth()+\";\"+scrollableTOGGLE.getLeft()+\";\"+scrollableTOGGLE.getTop()");
+                            block.addStatement(++i,dirScrollableStmt2);
+                            LogCat log = new LogCat(methodName, "class-scrollTo", "scrollableClassTOGGLE+\"_\"+ScrollHandler.getScrollableCoords(scrollableTOGGLE)", "scrollableDirTOGGLE",
+                                    "scrollYTOGGLE[0]+\";\"+scrollYTOGGLE[1]+\";\"+scrollXTOGGLE[0]+\";\"+scrollXTOGGLE[1]+\";-1;-1;\"+scrollableTOGGLE.getHeight()+\";\"+scrollableTOGGLE.getWidth()+\";\"+scrollableTOGGLE.getLeft()+\";\"+scrollableTOGGLE.getTop()");
                             i = addLogInteractionToCu(log,i,block);
 
                             // 6.5 increment log number
@@ -1353,7 +1355,7 @@ public class Enhancer {
                         "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
 
                 block.addStatement(++i, screenCapture);
-                log = new LogCat(methodName, "position-adapterView", "\""+listId+"_\"+ScrollHandler.getAdapterViewPosFrom(postScrollYTOGGLE,adapterViewTOGGLE)", interactionType,
+                log = new LogCat(methodName, "position-adapterView", "\""+listId+"_\"+ScrollHandler.getAdapterViewPosFrom(postScrollYTOGGLE,postScrollXTOGGLE,adapterViewTOGGLE)", interactionType,
                         interactionParams);
                 i = addLogInteractionToCu(log,i,block);
                 block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
@@ -1825,7 +1827,7 @@ public class Enhancer {
                 //		+ "\"-\", \"-\"," + "\"" + log.getInteractionType() + "\", \"" + log.getInteractionParams() + "\"" + ");");
                 break;
             case "scrollDirTOGGLE":
-            case "scrollableYDirTOGGLE":
+            case "scrollableDirTOGGLE":
                 System.out.println(log.getInteractionParams());
                 l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName() + "\","
                         + "\"" + log.getSearchType() + "\"" + "," + log.getSearchKw() + ","
