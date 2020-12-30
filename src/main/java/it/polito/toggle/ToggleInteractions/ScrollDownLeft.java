@@ -105,31 +105,27 @@ public class ScrollDownLeft extends ToggleInteraction {
         res.add("start = start.below(stepY)");
         //res.add("start = start.left(stepX)");
 
-        res.add("run = start");
+        res.add("run = start.above(stepY)");
+        res.add("run = start.right(stepX)");
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
         int last = totToBeScrolled%totScrollStep;
 
-        for(int i = 0; i < totToBeScrolled/totScrollStep; i++) {
+        for(int i = 0; i < (totToBeScrolled/totScrollStep); i++) {
             res.add("mouseMove(start); wait(0.5)");
             res.add("mouseDown(Button.LEFT); wait(0.5)");
-            res.add("run = run.above(stepY)");
-            res.add("run = run.right(stepX)");
             res.add("wait(0.5)");//
             res.add("mouseMove(run)");
             res.add("wait(1)");//
             res.add("mouseUp()");
-            res.add("wait(0.5)");
-            res.add("start = run.below(stepY)");
-            res.add("start = run.left(stepX)");
             res.add("wait(0.5)");
         }
         if(last > 0){
             double ratio = (double)last/(double)totScrollStep;
             res.add("mouseMove(start); wait(0.5)");
             res.add("mouseDown(Button.LEFT); wait(0.5)");
-            res.add("run = run.above("+((int) this.scrollYStep*ratio)+")");
-            res.add("run = run.right("+((int) this.scrollXStep*ratio)+")");
+            res.add("run = start.above("+(int)(this.scrollYStep*ratio)+")");
+            res.add("run = run.right("+(int)(this.scrollXStep*ratio)+")");
             res.add("wait(0.5)");
             res.add("mouseMove(run)");
             res.add("wait(1)");//
@@ -154,7 +150,7 @@ public class ScrollDownLeft extends ToggleInteraction {
         res.add("MoveRelative \"0\" \"" + this.scrollYStep +"\"");
         res.add("Sleep 500");
         //int last = toBeScrolled%this.scrollStep;
-        for(int i = 0; i < totToBeScrolled/totScrollStep;i++){
+        for(int i = 0; i < (totToBeScrolled/totScrollStep);i++){
             res.add("MouseLeftPress");
             res.add("Sleep 500");
             res.add("MoveRelative \""+ this.scrollXStep + "\" \"-" + this.scrollYStep + "\"");
@@ -168,7 +164,7 @@ public class ScrollDownLeft extends ToggleInteraction {
             double ratio = (double)last/(double)totScrollStep;
             res.add("MouseLeftPress");
             res.add("Sleep 500");
-            res.add("MoveRelative \"" + ((int)this.scrollXStep*ratio) + "\" \"-" + ((int)this.scrollYStep*ratio) + "\"");
+            res.add("MoveRelative \"" + (int)(this.scrollXStep*ratio) + "\" \"-" + (int)(this.scrollYStep*ratio) + "\"");
             res.add("Sleep 1000");
             res.add("MouseLeftRelease");
             res.add("Sleep 500");
@@ -193,7 +189,7 @@ public class ScrollDownLeft extends ToggleInteraction {
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
         int last = totToBeScrolled%totScrollStep;
 
-        for(int i = 0; i < totToBeScrolled/totScrollStep; i++ ){
+        for(int i = 0; i < (totToBeScrolled/totScrollStep); i++ ){
             res.add("\tsikuli_screen.mouseMove(l);");
             res.add("\tsikuli_screen.wait(0.5);");
             res.add("\tsikuli_screen.mouseDown(Button.LEFT);");
@@ -214,8 +210,8 @@ public class ScrollDownLeft extends ToggleInteraction {
             res.add("\tsikuli_screen.wait(0.5);");
             res.add("\tsikuli_screen.mouseDown(Button.LEFT);");
             res.add("\tsikuli_screen.wait(0.5);");
-            res.add("\tl = l.above("+((int) this.scrollYStep*ratio)+");");
-            res.add("\tl = l.right("+((int) this.scrollXStep*ratio)+");");
+            res.add("\tl = l.above("+(int)(this.scrollYStep*ratio)+");");
+            res.add("\tl = l.right("+(int)(this.scrollXStep*ratio)+");");
             res.add("\tsikuli_screen.mouseMove(l);");
             res.add("\tsikuli_screen.wait(1);");
             res.add("\tsikuli_screen.mouseUp();");
@@ -244,29 +240,29 @@ public class ScrollDownLeft extends ToggleInteraction {
         res.add("\t\treturn \"fail;\"+interactions;");
         res.add("\t}");
 
-        res.add("		eye.move(match.getCenterLocation());\r\n");
-        res.add("		Thread.sleep(500);\r\n");
+        res.add("\t\teye.move(match.getCenterLocation());\r\n");
+        res.add("\t\tThread.sleep(500);\r\n");
         //res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + this.scrollXStep +"),(int)(match.getCenterLocation().getY() + " + this.scrollYStep +"));\r\n");
-        res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(match.getCenterLocation().getY() + " + this.scrollYStep +"));\r\n");
-        res.add("		Thread.sleep(500);\r\n");
+        res.add("\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + this.scrollYStep +"));\r\n");
+        res.add("\t\tThread.sleep(500);\r\n");
         for (int i = 0 ; i < (totToBeScrolled/totScrollStep); i++){
-            res.add("		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
-            res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(match.getCenterLocation().getX() + " + this.scrollXStep + "),(int)(match.getCenterLocation().getY()));\r\n"); //from bottom to top
-            res.add("		Thread.sleep(1000);\r\n");
-            res.add("		bot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);\r\n");
-            res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(match.getCenterLocation().getY() + " + this.scrollYStep +"));\r\n");
-            res.add("		Thread.sleep(500);\r\n");
+            res.add("\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
+            res.add("\t\tThread.sleep(500);\r\n");
+            res.add("\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.scrollXStep + "),(int)(match.getCenterLocation().getY()));\r\n"); //from bottom to top
+            res.add("\t\tThread.sleep(1000);\r\n");
+            res.add("\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);\r\n");
+            res.add("\t\tThread.sleep(500);\r\n");
+            res.add("\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() - " + this.scrollXStep + "),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + this.scrollYStep +"));\r\n");
+            res.add("\t\tThread.sleep(500);\r\n");
         }
         if(last > 0){
             double ratio = (double)last/(double)totScrollStep;
-            res.add("		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
-            res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + "+((int) this.scrollXStep*ratio)+"),(int)(match.getCenterLocation().getY() - "+((int) this.scrollYStep*ratio)+"));");
-            res.add("		Thread.sleep(1000);\r\n");
-            res.add("		bot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
-            res.add("		Thread.sleep(500);\r\n");
+            res.add("\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
+            res.add("\t\tThread.sleep(500);\r\n");
+            res.add("\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + "+(int)(this.scrollXStep*ratio)+"),(int)(MouseInfo.getPointerInfo().getLocation().getY() - "+(int)(this.scrollYStep*ratio)+"));");
+            res.add("\t\tThread.sleep(1000);\r\n");
+            res.add("\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
+            res.add("\t\tThread.sleep(500);\r\n");
         }
 
         res.add("}");
@@ -317,16 +313,16 @@ public class ScrollDownLeft extends ToggleInteraction {
             res.add("\t\t\tsikuli_screen.wait(0.5);");
         }
         if(last > 0){
-            res.add("\tsikuli_screen.mouseMove(l);");
-            res.add("\tsikuli_screen.wait(0.5);");
-            res.add("\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\tsikuli_screen.wait(0.5);");
-            res.add("\tl = l.above("+((int) this.scrollYStep*ratio)+");");
-            res.add("\tl = l.right("+((int)this.scrollXStep*ratio)+");");
-            res.add("\tsikuli_screen.mouseMove(l);");
+            res.add("\t\t\tsikuli_screen.mouseMove(l);");
+            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tsikuli_screen.mouseDown(Button.LEFT);");
+            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tl = l.above("+(int)(this.scrollYStep*ratio)+");");
+            res.add("\t\t\tl = l.right("+(int)(this.scrollXStep*ratio)+");");
+            res.add("\t\t\tsikuli_screen.mouseMove(l);");
             res.add("\t\t\tsikuli_screen.wait(1);");
-            res.add("\tsikuli_screen.mouseUp();");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tsikuli_screen.mouseUp();");
+            res.add("\t\t\tsikuli_screen.wait(0.5);");
         }
         res.add("\t\t\t}");
         res.add("\t\tcatch (FindFailed ffe) {");
@@ -337,29 +333,29 @@ public class ScrollDownLeft extends ToggleInteraction {
 
         //eyeautomate
         res.add("\telse {");
-        res.add("		eye.move(match.getCenterLocation());\r\n");
-        res.add("		Thread.sleep(500);\r\n");
+        res.add("\t\t\teye.move(match.getCenterLocation());\r\n");
+        res.add("\t\t\tThread.sleep(500);\r\n");
 
-        res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(match.getCenterLocation().getY() + " + this.scrollYStep +"));\r\n");
+        res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + this.scrollYStep +"));\r\n");
 
-        res.add("		Thread.sleep(500);\r\n");
+        res.add("\t\t\tThread.sleep(500);\r\n");
         for (int i = 0 ; i < (totToBeScrolled/totScrollStep); i++){
-            res.add("		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
-            res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(match.getCenterLocation().getX() + " + this.scrollXStep + "),(int)(match.getCenterLocation().getY()));\r\n"); //from bottom to top
-            res.add("		Thread.sleep(1000);\r\n");
-            res.add("		bot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
-            res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(match.getCenterLocation().getY() + " + this.scrollYStep +"));\r\n");
-            res.add("		Thread.sleep(500);\r\n");
+            res.add("\t\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
+            res.add("\t\t\tThread.sleep(500);\r\n");
+            res.add("\t\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.scrollXStep + "),(int)(match.getCenterLocation().getY()));\r\n"); //from bottom to top
+            res.add("\t\t\tThread.sleep(1000);\r\n");
+            res.add("\t\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
+            res.add("\t\t\tThread.sleep(500);\r\n");
+            res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() - " + this.scrollXStep + "),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + this.scrollYStep +"));\r\n");
+            res.add("\t\t\tThread.sleep(500);\r\n");
         }
         if(last > 0){
-            res.add("		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
-            res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + ((int)this.scrollXStep*ratio) + "),(int)(match.getCenterLocation().getY() - " + ((int)this.scrollYStep*ratio) +"));");
-            res.add("		Thread.sleep(1000);\r\n");
-            res.add("		bot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
-            res.add("		Thread.sleep(500);\r\n");
+            res.add("\t\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
+            res.add("\t\t\tThread.sleep(500);\r\n");
+            res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + (int)(this.scrollXStep*ratio) + "),(int)(MouseInfo.getPointerInfo().getLocation().getY() - " + (int)(this.scrollYStep*ratio) +"));");
+            res.add("\t\t\tThread.sleep(1000);\r\n");
+            res.add("\t\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
+            res.add("\t\t\tThread.sleep(500);\r\n");
         }
 
         res.add("\t}");
@@ -384,31 +380,31 @@ public class ScrollDownLeft extends ToggleInteraction {
         res.add("\torg.sikuli.script.Match sikuli_match = sikuli_screen.find(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\",  "\\\\") + "\");");
         res.add("\torg.sikuli.script.Location l = sikuli_match.getCenter();");
 
-        res.add("\t\t\tsikuli_screen.wait(0.5);");
+        res.add("\tsikuli_screen.wait(0.5);");
         res.add("\tl = l.below("+this.scrollYStep+");");
         //res.add("\tl = l.left("+this.scrollXStep+");");
-        for(int i = 0; i < totToBeScrolled/totScrollStep; i++) {
-            res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
-            res.add("\t\t\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
-            res.add("\t\t\tl = l.above(" + this.scrollYStep + ");");
-            res.add("\t\t\tl = l.right(" + this.scrollXStep + ");");
-            res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tsikuli_screen.wait(1);");
-            res.add("\t\t\tsikuli_screen.mouseUp();");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
-            res.add("\t\t\tl = l.below(" + this.scrollYStep + ");");
-            res.add("\t\t\tl = l.left(" + this.scrollXStep + ");");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+        for(int i = 0; i < (totToBeScrolled/totScrollStep); i++) {
+            res.add("\tsikuli_screen.mouseMove(l);");
+            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tsikuli_screen.mouseDown(Button.LEFT);");
+            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tl = l.above(" + this.scrollYStep + ");");
+            res.add("\tl = l.right(" + this.scrollXStep + ");");
+            res.add("\tsikuli_screen.mouseMove(l);");
+            res.add("\tsikuli_screen.wait(1);");
+            res.add("\tsikuli_screen.mouseUp();");
+            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tl = l.below(" + this.scrollYStep + ");");
+            res.add("\tl = l.left(" + this.scrollXStep + ");");
+            res.add("\tsikuli_screen.wait(0.5);");
         }
         if(last > 0){
             res.add("\tsikuli_screen.mouseMove(l);");
             res.add("\tsikuli_screen.wait(0.5);");
             res.add("\tsikuli_screen.mouseDown(Button.LEFT);");
             res.add("\tsikuli_screen.wait(0.5);");
-            res.add("\t\t\tl = l.above(" + ((int)this.scrollYStep*ratio) + ");");
-            res.add("\t\t\tl = l.right(" + ((int)this.scrollXStep*ratio) + ");");
+            res.add("\tl = l.above(" + (int)(this.scrollYStep*ratio) + ");");
+            res.add("\tl = l.right(" + (int)(this.scrollXStep*ratio) + ");");
             res.add("\tsikuli_screen.mouseMove(l);");
             res.add("\tsikuli_screen.wait(1);");
             res.add("\tsikuli_screen.mouseUp();");
@@ -424,27 +420,27 @@ public class ScrollDownLeft extends ToggleInteraction {
         res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions;");
         res.add("\t\t}");
         res.add("\t\telse {");						//test ok with eyeautomate
-        res.add("		eye.move(match.getCenterLocation());\r\n");
-        res.add("		Thread.sleep(500);\r\n");
-        res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(match.getCenterLocation().getY() + " + this.scrollYStep +"));\r\n");
-        res.add("		Thread.sleep(500);\r\n");
+        res.add("\t\t\teye.move(match.getCenterLocation());\r\n");
+        res.add("\t\t\tThread.sleep(500);\r\n");
+        res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + this.scrollYStep +"));\r\n");
+        res.add("\t\t\tThread.sleep(500);\r\n");
         for (int i = 0 ; i < (totToBeScrolled/totScrollStep); i++){
-            res.add("		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
-            res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(match.getCenterLocation().getX() + " + this.scrollXStep + "),(int)(match.getCenterLocation().getY()));\r\n"); //from bottom to top
-            res.add("		Thread.sleep(1000);\r\n");
-            res.add("		bot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
-            res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX()),(int)(match.getCenterLocation().getY() + " + this.scrollYStep +"));\r\n");
-            res.add("		Thread.sleep(500);\r\n");
+            res.add("\t\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
+            res.add("\t\t\tThread.sleep(500);\r\n");
+            res.add("\t\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.scrollXStep + "),(int)(match.getCenterLocation().getY()));\r\n"); //from bottom to top
+            res.add("\t\t\tThread.sleep(1000);\r\n");
+            res.add("\t\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
+            res.add("\t\t\tThread.sleep(500);\r\n");
+            res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() - " + this.scrollXStep + "),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + this.scrollYStep +"));\r\n");
+            res.add("\t\t\tThread.sleep(500);\r\n");
         }
         if(last > 0){
-            res.add("		bot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
-            res.add("		Thread.sleep(500);\r\n");
-            res.add("       bot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + ((int)this.scrollXStep*ratio) +"),(int)(match.getCenterLocation().getY() - " + ((int)this.scrollYStep*ratio) +"));\r\n");
-            res.add("		Thread.sleep(1000);\r\n");
-            res.add("		bot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
-            res.add("		Thread.sleep(500);\r\n");
+            res.add("\t\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
+            res.add("\t\t\tThread.sleep(500);\r\n");
+            res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + (int)(this.scrollXStep*ratio) +"),(int)(MouseInfo.getPointerInfo().getLocation().getY() - " + (int)(this.scrollYStep*ratio) +"));\r\n");
+            res.add("\t\t\tThread.sleep(1000);\r\n");
+            res.add("\t\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
+            res.add("\t\t\tThread.sleep(500);\r\n");
         }
         res.add("\t\t}");
         res.add("\t}");
