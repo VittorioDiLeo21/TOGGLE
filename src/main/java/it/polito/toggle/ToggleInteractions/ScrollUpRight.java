@@ -70,8 +70,14 @@ public class ScrollUpRight extends ToggleInteraction {
             tmpStepY = Math.max(-(toY-fromY) - singleItemH,0);
         }
         if((this.top + tmpStepY + offFromTop) > (AVTop + AVHeight)){
-            //todo non hardoccare quel 10, potremmo ottenere dalla super classe l'ampiezza dell'ultimo nodo
-            tmpStepY = tmpStepY-((this.top + tmpStepY + offFromTop) -(AVTop + AVHeight + 10));
+            for(int i = 10; i >=0 ; i--) {
+                int newtmp = tmpStepY - ((this.top + tmpStepY + offFromTop) - (AVTop + AVHeight - i));
+                if( newtmp < tmpStepY ) {
+                    tmpStepY = newtmp;
+                    break;
+                }
+            }
+            //tmpStepY = tmpStepY-((this.top + tmpStepY + offFromTop) -(AVTop + AVHeight + 10));
         }
         tmpStepY = (int)(tmpStepY*screenYRatio);
         this.toBeScrolledY = (int)((toY-fromY)*screenYRatio*(-1));
@@ -84,8 +90,14 @@ public class ScrollUpRight extends ToggleInteraction {
             tmpStepX = Math.max((toX-fromX) - singleItemW,0);
         }
         if((this.left + tmpStepX + offFromStart) > (AVLeft + AVWidth)){
-            //todo non hardoccare quel 10, potremmo ottenere dalla super classe l'ampiezza dell'ultimo nodo
-            tmpStepX = tmpStepX-((this.left + tmpStepX + offFromStart) - (AVLeft + AVWidth + 10));
+            for(int i = 10; i >=0 ; i--) {
+                int newtmp = tmpStepX-((this.left + tmpStepX + offFromStart) - (AVLeft + AVWidth - i));
+                if( newtmp < tmpStepX ) {
+                    tmpStepX = newtmp;
+                    break;
+                }
+            }
+            //tmpStepX = tmpStepX-((this.left + tmpStepX + offFromStart) - (AVLeft + AVWidth + 10));
         }
         tmpStepX = (int)(tmpStepX*screenXRatio);
         this.toBeScrolledX = (int)((toX-fromX)*screenXRatio);
