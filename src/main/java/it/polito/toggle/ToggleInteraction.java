@@ -215,7 +215,7 @@ public abstract class ToggleInteraction {
                 expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(parameters[0]).append("\"]/node[@index=\"").append(pos).append("\"]").toString());
                 break;
             case "text_adapterView":
-                expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword.split("_")[0]).append("\"]//node[@text=\"").append(search_keyword.split("_")[1]).append("\"]").toString());
+                expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword.split("_")[0]).append("\"]//node[node//@text=\"").append(search_keyword.split("_")[1]).append("\"]").toString());
                 break;
             case "class-scrollTo" :
                 expr = xPath.compile(new StringBuilder().append("//node[@class=\"android.widget.").append(search_keyword.split("_")[0]).append("\" and contains(@bounds,'").append(search_keyword.split("_")[1]).append("')]").toString());

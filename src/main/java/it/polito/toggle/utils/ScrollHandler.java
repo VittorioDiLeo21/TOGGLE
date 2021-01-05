@@ -12,11 +12,13 @@ import android.view.ViewParent;
 import android.view.WindowManager;
 import android.widget.Adapter;
 import android.widget.AdapterView;
+import android.widget.Gallery;
 import android.widget.GridView;
 import android.widget.HorizontalScrollView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.test.rule.ActivityTestRule;
@@ -24,6 +26,7 @@ import androidx.test.rule.ActivityTestRule;
 import com.example.ondatatestapp.TOGGLETools;
 
 import java.lang.reflect.Field;
+import java.nio.channels.GatheringByteChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,12 +48,9 @@ public class ScrollHandler {
             View child = adapter.getView(i,null,adapterView);
             child.measure(UNBOUNDED,UNBOUNDED);
             elementHeight+=child.getMeasuredHeight();
-            //Log.d("TEST HEIGHT", "Item " + i + " " + child.getMeasuredHeight());
         }
         return elementHeight;
     }
-
-    //TODO AGGIUNGERE PER CERCARE SIA SU MATRICE Y CHE X
 
     public static String getAdapterViewPosFrom(int offsetY, int offsetX, AdapterView av){
         int pos = 0,posDisplayed = 0;
@@ -60,13 +60,11 @@ public class ScrollHandler {
                 break;
         }
 
-        /*while(m_nItemOffY[pos] < offsetY)
-            pos++;*/
-
         for(int i = av.getFirstVisiblePosition(); i <= av.getLastVisiblePosition(); i++,posDisplayed++){
             if(i==pos)
                 break;
         }
+
         View child = av.getChildAt(posDisplayed);
         int[] coords = new int[2];
         child.getLocationInWindow(coords);
@@ -113,14 +111,53 @@ public class ScrollHandler {
         int height = 0;
         int width = 0;
         int numX = 1;
-        if(v instanceof GridView)
+        int numY = 1;
+        int colW = 0;
+        int pos = 0;
+        if(v instanceof GridView) {
             numX = ((GridView) v).getNumColumns();
+            colW = ((GridView) v).getColumnWidth();
+            numY = m_nItemCount/numX;
+            if(m_nItemCount%numX > 0)
+                numY++;
+        } else if( v instanceof Gallery){
+            numX = m_nItemCount;
+            v.measure(UNBOUNDED,UNBOUNDED);
+            colW = ((Gallery) v).getWidth();
+            numY = 1;
+        } else if( v instanceof ListView || v instanceof Spinner){
+            numX = 1;
+            v.measure(UNBOUNDED,UNBOUNDED);
+            colW = v.getWidth();
+            numY = m_nItemCount;
+        }
         int i = 0;
         int j = 0;
         m_nItemOffY = new int[m_nItemCount];
         m_nItemOffX = new int[m_nItemCount];
         View view;
-        for(i = 0; i < m_nItemCount;) {
+
+        for(i = 0; i < numY && pos < m_nItemCount; i++){
+            for(j = 0; j < numX && pos < m_nItemCount; j++, pos++){
+                view = adapter.getView(pos,null,v);
+                view.measure(UNBOUNDED,UNBOUNDED);
+                /*int left = view.getLeft();
+                int top = view.getTop();
+                int coords[] = new int[2];
+                view.getLocationInWindow(coords);*/
+                m_nItemOffY[pos] = height;
+                m_nItemOffX[pos] = width;
+                //width+= view.getMeasuredWidth();
+                width+= colW;
+                if((j == (numX-1)) ||               // if I'm going to start a new row
+                        (pos == m_nItemCount-1)){   // or if this was the last element
+                    height+= view.getMeasuredHeight();
+                }
+            }
+            width = 0;
+        }
+
+        /*for(i = 0; i < m_nItemCount;) {
             for(j = i%numX; j < numX && i < m_nItemCount; i++, j++){
                 view = adapter.getView(i,null,v);
                 view.measure(UNBOUNDED,UNBOUNDED);
@@ -132,7 +169,7 @@ public class ScrollHandler {
                 }
             }
             width = 0;
-        }
+        }*/
         return height;
     }
 

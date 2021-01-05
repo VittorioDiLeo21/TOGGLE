@@ -41,8 +41,8 @@ public class ScrollUpRight extends ToggleInteraction {
         if(AVHeight <= singleItemH){
             singleItemH = (AVHeight)/2;
             for(int i = 10; i >= 0; i--){
-                if((singleItemH-i)>0){
-                    singleItemH-=i;
+                if((singleItemH+i)<AVHeight){
+                    singleItemH+=i;
                     break;
                 }
             }
@@ -51,8 +51,8 @@ public class ScrollUpRight extends ToggleInteraction {
         if(AVWidth <= singleItemW) {
             singleItemW = (AVWidth)/2;
             for(int i = 10; i >= 0; i--){
-                if((singleItemW-i)>0){
-                    singleItemW-=i;
+                if((singleItemW+i)<AVWidth){
+                    singleItemW+=i;
                     break;
                 }
             }
