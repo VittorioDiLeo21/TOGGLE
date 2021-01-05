@@ -128,7 +128,13 @@ public class Toggle {
             //ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolution(),windowUtils.getEmulatorScreenPixelsWidth(this.device));
             String className = testClassName.replace("Enhanced","");
             //ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolutionAndHeight(),windowUtils.getEmulatorScreenPixelsWidth(this.device),windowUtils.getEmulatorScreenPixelHeight(this.device));
-            ToggleClassManager tcm = new ToggleClassManager(className,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolutionAndHeight(),windowUtils.getEmulatorScreenPixelsWidth(this.device),windowUtils.getEmulatorScreenPixelHeight(this.device));
+            ToggleClassManager tcm = new ToggleClassManager(className,
+                    appPackageName,
+                    guiTestsPath,
+                    new ArrayList<>(tests.get(testClassName).getTests()),
+                    getEmulatorResolutionAndHeight(),
+                    windowUtils.getEmulatorScreenPixelsWidth(this.device),
+                    windowUtils.getEmulatorScreenPixelHeight(this.device));
             //7
             try {
                 it.polito.toggle.Utils.createJavaProjectFolder(guiTestsPath);
@@ -192,6 +198,40 @@ public class Toggle {
         while ((line = r.readLine()) != null) {
             System.out.println(line);
         }
+    }
+
+    public void executeAllEnhancedEspressoByTestMethod(Map<String,ClassData> tests,String instrumentation) throws IOException {
+        grantPermissions();
+        removeOldDumps();
+        resetLogFiles();
+
+        startEspressoExecution = System.currentTimeMillis();
+        for(String testClass : tests.keySet()){
+            for(String test : tests.get(testClass).getTests()) {
+                executeEspressoTestMethod(testClass,test,instrumentation);
+            }
+            //todo pullare il file txt ed eliminarlo
+        }
+        endEspressoExecution = System.currentTimeMillis();
+    }
+
+    public void executeEspressoTestMethod(String testClass, String testMethod,String instrumentation) throws IOException {
+        ProcessBuilder builder;
+        Process p;
+        BufferedReader r;
+        String line;
+        startEspressoExecution = System.currentTimeMillis();
+        builder = new ProcessBuilder(
+                "cmd.exe", "/c\"", adbPath + "\\adb\" shell am instrument -w -e class "+/*appPackageName*/toggleInjectionPath+"."+testClass+"#"+testMethod+" "+instrumentation);
+        builder.redirectErrorStream(true);
+        p = builder.start();
+        r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        while ((line = r.readLine()) != null) {
+            System.out.println(line);
+        }
+
+        //todo pullare i file xml + bmp
+        //todo eliminarli
     }
 
     public void executeAllEnhancedEspresso(List<String> testClasses, String instrumentation) throws IOException {
