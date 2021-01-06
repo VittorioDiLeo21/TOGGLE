@@ -41,6 +41,72 @@ public class ToggleToolFinder extends Thread {
 		return false;
 	}
 
+	public static boolean findScrollHandler(File testFolder) {
+		File[] list = testFolder.listFiles();
+		if(list!=null) {
+			for (File fil : list) {
+				if (! fil.isDirectory() && fil.getName().endsWith(".java")) {
+					//System.out.println("File: "+fil.getName());
+					if (fil.getName().matches("(.*)ScrollHandler(.*)")) {
+						try {
+							Scanner scanner = new Scanner(fil);
+							while (scanner.hasNextLine()) {
+								String line = scanner.nextLine();
+								if (line.matches("(.*)package(.*)") && !line.matches("(.*)//(.*)")) {
+
+									//System.out.println(line);
+									toggleToolsPackage = line.split("package")[1].trim().replace(";", "");
+									break;
+								}
+
+							}
+							scanner.close();
+
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean findBitmapSaver(File testFolder) {
+		File[] list = testFolder.listFiles();
+		if(list!=null) {
+			for (File fil : list) {
+				if (! fil.isDirectory() && fil.getName().endsWith(".java")) {
+					//System.out.println("File: "+fil.getName());
+					if (fil.getName().matches("(.*)BitmapSaver(.*)")) {
+						try {
+							Scanner scanner = new Scanner(fil);
+							while (scanner.hasNextLine()) {
+								String line = scanner.nextLine();
+								if (line.matches("(.*)package(.*)") && !line.matches("(.*)//(.*)")) {
+
+									//System.out.println(line);
+									toggleToolsPackage = line.split("package")[1].trim().replace(";", "");
+									break;
+								}
+
+							}
+							scanner.close();
+
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	public static void copyScrollHandler(String scrollHandlerDstPath, String testClassPackage){
 		try {
 			String content = "package "+testClassPackage+";\r\n";

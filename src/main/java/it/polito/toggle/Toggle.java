@@ -7,19 +7,12 @@ import it.polito.toggle.exceptions.ToggleException;
 import it.polito.toggle.utils.Emulators;
 import it.polito.toggle.utils.EspressoTestFinder;
 import it.polito.toggle.utils.ToggleToolFinder;
-import it.windowUtils.ResizeException;
-import org.apache.commons.io.IOCase;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.xml.sax.SAXException;
 
-import javax.naming.NameNotFoundException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.awt.*;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -88,7 +81,11 @@ public class Toggle {
         File folder = new File(path);
         if(!ToggleToolFinder.findToggleTools(folder)){
             ToggleToolFinder.copyToggleTools(path,toggleInjectionPath);
+        }
+        if(!ToggleToolFinder.findBitmapSaver(folder)){
             ToggleToolFinder.copyBitmapSaver(path,toggleInjectionPath);
+        }
+        if(!ToggleToolFinder.findScrollHandler(folder)){
             ToggleToolFinder.copyScrollHandler(path,toggleInjectionPath);
         }
     }
@@ -210,7 +207,8 @@ public class Toggle {
             for(String test : tests.get(testClass).getTests()) {
                 executeEspressoTestMethod(testClass,test,instrumentation);
             }
-            //todo pullare il file txt ed eliminarlo
+            pullFile(testClass.replace("Enhanced","TOGGLE")+".txt");
+            resetLogFiles();
         }
         endEspressoExecution = System.currentTimeMillis();
     }
@@ -229,9 +227,9 @@ public class Toggle {
         while ((line = r.readLine()) != null) {
             System.out.println(line);
         }
-
-        //todo pullare i file xml + bmp
-        //todo eliminarli
+        //todo dbg
+        pullAllBmpXml(testMethod);
+        clearAllBmpXml(testMethod);
     }
 
     public void executeAllEnhancedEspresso(List<String> testClasses, String instrumentation) throws IOException {
@@ -242,7 +240,7 @@ public class Toggle {
         // Clear log files from previous executions
         resetLogFiles();
         // Clear the app before the test is launched
-        //clearApp(this.appProjectPath); todo il parametro è corretto? vedi EspressGUI.java linea 1717
+        //clearApp(this.appProjectPath); //todo il parametro è corretto? vedi EspressGUI.java linea 1717
         ProcessBuilder builder;
         Process p;
         BufferedReader r;
@@ -261,7 +259,7 @@ public class Toggle {
         endEspressoExecution = System.currentTimeMillis();
         testClasses.forEach(testName -> {
             try {
-                pullLogFile(testName.replace("Enhanced","TOGGLE")+".txt");
+                pullFile(testName.replace("Enhanced","TOGGLE")+".txt");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -386,15 +384,30 @@ public class Toggle {
         }
     }
 
-    public void pullLogFile(String logFile ) throws IOException {
+    public void pullAllBmpXml(String fileName) throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                "cmd.exe","/c\"",adbPath + "\\adb\" pull /sdcard/" + logFile + " " + guiTestsPath + "\\" + logFile
+                "cmd.exe","/c\"",adbPath + "\\adb\" shell find /sdcard/ -iname \""+fileName+"*\" | tr -d '\015' | while read line; do adb pull \"$line\" \""+guiTestsPath+"\\"+fileName+"; done;"
         );
         builder.redirectErrorStream(true);
         Process p = builder.start();
 
         BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        //todo --> debug
+        String line;
+        System.out.println("pullFiles.............");
+        int i = 0;
+        while((line = r.readLine()) != null){
+            System.out.println( i++ + "->" + line);
+        }
+    }
+
+    public void pullFile(String fileName ) throws IOException {
+        ProcessBuilder builder = new ProcessBuilder(
+                "cmd.exe","/c\"",adbPath + "\\adb\" pull /sdcard/" + fileName + " " + guiTestsPath + "\\" + fileName
+        );
+        builder.redirectErrorStream(true);
+        Process p = builder.start();
+
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
         String line;
         System.out.println("pullLogFile.............");
         int i = 0;
@@ -490,7 +503,22 @@ public class Toggle {
         }
     }
 
-    //funge!
+    public void clearAllBmpXml(String fileName) throws IOException {
+        ProcessBuilder builder = new ProcessBuilder(
+                "cmd.exe","/c\"",adbPath + "\\adb\" shell rm -f /sdcard/"+fileName+"*"
+        );
+        builder.redirectErrorStream(true);
+        Process p = builder.start();
+
+        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        System.out.println("clearing sdcard.............");
+        int i = 0;
+        while((line = r.readLine()) != null){
+            System.out.println( i++ + "->" + line);
+        }
+    }
+
     public void resetLogFile() throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
                 "cmd.exe", "/c\"", adbPath + "\\adb\" shell rm -f /sdcard/"+logFilename);
@@ -676,6 +704,7 @@ public class Toggle {
         Matcher m=p.matcher(source);
         return m.find();
     }
+
     //todo non è che funzioni benissimo
     private static boolean isAndroidFolder(File file) {
 
@@ -705,6 +734,7 @@ public class Toggle {
         return false;
 
     }
+
     //todo
     private static boolean hasAndroidManifest(File file) {
 

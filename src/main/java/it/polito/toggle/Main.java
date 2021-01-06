@@ -12,14 +12,22 @@ public class Main {
                 "org.ligi.passandroid",
                 "C:\\Users\\vitto\\AndroidStudioProjects\\PassAndroid\\app\\src\\androidTest\\java\\org\\ligi\\passandroid\\tests\\",
                 Emulators.NEXUS_5);*/
-        Toggle toggle = new Toggle(
+        /*Toggle toggle = new Toggle(
                 "androidTest",
                 "C:\\Users\\vitto\\OneDrive\\Desktop\\onDataTests",
                 "com.example.ondatatestapp",
                 "C:\\Users\\vitto\\AndroidStudioProjects\\OnDataTestApp\\app\\src\\androidTest\\java\\com\\example\\ondatatestapp\\finalTest\\",
+                Emulators.NEXUS_5);*/
+
+        Toggle toggle = new Toggle(
+                "androidTest",
+                "C:\\Users\\vitto\\OneDrive\\Desktop\\test",
+                "com.example.ondatatestapp",
+                "C:\\Users\\vitto\\AndroidStudioProjects\\OnDataTestApp\\app\\src\\androidTest\\java\\com\\example\\ondatatestapp\\finalTest\\",
                 Emulators.NEXUS_5);
         try {
-            toggle.executeFullProcess();
+            //toggle.executeFullProcess();
+            toggle.pullAllBmpXml("testWithGallery");
         } catch (IOException e) {
             e.printStackTrace();
         }
