@@ -126,15 +126,10 @@ public class ToggleTranslator {
     }
 
     public final ToggleInteraction readInteractionsFromLogcat(String line) throws IOException, XPathExpressionException, SAXException, ParserConfigurationException, ToggleException {
-
         String[] separated = line.split(": ");
-
         String line_data = separated[1];
-
         String[] separated2 = line_data.split("; ");
-
         System.out.println(line);
-
         String time = separated2[1];
         String search_type = separated2[2];
         String searched = separated2[3];
@@ -179,15 +174,61 @@ public class ToggleTranslator {
             case "openactionbaroverfloworoptionsmenu": return new OpenOptionsMenu(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
             case "opencontextualactionmodeoverflowmenu": return new OpenOptionsMenu(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
             case "dialogescape": return new DialogEscape(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
-
-            //*********************************************************************************
-            //case "scrolldown": return new ScrollDown(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH);
             case "scrolldownright": return new ScrollDownRight(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH, ratioW);
             case "scrolldownleft": return new ScrollDownLeft(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH, ratioW);
-            //case "scrollup": return new ScrollUp(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH);
             case "scrollupright": return new ScrollUpRight(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH, ratioW);
             case "scrollupleft": return new ScrollUpLeft(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH, ratioW);
-            //*********************************************************************************
+            default: throw new ToggleException("Interaction not found: " + interaction_type);
+        }
+    }
+
+    public final ToggleInteraction readInteractionsFromLogcatMethodGranularity(String line) throws IOException, XPathExpressionException, SAXException, ParserConfigurationException, ToggleException {
+        String[] separated = line.split(": ");
+        String line_data = separated[1];
+        String[] separated2 = line_data.split("; ");
+        System.out.println(line);
+        String time = separated2[1];
+        String search_type = separated2[2];
+        String searched = separated2[3];
+        String interaction_type = separated2[4];
+        String args;
+        if (separated2.length==6) {
+            args = separated2[5];
+        } else {
+            args = "";
+        }
+        //pullFile(time + ".xml");
+        //pullFile(time + ".bmp"); //3001
+        //pullFile(time + ".png"); //3001
+        File imageFile = new File(starting_folder + "\\" + time + ".bmp");  //3001
+        File xmlFile = new File(starting_folder + "\\" + time + ".xml");
+        ToggleInteraction res;
+        switch (interaction_type) {
+            case "click": return new Click(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "typetext": return new TypeText(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "longclick": return new LongClick(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "doubleclick": return new DoubleClick(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "typeintofocused": return new TypeIntoFocused(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "replacetext": return new ReplaceText(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "cleartext": return new ClearText(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "check": return new Check(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "fullcheck": return new FullCheck(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "presskey": return new PressKey(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "swipeleft": return new SwipeLeft(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "swiperight": return new SwipeRight(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "swipeup": return new SwipeUp(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "swipedown": return new SwipeDown(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "pressback": return new PressBack(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "pressbackunconditionally": return new PressBack(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "closekeyboard": return new PressBack(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "pressmenukey": return new PressMenuKey(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "openactionbaroverfloworoptionsmenu": return new OpenOptionsMenu(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "opencontextualactionmodeoverflowmenu": return new OpenOptionsMenu(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "dialogescape": return new DialogEscape(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile);
+            case "scrolldownright": return new ScrollDownRight(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH, ratioW);
+            case "scrolldownleft": return new ScrollDownLeft(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH, ratioW);
+            case "scrollupright": return new ScrollUpRight(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH, ratioW);
+            case "scrollupleft": return new ScrollUpLeft(package_name, search_type, searched, time, interaction_type, args, imageFile, xmlFile, ratioH, ratioW);
             default: throw new ToggleException("Interaction not found: " + interaction_type);
         }
     }

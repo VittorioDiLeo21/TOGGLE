@@ -90,7 +90,7 @@ public class Toggle {
         }
     }
 
-    public boolean executeFullProcess() throws IOException {
+    public boolean translateTests() throws IOException {
         //1
 
         Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath); //todo : fa l'enhance anche di altre classi di test nella directory
@@ -127,14 +127,84 @@ public class Toggle {
             //ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolutionAndHeight(),windowUtils.getEmulatorScreenPixelsWidth(this.device),windowUtils.getEmulatorScreenPixelHeight(this.device));
             ToggleClassManager tcm = new ToggleClassManager(className,
                     appPackageName,
-                    guiTestsPath,
+                    guiTestsPath+"\\TOGGLE\\",
                     new ArrayList<>(tests.get(testClassName).getTests()),
                     getEmulatorResolutionAndHeight(),
                     windowUtils.getEmulatorScreenPixelsWidth(this.device),
                     windowUtils.getEmulatorScreenPixelHeight(this.device));
             //7
             try {
-                it.polito.toggle.Utils.createJavaProjectFolder(guiTestsPath);
+                it.polito.toggle.Utils.createJavaProjectFolder(guiTestsPath+"\\TOGGLE\\");
+                tcm.createClass(className+"TOGGLE.txt");
+            } catch (XPathExpressionException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            } catch (ToggleException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //8
+        /*try {
+            //todo
+            windowUtils.resizeWindow(339,Emulators.NEXUS_5);
+        } catch (NameNotFoundException e) {
+            e.printStackTrace();
+        } catch (ResizeException e) {
+            e.printStackTrace();
+        }*/
+        return true;
+    }
+
+    public boolean translateTestsWithMethodGranularity() throws IOException {
+        //1
+
+        Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath);
+        injectToggleTool(testDirectoryPath);
+
+        //2 build and install the apk
+
+        try {
+            installApp();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        //3 get the test Instrumentation
+
+        String instrumentation = getInstrumentation();
+        if(instrumentation.isEmpty())
+            return false;
+
+        //4
+        //getDeviceDensity<-- da toggleGUI.EspressoGUI
+        //4.5
+        //eventually resize the emulator
+        //5
+
+        executeAllEnhancedEspressoByTestMethod(tests,instrumentation);
+        //executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
+
+        //6
+
+        for(String testClassName : tests.keySet()){
+            //ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolution(),windowUtils.getEmulatorScreenPixelsWidth(this.device));
+            String className = testClassName.replace("Enhanced","");
+            //ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolutionAndHeight(),windowUtils.getEmulatorScreenPixelsWidth(this.device),windowUtils.getEmulatorScreenPixelHeight(this.device));
+            ToggleClassManager tcm = new ToggleClassManager(className,
+                    appPackageName,
+                    guiTestsPath+"\\TOGGLE\\",
+                    new ArrayList<>(tests.get(testClassName).getTests()),
+                    getEmulatorResolutionAndHeight(),
+                    windowUtils.getEmulatorScreenPixelsWidth(this.device),
+                    windowUtils.getEmulatorScreenPixelHeight(this.device));
+            //7
+            try {
+                it.polito.toggle.Utils.createJavaProjectFolder(guiTestsPath+"\\TOGGLE\\");
                 tcm.createClass(className+"TOGGLE.txt");
             } catch (XPathExpressionException e) {
                 e.printStackTrace();
@@ -227,8 +297,7 @@ public class Toggle {
         while ((line = r.readLine()) != null) {
             System.out.println(line);
         }
-        //todo dbg
-        pullAllBmpXml(testMethod);
+        pullAllBmpXml();
         clearAllBmpXml(testMethod);
     }
 
@@ -325,7 +394,6 @@ public class Toggle {
         }
     }
 
-
     private void installApp() throws IOException {
         ArrayList<String> installationTasks = getGradlewTasks();
         for(String task : installationTasks){
@@ -358,7 +426,6 @@ public class Toggle {
         Process p = builder.start();
         BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-        //todo delete this --> debug
         String line;
         while ((line = r.readLine()) != null) {
             System.out.println(line);
@@ -369,13 +436,12 @@ public class Toggle {
 
     public void pullLogFile() throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                "cmd.exe","/c\"",adbPath + "\\adb\" pull /sdcard/" + logFilename + " " + guiTestsPath + "\\" + logFilename
+                "cmd.exe","/c\"",adbPath + "\\adb\" pull /sdcard/TOGGLE/" + logFilename + " " + guiTestsPath + "\\TOGGLE\\" + logFilename
         );
         builder.redirectErrorStream(true);
         Process p = builder.start();
 
         BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        //todo --> debug
         String line;
         System.out.println("pullLogFile.............");
         int i = 0;
@@ -384,9 +450,9 @@ public class Toggle {
         }
     }
 
-    public void pullAllBmpXml(String fileName) throws IOException {
+    public void pullAllBmpXml() throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                "cmd.exe","/c\"",adbPath + "\\adb\" shell find /sdcard/ -iname \""+fileName+"*\" | tr -d '\015' | while read line; do adb pull \"$line\" \""+guiTestsPath+"\\"+fileName+"; done;"
+                "cmd.exe","/c\"",adbPath + "\\adb\" pull /sdcard/TOGGLE " + guiTestsPath + "\\"
         );
         builder.redirectErrorStream(true);
         Process p = builder.start();
@@ -402,7 +468,7 @@ public class Toggle {
 
     public void pullFile(String fileName ) throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                "cmd.exe","/c\"",adbPath + "\\adb\" pull /sdcard/" + fileName + " " + guiTestsPath + "\\" + fileName
+                "cmd.exe","/c\"",adbPath + "\\adb\" pull /sdcard/TOGGLE/" + fileName + " " + guiTestsPath + "\\TOGGLE\\" + fileName
         );
         builder.redirectErrorStream(true);
         Process p = builder.start();
@@ -434,42 +500,6 @@ public class Toggle {
         return true;
     }
 
-    public int getEmulatorWidth(){
-        Rectangle rect = null;
-        for (DesktopWindow desktopWindow : WindowUtils.getAllWindows(true)) {
-            if (desktopWindow.getTitle().contains("Android Emulator")) {
-                rect = desktopWindow.getLocAndSize();
-                String device = desktopWindow.getTitle().split(" - ")[1];
-                System.out.println(device + " : " + rect.width + " x " + rect.height);
-                return rect.width;
-            }
-        }
-        return -1;
-    }
-
-    public int getEmulatorResolution() throws IOException {
-        ProcessBuilder builder = new ProcessBuilder(
-                "cmd.exe", "/c\"", adbPath + "\\adb\" shell wm size");
-
-        builder.redirectErrorStream(true);
-        Process p = builder.start();
-        BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        int ret = -1;
-        String line;
-        while ((line = r.readLine()) != null) {
-            System.out.println(line);
-            String[] strings = line.split(": ");
-            if(strings.length>=2){
-                String[] resolution = strings[1].split("x");
-                if(resolution.length==2 && isNumeric(resolution[0]) && isNumeric(resolution[1])){
-                    ret = Integer.parseInt(resolution[0]);
-                    break;
-                }
-            }
-        }
-        return ret;
-    }
-
     public String getEmulatorResolutionAndHeight() throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
                 "cmd.exe", "/c\"", adbPath + "\\adb\" shell wm size");
@@ -491,7 +521,7 @@ public class Toggle {
 
     public void resetLogFiles() throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                "cmd.exe", "/c\"", adbPath + "\\adb\" shell rm -f /sdcard/*TOGGLE.txt");
+                "cmd.exe", "/c\"", adbPath + "\\adb\" shell rm -f /sdcard/TOGGLE/*TOGGLE.txt");
 
         builder.redirectErrorStream(true);
         Process p = builder.start();
@@ -505,7 +535,7 @@ public class Toggle {
 
     public void clearAllBmpXml(String fileName) throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                "cmd.exe","/c\"",adbPath + "\\adb\" shell rm -f /sdcard/"+fileName+"*"
+                "cmd.exe","/c\"",adbPath + "\\adb\" shell rm -f /sdcard/TOGGLE/"+fileName+"*"
         );
         builder.redirectErrorStream(true);
         Process p = builder.start();
@@ -521,7 +551,7 @@ public class Toggle {
 
     public void resetLogFile() throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                "cmd.exe", "/c\"", adbPath + "\\adb\" shell rm -f /sdcard/"+logFilename);
+                "cmd.exe", "/c\"", adbPath + "\\adb\" shell rm -f /sdcard/TOGGLE/"+logFilename);
 
         builder.redirectErrorStream(true);
         Process p = builder.start();
@@ -776,7 +806,7 @@ public class Toggle {
 
     public void removeOldDumps() throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
-                "cmd.exe", "/c\"", adbPath + "\\adb\" shell rm sdcard/*.bmp sdcard/*.xml");
+                "cmd.exe", "/c\"", adbPath + "\\adb\" shell rm sdcard/TOGGLE/*.bmp sdcard/TOGGLE/*.xml");
 
         builder.redirectErrorStream(true);
         Process p = builder.start();

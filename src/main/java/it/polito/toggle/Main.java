@@ -26,8 +26,10 @@ public class Main {
                 "C:\\Users\\vitto\\AndroidStudioProjects\\OnDataTestApp\\app\\src\\androidTest\\java\\com\\example\\ondatatestapp\\finalTest\\",
                 Emulators.NEXUS_5);
         try {
-            //toggle.executeFullProcess();
-            toggle.pullAllBmpXml("testWithGallery");
+            toggle.translateTestsWithMethodGranularity();
+            //toggle.pullAllBmpXml("testWithGallery");
+            //toggle.clearAllBmpXml("testWithGallery");
+            //toggle.executeAllEnhancedEspressoByTestMethod();
         } catch (IOException e) {
             e.printStackTrace();
         }

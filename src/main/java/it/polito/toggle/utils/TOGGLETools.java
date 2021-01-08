@@ -32,6 +32,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -61,24 +63,17 @@ public class TOGGLETools {
     }
 
     private static void execute(String currCmd, UiAutomation auto){
-        //Log.d(TAG, "exec cmd: " + currCmd);
         auto.executeShellCommand(currCmd);
     }
 
     private Rect retrieveSmallRect(Point center_point, Rect starting_rect) {
-
-
         return null;
     }
 
 
 
     private Point retrieve_relative_x_y_int(float x, float y, Rect reference_rectangle) {
-
-
         return null;
-
-
     }
 
     public static void clearLog() throws FileNotFoundException {
@@ -90,20 +85,17 @@ public class TOGGLETools {
         LOG_FILE_NAME = name+".txt";
     }
 
-    public static void appendLog(String className,String text)
-    {
-        File logFile = new File(LOG_FILE_PATH + className + ".txt");
+    public static void appendLog(String className,String text) {
+        File logFile = new File(LOG_FILE_PATH +"TOGGLE/"+ className + ".txt");
         if (!logFile.exists()) {
             try {
+                logFile.getParentFile().mkdirs();
                 logFile.createNewFile();
-            }
-            catch (IOException e) {
-                // TODO Auto-generated catch block
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         try {
-            //BufferedWriter for performance, true to set append to file flag
             BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
             buf.append(text);
             buf.newLine();
@@ -116,14 +108,11 @@ public class TOGGLETools {
     }
 
     public static Rect GetCurrentDisplaySize(Activity activity) {
-
         View v1 = activity.getWindow().getDecorView().getRootView();
         Display display = activity.getWindowManager().getDefaultDisplay();
         Rect r = new Rect();
         v1.getWindowVisibleDisplayFrame(r);
         return r;
-
-
     }
 
 
@@ -138,7 +127,6 @@ public class TOGGLETools {
                 }
             }
         }
-
         return false;
     }
 
@@ -153,7 +141,6 @@ public class TOGGLETools {
             WindowManager.LayoutParams castedParams = (WindowManager.LayoutParams)decorView.getLayoutParams();
             //if (decorView.getClass().getName().compareTo("android.widget.PopupWindow$PopupDecorView") == 0) {
             if (i == viewsFieldValue.size() - 1) {
-
                 decorView.setDrawingCacheEnabled(true);
                 int[] coord = new int[2];
                 decorView.getLocationOnScreen(coord);
@@ -355,7 +342,7 @@ public class TOGGLETools {
 
     public static String DumpScreenProgressive(int num, String test_name, UiDevice device) {
 
-        String dumpPath = Environment.getExternalStorageDirectory().toString() + "/" + test_name + num + ".xml";
+        String dumpPath = Environment.getExternalStorageDirectory().toString() + "/TOGGLE/" + test_name + num + ".xml";
         final File dump = new File(dumpPath);
 
         if (dump.exists()) {
@@ -426,9 +413,11 @@ public class TOGGLETools {
 
 
         Thread.sleep(500);
-        String mPath = Environment.getExternalStorageDirectory().toString() + "/" + test_name + num + ".png";
+        //String mPath = Environment.getExternalStorageDirectory().toString() + "/" + test_name + num + ".png";
+        String mPath = Environment.getExternalStorageDirectory().toString() + "/TOGGLE/" + test_name + num + ".png";
         //Log.i("touchtest", mPath);
-        String mPath2 = Environment.getExternalStorageDirectory().toString() + "/" + test_name + num + ".bmp";
+        //String mPath2 = Environment.getExternalStorageDirectory().toString() + "/" + test_name + num + ".bmp";
+        String mPath2 = Environment.getExternalStorageDirectory().toString() + "/TOGGLE/" + test_name + num + ".bmp";
 
         View v1 = activity.getWindow().getDecorView().getRootView();
 
@@ -448,7 +437,8 @@ public class TOGGLETools {
             File imageFile = new File(mPath);
 
             try {
-
+                if(!imageFile.getParentFile().exists())
+                    imageFile.getParentFile().mkdirs();
                 //need to have storage permission for this (enable from settings)
                 //FileOutputStream outputStream = new FileOutputStream(imageFile);
 

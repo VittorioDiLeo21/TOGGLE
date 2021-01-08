@@ -574,6 +574,121 @@ public class ToggleClassManager {
         return test_class_code;
     }
 
+    public ArrayList<String> createClassMethodGranularity(String logName) throws IOException, XPathExpressionException, SAXException, ParserConfigurationException, ToggleException {
+        //FUNZIONAMENTO: si aggiunge al logger come primo parametro dopo TOGGLETOOL il nome del test;
+        //createClass lancia per ogni nome di test ricevuto un toggle translator.
+        //gli script sikuli ed eyeautomate vengono salvati direttamente all'interno della cartella con le giuste immagini
+        //gli script java vengono salvati all'interno di una cartella dove:
+        //1) si salvano le immagini (tutte)
+        //2) si crea una classe Main.java, la classe main contiene un metodo per ogni test + nel main lancia tutti i test e fa girare statistiche su quanti hanno ritornato true e quanti null
+
+        int method_interactions = 0;
+
+        float ratioH = this.actualHeight / (float) this.deviceHeight;
+        float ratioW = this.actualWidth / (float) this.deviceWidth;
+
+        ArrayList<String> test_class_code = new ArrayList<>();
+
+        ArrayList<String> eyeautomate_only = new ArrayList<>();
+        ArrayList<String> sikuli_only = new ArrayList<>();
+        ArrayList<String> eyeautomate_sikuli = new ArrayList<>();
+        ArrayList<String> sikuli_eyeautomate = new ArrayList<>();
+
+        //ADD HEADERS
+        for(String header : createHeaders()){
+            eyeautomate_only.add(header);
+            sikuli_only.add(header);
+            eyeautomate_sikuli.add(header);
+            sikuli_eyeautomate.add(header);
+        }
+
+        //add class spec
+        eyeautomate_only.add("\n\n");
+        eyeautomate_only.add("public class " + class_name + "EyeAutomate { ");
+        eyeautomate_only.add("\n\n");
+
+        sikuli_only.add("\n\n");
+        sikuli_only.add("public class " + class_name + "Sikuli { ");
+        sikuli_only.add("\n\n");
+
+        eyeautomate_sikuli.add("\n\n");
+        eyeautomate_sikuli.add("public class " + class_name + "EyeAutomateSikuli { ");
+        eyeautomate_sikuli.add("\n\n");
+
+        sikuli_eyeautomate.add("\n\n");
+        sikuli_eyeautomate.add("public class " + class_name+ "SikuliEyeAutomate { ");
+        sikuli_eyeautomate.add("\n\n");
+
+        //add the methods
+        for(String test_name: testNames){
+            method_interactions = 0;
+            ToggleTranslator translator = new ToggleTranslator(starting_folder, package_name, class_name, test_name, ratioH, ratioW);
+
+            //translator.readLogcatToFile(logcat_filename);
+
+            List<String> filtered_logcat_interactions = translator.filterLogcat(logName,logcat_tool_tag);
+
+            interactions = new ArrayList<>();
+
+            for(String logInteraction : filtered_logcat_interactions){
+                ToggleInteraction interaction = translator.readInteractionsFromLogcatMethodGranularity(logInteraction);
+                interactions.add(interaction);
+                method_interactions++;
+            }
+
+            //never comment
+            if(deviceWidth > 0 && actualWidth > 0) {
+                translator.saveCroppedScreenshots(interactions, deviceWidth, actualWidth);
+            }else
+                translator.saveCroppedScreenshots(interactions);
+            translator.createEyeStudioScript(interactions);
+            translator.createSikuliScript(interactions);
+
+            eyeautomate_only.addAll(translator.createEyeAutomateJavaMethod(interactions));
+            sikuli_only.addAll(translator.createSikuliJavaMethod(interactions));
+            eyeautomate_sikuli.addAll(translator.createCombinedJavaMethod(interactions));
+            sikuli_eyeautomate.addAll(translator.createCombinedJavaMethodSikuliFirst(interactions));
+
+            eyeautomate_only.add("\n\n\n");
+            sikuli_only.add("\n\n\n");
+            eyeautomate_sikuli.add("\n\n\n");
+            sikuli_eyeautomate.add("\n\n\n");
+        }
+        //add the main function
+        eyeautomate_only.add("\n\n\n");
+        sikuli_only.add("\n\n\n");
+        eyeautomate_sikuli.add("\n\n\n");
+        sikuli_eyeautomate.add("\n\n\n");
+
+        ArrayList<String> eyeAutomateOrSiculiMain = this.createEyeAutomateOrSikuliJavaMain();
+        eyeautomate_only.addAll(eyeAutomateOrSiculiMain);
+        sikuli_only.addAll(eyeAutomateOrSiculiMain);
+
+        eyeautomate_sikuli.addAll(this.createCombinedMainEyeAutomateFirst());
+        sikuli_eyeautomate.addAll(this.createCombinedMainSikuliFirst());
+
+        //add closure of function
+        eyeautomate_only.add("\n\n");
+        eyeautomate_only.add("}");
+
+        sikuli_only.add("\n\n");
+        sikuli_only.add("}");
+
+        eyeautomate_sikuli.add("\n\n");
+        eyeautomate_sikuli.add("}");
+
+        sikuli_eyeautomate.add("\n\n");
+        sikuli_eyeautomate.add("}");
+
+
+        writeOnFile(starting_folder + "\\JavaTranslatedProject\\src\\" + class_name + "EyeAutomate.java",eyeautomate_only);
+        writeOnFile(starting_folder + "\\JavaTranslatedProject\\src\\" + class_name + "Sikuli.java",sikuli_only);
+        writeOnFile(starting_folder + "\\JavaTranslatedProject\\src\\" + class_name + "EyeAutomateSikuli.java",eyeautomate_sikuli);
+        writeOnFile(starting_folder + "\\JavaTranslatedProject\\src\\" + class_name + "SikuliEyeAutomate.java",sikuli_eyeautomate);
+
+        return test_class_code;
+    }
+
     private void writeOnFile(String filename, ArrayList<String> toBeWritten) throws IOException {
         File fout = new File(filename);
         FileOutputStream fos = new FileOutputStream(fout);
