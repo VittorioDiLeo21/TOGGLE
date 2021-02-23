@@ -1,7 +1,5 @@
 package it.polito.toggle;
 
-import com.sun.jna.platform.DesktopWindow;
-import com.sun.jna.platform.WindowUtils;
 import it.enhancer.Enhancer;
 import it.polito.toggle.exceptions.ToggleException;
 import it.polito.toggle.utils.Emulators;
@@ -11,7 +9,6 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -129,7 +126,7 @@ public class Toggle {
                     appPackageName,
                     guiTestsPath+"\\TOGGLE\\",
                     new ArrayList<>(tests.get(testClassName).getTests()),
-                    getEmulatorResolutionAndHeight(),
+                    getEmulatorWidthAndHeight(),
                     windowUtils.getEmulatorScreenPixelsWidth(this.device),
                     windowUtils.getEmulatorScreenPixelHeight(this.device));
             //7
@@ -199,7 +196,7 @@ public class Toggle {
                     appPackageName,
                     guiTestsPath+"\\TOGGLE\\",
                     new ArrayList<>(tests.get(testClassName).getTests()),
-                    getEmulatorResolutionAndHeight(),
+                    getEmulatorWidthAndHeight(),
                     windowUtils.getEmulatorScreenPixelsWidth(this.device),
                     windowUtils.getEmulatorScreenPixelHeight(this.device));
             //7
@@ -216,16 +213,6 @@ public class Toggle {
                 e.printStackTrace();
             }
         }
-
-        //8
-        /*try {
-            //todo
-            windowUtils.resizeWindow(339,Emulators.NEXUS_5);
-        } catch (NameNotFoundException e) {
-            e.printStackTrace();
-        } catch (ResizeException e) {
-            e.printStackTrace();
-        }*/
         return true;
     }
 
@@ -234,6 +221,12 @@ public class Toggle {
         return enhancer.generateEnhancedClassFrom(path);
     }
 
+    /**
+     * Method to enhance all Espresso test classes in the given folder.
+     * @param testFolder the path to the folder containing the Espresso test classes we want to enhance
+     * @return  a Map containing as keys the name of the enhanced classes and as values objects containing general
+     *          information on the enhanced classes
+     */
     public Map<String,ClassData> enhanceEspressoTestFolder(String testFolder){
         File folder = new File(testFolder);
         List<String> files = EspressoTestFinder.getEspressoTests(folder);
@@ -267,6 +260,12 @@ public class Toggle {
         }
     }
 
+    /**
+     * A method to execute all the enhanced methods.
+     * @param tests a map containing information on the enhanced test classes and test method.
+     * @param instrumentation the android instrumentation needed to trun the test cases
+     * @throws IOException
+     */
     public void executeAllEnhancedEspressoByTestMethod(Map<String,ClassData> tests,String instrumentation) throws IOException {
         grantPermissions();
         removeOldDumps();
@@ -500,7 +499,7 @@ public class Toggle {
         return true;
     }
 
-    public String getEmulatorResolutionAndHeight() throws IOException {
+    public String getEmulatorWidthAndHeight() throws IOException {
         ProcessBuilder builder = new ProcessBuilder(
                 "cmd.exe", "/c\"", adbPath + "\\adb\" shell wm size");
 
