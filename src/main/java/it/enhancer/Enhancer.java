@@ -1100,10 +1100,19 @@ public class Enhancer {
                         //todo per lo scroll :
                         Statement firstScrollable = null;
                         Statement scrollable = null;
+                        TryStmt firstScrollableTry = null;
+                        TryStmt scrollableTry = null;
 
                         if(operations.get(1).getName().equals("withText")){
-                            firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",false);");
-                            scrollable = JavaParser.parseStatement("scrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",false);");
+                            firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = null;");
+                            firstScrollableTry = (TryStmt) JavaParser.parseStatement("try {\r\n" +
+                                    "\tscrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",false);\r\n" +
+                                    "} catch(Exception e) {\r\n" +
+                                    "}");
+                            scrollableTry = (TryStmt) JavaParser.parseStatement("try {\r\n" +
+                                    "\tscrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",false);\r\n" +
+                                    "} catch (Exception e) {\r\n" +
+                                    "}");
                         } else if(operations.get(1).getName().equals("withId")){
                             firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = (View) ScrollHandler.getScrollableParent(activityTOGGLETools.findViewById(R.id." + operations.get(1).getParameter().replace("\"","") + "));");
                             scrollable = JavaParser.parseStatement("scrollableTOGGLE = (View) ScrollHandler.getScrollableParent(activityTOGGLETools.findViewById(R.id." + operations.get(1).getParameter().replace("\"","") + "));");
@@ -1111,12 +1120,14 @@ public class Enhancer {
                             firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",true);");
                             scrollable = JavaParser.parseStatement("scrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",true);");
                         }
-                        if(firstScrollable != null && scrollable != null){
+                        if((firstScrollable != null && scrollable != null) || ( firstScrollable!= null &&firstScrollableTry != null && scrollableTry != null)){
                             if(firstScrollToTest){
                                 firstScrollToTest = false;
                                 block.addStatement(++i,firstScrollX);
                                 block.addStatement(++i,firstScrollY);
                                 block.addStatement(++i, firstScrollable);
+                                if(firstScrollableTry != null )
+                                    block.addStatement(++i, firstScrollableTry);
                                 block.addStatement(++i, firstScrollableClass);
                                 //block.addStatement(++i,firstScrollableYDirectionStr);
                                 block.addStatement(++i,firstScrollableDirectionStr);
@@ -1125,7 +1136,10 @@ public class Enhancer {
                                 block.addStatement(++i,scrollX);
                                 block.addStatement(++i,scrollY);
                                 block.addStatement(++i, scrollableClass);
-                                block.addStatement(++i, scrollable);
+                                if(scrollable != null)
+                                    block.addStatement(++i, scrollable);
+                                else if(scrollableTry != null )
+                                    block.addStatement(++i, scrollableTry);
                                 //block.addStatement(++i,scrollableYDirectionStr);
                                 block.addStatement(++i,scrollableDirectionStr);
                                 //block.addStatement(++i,scrollableXDirectionStr);

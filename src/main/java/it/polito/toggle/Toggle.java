@@ -44,7 +44,10 @@ public class Toggle {
         this.testDirectoryPath = testDirectoryPath;
         int indexProjectPath = testDirectoryPath.indexOf("\\app\\");
         int indexJava = testDirectoryPath.indexOf("\\java\\");
-        this.toggleInjectionPath = testDirectoryPath.substring(indexJava+6,testDirectoryPath.length()-1).replace("\\",".");
+        if(testDirectoryPath.endsWith("\\"))
+            this.toggleInjectionPath = testDirectoryPath.substring(indexJava+6,testDirectoryPath.length()-1).replace("\\",".");
+        else
+            this.toggleInjectionPath = testDirectoryPath.substring(indexJava+6,testDirectoryPath.length()).replace("\\",".");
 
         this.appProjectPath = testDirectoryPath.substring(0,indexProjectPath);
         this.windowUtils = new it.windowUtils.WindowUtils();

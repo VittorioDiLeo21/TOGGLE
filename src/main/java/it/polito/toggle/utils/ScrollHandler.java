@@ -23,7 +23,6 @@ import android.widget.TextView;
 
 import androidx.test.rule.ActivityTestRule;
 
-import com.example.ondatatestapp.TOGGLETools;
 
 import java.lang.reflect.Field;
 import java.nio.channels.GatheringByteChannel;
