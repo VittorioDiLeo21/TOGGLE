@@ -8,6 +8,7 @@ public enum ViewMatchers {
     //hasLinks("haslinks"),
     //hasMultilineTest("hasmultilinetest"),
     //hasSibling("hassibling"),
+    instanceOf("class"),
     //isDescendantOfA("isdescendantofa"),
     //isDisplayed("isdisplayed"),*
     //isCompletelyDisplayed("iscompletelydisplayed"),*

@@ -855,8 +855,114 @@ public class Enhancer {
                 }
                 methodParameters(a, ++j);
             } catch (JSONException e1) {
-                // TODO: handle exception
-                Utils.logException(e, "methodParameters");
+                try{
+                    String type = a.getJSONObject(j).getString("typeC");
+                    String name = "";
+                    String index = "";
+
+                    if (type.equals("ArrayAccessExpr")) {
+                        name = a.getJSONObject(j).getJSONObject("name").getJSONObject("name").getString("identifier");
+                        if (a.getJSONObject(j).getJSONObject("index").getString("type").equals("NameExpr"))
+                            index = a.getJSONObject(j).getJSONObject("index").getJSONObject("name").getString("identifier");
+                        else
+                            index = a.getJSONObject(j).getJSONObject("index").getString("value");
+                    } else if (type.equals("BinaryExpr")) {
+                        name = a.getJSONObject(j).getJSONObject("right").getJSONObject("name").getString("identifier");
+                    } else if(type.equals("ClassExpr")){
+                        name = a.getJSONObject(j).getJSONObject("type").getJSONObject("name").getString("identifier");
+                    } else
+                        name = a.getJSONObject(j).getJSONObject("name").getString("identifier");
+
+                    if (!field.toString().isEmpty() && !field.toString().startsWith("R.id.")
+                            // && !field.toString().startsWith("ViewMatchers.") &&
+                            // !field.toString().startsWith("ViewActions.")
+                            /* && !field.toString().startsWith("Matchers.") */ && isNotAnEspressoCommand(name)) {
+                        field.append(name + ",");
+                        name = field.toString();
+                    }
+
+                    String parametersValue = parameters.toString();
+
+                    if (type.equals("BinaryExpr") || !type.equals("MethodCallExpr") && !parameters.toString().contains(name)
+                            || (type.equals("MethodCallExpr") && isNotAnEspressoCommand(name)
+                            && !parameters.toString().contains(name))) {
+
+                        if (type.equals("BinaryExpr")) {
+                            type = a.getJSONObject(j).getString("type");
+
+                            if (name.endsWith(","))
+                                name = name.substring(0, name.length() - 1);
+                            if (type.equals("StringLiteralExpr"))
+                                name = "\"" + name + "\"";
+                            if (parametersValue.isEmpty())
+                                parameters.append(name);
+                            else {
+                                type = a.getJSONObject(j).getJSONObject("right").getString("type");
+                                int commaIndex = -1;
+                                if (type.equals("MethodCallExpr") && (commaIndex = parameters.lastIndexOf(",")) != -1) {
+                                    int numberOfArguments = a.getJSONObject(j).getJSONObject("right")
+                                            .getJSONArray("arguments").length();
+                                    for (int w = 0; w < numberOfArguments - 1; w++)
+                                        commaIndex = parametersValue.substring(0, commaIndex).lastIndexOf(",");
+                                    parameters.replace(commaIndex, commaIndex + 1, "+" + name + "(");
+                                    parameters.append(")");
+                                } else
+                                    parameters.append("+" + name);
+                            }
+                            // field access
+                        } else if (type.equals("FieldAccessExpr") && field.toString().startsWith("R.id.")) {
+                            if (parametersValue.isEmpty())
+                                parameters.append("\"" + name + "\"");
+                            else
+                                parameters.append("," + "\"" + name + "\"");
+
+                            field = new StringBuilder("");
+
+                            // field access
+                        } else if (type.equals("FieldAccessExpr")) {
+                            if (parametersValue.isEmpty())
+                                parameters.append(name.substring(0, name.length() - 1));
+                            else
+                                parameters.append("," + name.substring(0, name.length() - 1));
+
+                            // array access
+                        } else if (type.equals("ArrayAccessExpr")) {
+                            if (name.charAt(name.length() - 1) != ',') {
+
+                                if (parametersValue.isEmpty())
+                                    parameters.append(name + "[" + index + "]");
+                                else
+                                    parameters.append("," + name + "[" + index + "]");
+                            } else {
+                                if (parametersValue.isEmpty())
+                                    parameters.append(name.substring(0, name.length() - 1) + "[" + index + "]");
+                                else
+                                    parameters.append("," + name.substring(0, name.length() - 1) + "[" + index + "]");
+                            }
+                            // method call
+                        } else if ((type.equals("MethodCallExpr"))) {
+                            // substring is used to remove the comma at the end of the string
+                            if (parametersValue.isEmpty())
+                                parameters.append(name.substring(0, name.length() - 1) + "()");
+                            else
+                                parameters = new StringBuilder(
+                                        name.substring(0, name.length() - 1) + "(" + parametersValue + ")");
+                            field = new StringBuilder("");
+
+                            // name expr
+                        } else {
+                            if (field.toString().isEmpty()) {
+                                if (parametersValue.isEmpty())
+                                    parameters.append(name);
+                                else
+                                    parameters.append("," + name);
+                            }
+                        }
+                    }
+                    methodParameters(a, ++j);
+                } catch (JSONException e2) {
+                    Utils.logException(e, "methodParameters");
+                }
             }
         }
     }
@@ -1060,6 +1166,10 @@ public class Enhancer {
 
                     if (interactionType.isEmpty()) {
                         interactionType = ViewAssertions.getSearchType(operations.get(j).getName());
+                        /*
+                         * if (interactionType.isEmpty()) { new Exception(operations.get(j).getName() +
+                         * " is not supported or is not an Espresso command").printStackTrace(); }
+                         */
                         if (searchType.isEmpty() || interactionType.isEmpty()) {
                             block.addStatement(i, st);
                             break;
@@ -1205,6 +1315,193 @@ public class Enhancer {
                         block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" + methodName + "\", device);"));
                         block.addStatement(++i, st);
                         block.addStatement(++i, tryStmt);
+                    }
+                }
+            } else if(searchType.isEmpty() && (operations.get(1).getName().equals("allOf") || operations.get(1).getName().equals("anyOf"))){
+                boolean allOf = operations.get(1).getName().equals("allOf");
+                String stmtString = stmt.toString();
+                Statement st = JavaParser.parseStatement(stmtString);
+                if (operations.size() > 1) {
+                    block.remove(stmt);
+                }
+                String srct = "";
+                String srck = "";
+                for (int j = 2; j < operations.size(); j++) {
+                    String interactionType = ViewMatchers.getSearchType(operations.get(j).getName());
+                    String interactionParams = operations.get(j).getParameter();
+
+                    if(interactionType.isEmpty()){
+                        interactionType = ViewActions.getSearchType(operations.get(j).getName());
+
+                        if(interactionType.isEmpty()){
+                            interactionType = ViewAssertions.getSearchType(operations.get(j).getName());
+
+                            if (searchType.isEmpty() || interactionType.isEmpty()) {
+                                interactionType = ViewMatchers.getSearchType(operations.get(j).getName());
+
+                                if(interactionType.isEmpty()){
+                                    block.addStatement(i, st);
+                                    break;
+                                }
+                            }
+                            // log only if the assertion is 'matches'. Leave out isLeft, isRight ecc... for
+                            // now.
+                            if (interactionType.equals("matches") && canItBeAnAssertionParameter(operations.get(++j)))
+                                interactionType = "check";
+                            else {
+                                block.addStatement(i, st);
+                                break;
+                            }
+                        }
+                        if (firstTest) {
+                            firstTest = false;
+                            block.addStatement(i, captureTask);
+                            block.addStatement(++i, instrumentation);
+                            block.addStatement(++i, device);
+                            block.addStatement(++i, firstLogNum);
+                            //b.addStatement(++i, firstTestDate);
+                            block.addStatement(++i, firstTestActivity);
+                        } else if (j == 3 && interactionType.equals("check") || j == 2) {
+                            block.addStatement(i, logNum);
+                            //b.addStatement(i, date);
+                            block.addStatement(++i, activity);
+                            // this makes it work on test cases with multiple interactions avoiding the try
+                            // statements to stay to the bottom
+                        } else {
+                            //b.addStatement(++i, date);
+                            block.addStatement(++i, logNum);
+                            block.addStatement(++i, activity);
+                        }
+
+                        System.out.println("logcatting: methodname = " + methodName + "; searchType = " + srct + "; searchKw = " + srck + "; interactionType = " + interactionType + "; interactionParams = " + interactionParams);
+                        if(interactionType.equals("scrollto")){
+                            //todo per lo scroll :
+                            Statement firstScrollable = null;
+                            Statement scrollable = null;
+                            TryStmt firstScrollableTry = null;
+                            TryStmt scrollableTry = null;
+
+                            if(operations.get(1).getName().equals("withText")){
+                                firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = null;");
+                                firstScrollableTry = (TryStmt) JavaParser.parseStatement("try {\r\n" +
+                                        "\tscrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",false);\r\n" +
+                                        "} catch(Exception e) {\r\n" +
+                                        "}");
+                                scrollableTry = (TryStmt) JavaParser.parseStatement("try {\r\n" +
+                                        "\tscrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",false);\r\n" +
+                                        "} catch (Exception e) {\r\n" +
+                                        "}");
+                            } else if(operations.get(1).getName().equals("withId")){
+                                firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = (View) ScrollHandler.getScrollableParent(activityTOGGLETools.findViewById(R.id." + operations.get(1).getParameter().replace("\"","") + "));");
+                                scrollable = JavaParser.parseStatement("scrollableTOGGLE = (View) ScrollHandler.getScrollableParent(activityTOGGLETools.findViewById(R.id." + operations.get(1).getParameter().replace("\"","") + "));");
+                            } else if(operations.get(1).getName().equals("withHint")){
+                                firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",true);");
+                                scrollable = JavaParser.parseStatement("scrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",true);");
+                            }
+                            if((firstScrollable != null && scrollable != null) || ( firstScrollable!= null &&firstScrollableTry != null && scrollableTry != null)){
+                                if(firstScrollToTest){
+                                    firstScrollToTest = false;
+                                    block.addStatement(++i,firstScrollX);
+                                    block.addStatement(++i,firstScrollY);
+                                    block.addStatement(++i, firstScrollable);
+                                    if(firstScrollableTry != null )
+                                        block.addStatement(++i, firstScrollableTry);
+                                    block.addStatement(++i, firstScrollableClass);
+                                    //block.addStatement(++i,firstScrollableYDirectionStr);
+                                    block.addStatement(++i,firstScrollableDirectionStr);
+                                    //block.addStatement(++i,firstScrollableXDirectionStr);
+                                } else {
+                                    block.addStatement(++i,scrollX);
+                                    block.addStatement(++i,scrollY);
+                                    block.addStatement(++i, scrollableClass);
+                                    if(scrollable != null)
+                                        block.addStatement(++i, scrollable);
+                                    else if(scrollableTry != null )
+                                        block.addStatement(++i, scrollableTry);
+                                    //block.addStatement(++i,scrollableYDirectionStr);
+                                    block.addStatement(++i,scrollableDirectionStr);
+                                    //block.addStatement(++i,scrollableXDirectionStr);
+                                }
+
+                                // 1 screenshot pre onView
+                                block.addStatement(++i, JavaParser.parseStatement(
+                                        "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
+
+                                block.addStatement(++i, screenCapture);
+
+                                // 2 take the initial offset from the start of the scrollView
+                                block.addStatement(++i,getStartScrollXFromScrollable);
+                                block.addStatement(++i,getStartScrollYFromScrollable);
+
+                                // 3 take the pre scroll dump of the screen
+                                block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" + methodName + "\", device);"));
+
+                                // 4 scroll
+                                block.addStatement(++i,st);
+                                block.addStatement(++i,tryStmt);
+
+                                // 5 take the final offset inside the scrollView
+                                block.addStatement(++i,getEndScrollXFromScrollable);
+                                block.addStatement(++i,getEndScrollYFromScrollable);
+
+                                // 6 log with the appropriate searchType
+                                block.addStatement(++i,getScrollableClass);
+                                block.addStatement(++i,dirScrollableStmt1);
+                                block.addStatement(++i,dirScrollableStmt2);
+                                LogCat log = new LogCat(methodName, "class-scrollTo", "scrollableClassTOGGLE+\"_\"+ScrollHandler.getScrollableCoords(scrollableTOGGLE)", "scrollableDirTOGGLE",
+                                        "scrollYTOGGLE[0]+\";\"+scrollYTOGGLE[1]+\";\"+scrollXTOGGLE[0]+\";\"+scrollXTOGGLE[1]+\";-1;-1;\"+scrollableTOGGLE.getHeight()+\";\"+scrollableTOGGLE.getWidth()+\";\"+scrollableTOGGLE.getLeft()+\";\"+scrollableTOGGLE.getTop()");
+                                i = addLogInteractionToCu(log,i,block);
+
+                                // 6.5 increment log number
+                                block.addStatement(++i,logNum);
+
+                                // 7 fare screenshot
+                                block.addStatement(++i, JavaParser.parseStatement(
+                                        "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
+
+                                block.addStatement(++i, screenCapture);
+
+                                // 8 fare dump
+                                block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" + methodName + "\", device);"));
+
+                                // 9 loggare l'operazione che si sta facendo sulla view per la quale si è scrollato
+                                log = new LogCat(methodName, searchType, searchKw, "check", "");
+                                i = addLogInteractionToCu(log, i, block);
+                            }
+                        } else {
+                            LogCat log = new LogCat(methodName, srct, srck, interactionType, interactionParams);
+
+                            //b.addStatement(++i, captureTaskValue);
+                            block.addStatement(++i, JavaParser.parseStatement(
+                                    "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
+
+                            block.addStatement(++i, screenCapture);
+
+                            i = addLogInteractionToCu(log, i, block);
+
+                            //b.addStatement(++i, dumpScreen);
+                            block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" + methodName + "\", device);"));
+                            block.addStatement(++i, st);
+                            block.addStatement(++i, tryStmt);
+                        }
+
+                    } else {
+                        if(srct.isEmpty()) {
+                            srck = "";
+                            srct = interactionType;
+                            if(interactionParams.isEmpty())
+                                srck = "-";
+                            else
+                                srck = interactionParams.replace("\"","");
+                        } else {
+                            if(allOf) {
+                                srct = srct + "&" + interactionType;
+                                srck = srck + "&" + interactionParams.replace("\"", "");
+                            } else {
+                                srct = srct + "|" + interactionType;
+                                srck = srck + "|" + interactionParams.replace("\"", "");
+                            }
+                        }
                     }
                 }
             }
@@ -1849,6 +2146,10 @@ public class Enhancer {
 
                 break;
             default:
+                if(log.getSearchType().contains("&") || log.getSearchType().contains("|") ){
+                    String tmp ="\"" + log.getSearchKw() +"\"";
+                    log.setSearchKw(tmp);
+                }
                 if (log.getInteractionParams().isEmpty())
                     l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, "+ "\"" + log.getMethodName() + "\","
                             + "\"" + log.getSearchType() + "\"" + "," + log.getSearchKw() + "," + "\""

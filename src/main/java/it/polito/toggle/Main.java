@@ -19,19 +19,24 @@ public class Main {
                 "C:\\Users\\vitto\\AndroidStudioProjects\\OnDataTestApp\\app\\src\\androidTest\\java\\com\\example\\ondatatestapp\\finalTest\\",
                 Emulators.NEXUS_5);*/
 
-        Toggle toggle = new Toggle(
+        /*Toggle toggle = new Toggle(
                 "androidTest",
                 "C:\\Users\\vitto\\OneDrive\\Desktop\\BudgetWatch",
                 "protect.budgetwatch",
                 "D:\\AndroidStudioProject\\bw\\budget-watch-master\\app\\src\\androidTest\\java\\protect\\budgetwatch\\",
-                Emulators.NEXUS_5);
-
+                Emulators.NEXUS_5);*/
         /*Toggle toggle = new Toggle(
                 "androidTest",
                 "C:\\Users\\vitto\\OneDrive\\Desktop\\Stoic",
                 "app.reading.stoic.stoicreading",
                 "D:\\AndroidStudioProject\\StoicReading-master\\app\\src\\androidTest\\java\\app\\reading\\stoic\\stoicreading\\toggle\\",
                 Emulators.NEXUS_5);*/
+        Toggle toggle = new Toggle(
+                "androidTest",
+                "C:\\Users\\vitto\\OneDrive\\Desktop\\Images-to-PDF",
+                "swati4star.createpdf",
+                "D:\\AndroidStudioProject\\Images-to-PDF-master\\app\\src\\androidTest\\java\\swati4star\\createpdf\\",
+                Emulators.NEXUS_5);
         try {
             toggle.translateTestsWithMethodGranularity();
             //toggle.pullAllBmpXml("testWithGallery");
