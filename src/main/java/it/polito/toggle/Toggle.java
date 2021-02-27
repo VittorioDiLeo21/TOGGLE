@@ -163,7 +163,9 @@ public class Toggle {
         //1
 
         Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath);
-        /*injectToggleTool(testDirectoryPath);
+        if(true)
+            return true;
+        injectToggleTool(testDirectoryPath);
 
         //2 build and install the apk
 
@@ -215,7 +217,7 @@ public class Toggle {
             } catch (ToggleException e) {
                 e.printStackTrace();
             }
-        }*/
+        }
         return true;
     }
 

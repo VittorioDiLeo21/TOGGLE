@@ -512,6 +512,7 @@ public class ToggleClassManager {
             //translator.readLogcatToFile(logcat_filename);
 
             List<String> filtered_logcat_interactions = translator.filterLogcat(logName,logcat_tool_tag);
+            //List<String> filtered_logcat_interactions = translator.readLogFile(logName,logcat_tool_tag);
 
             interactions = new ArrayList<>();
 

@@ -96,6 +96,10 @@ public class ToggleTranslator {
         }
     }
 
+    public final List<String> readLogFile(String filename, String filter) throws IOException {
+        return Files.lines(Paths.get(starting_folder,filename), StandardCharsets.ISO_8859_1).collect(Collectors.toList());
+    }
+
     public final List<String> filterLogcat(String filename, String filter) throws IOException {
 
         System.out.println("*************************************");

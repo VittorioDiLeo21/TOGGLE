@@ -172,8 +172,72 @@ public abstract class ToggleInteraction {
         XPathFactory xPathFactory = XPathFactory.newInstance();
         XPath xPath = xPathFactory.newXPath();
         XPathExpression expr = null;
+        String splitter = "&";
+        String logicalCondition = " and ";
+        if(search_type.contains("|")) {
+            splitter = "\\|";
+            logicalCondition = " or ";
+        }
+        String joiner = "";
+        String[] searchTypes = search_type.split(splitter);
+        String[] searchKeys = search_keyword.split(splitter);
+        StringBuilder sb = new StringBuilder().append("//node[");
+        for(int i = 0; i < searchTypes.length; i++){
+            if(i == 1){
+                joiner = logicalCondition;
+            }
+            switch (searchTypes[i]) {
+                case "id":
+                    sb.append(joiner).append("@resource-id=\"").append(packagename).append(":id/").append(searchKeys[i]).append("\"");
+                    break;
+                case "text":
+                    sb.append(joiner).append("@text=\"").append(searchKeys[i]).append("\"");
+                    //TODO vedere come si comporta se il testo fosse preso da string resources
+                    break;
+                case "content-desc":
+                    sb.append(joiner).append("@content-desc=\"").append(searchKeys[i]).append("\"");
+                    break;
+                case "id-adapterView":
+                    expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]/node").toString());
+                    handleIdAdapterView(expr,document);
+                    return;
+                case "position-adapterView":
+                    String id = searchKeys[i].split("_")[0];
+                    String nodeCoords = searchKeys[i].split("_")[1];
+                    sb.append(joiner).append("@resource-id=\"").append(packagename).append(":id/").append(id).append("\"]/node[contains(@bounds,'").append(nodeCoords).append("')");
+                    //expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(id).append("\"]/node[contains(@bounds,'").append(nodeCoords).append("')]").toString());
+                    break;
+                case "atposition":
+                    String[] parameters = searchKeys[i].split("_");
+                    Integer pos = Integer.parseInt(parameters[1]);
+                    Integer offset = Integer.parseInt(parameters[2]);
+                    pos = pos-offset;
+                    sb.append(joiner).append("@resource-id=\"").append(packagename).append(":id/").append(parameters[0]).append("\"]/node[@index=\"").append(pos).append("\"");
+                    //expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(parameters[0]).append("\"]/node[@index=\"").append(pos).append("\"]").toString());
+                    break;
+                case "text_adapterView":
+                    String[] p = searchKeys[i].split("_");
+                    sb.append(joiner).append("@resource-id=\"").append(packagename).append(":id/").append(p[0]).append("\"]//node[node//@text=\"").append(p[1]).append("\"");
+                    //expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword.split("_")[0]).append("\"]//node[node//@text=\"").append(search_keyword.split("_")[1]).append("\"]").toString());
+                    break;
+                case "class-scrollTo" :
+                    String[] p2 = searchKeys[i].split("_");
+                    sb.append(joiner).append("@class=\"android.widget.").append(p2[0]).append("\" and contains(@bounds,'").append(p2[1]).append("')");
+                    //expr = xPath.compile(new StringBuilder().append("//node[@class=\"android.widget.").append(search_keyword.split("_")[0]).append("\" and contains(@bounds,'").append(search_keyword.split("_")[1]).append("')]").toString());
+                    break;
+            }
+        }
+        expr = xPath.compile(sb.append("]").toString());
 
-        switch (search_type) {
+        assert expr != null;
+
+        NodeList nodes = (NodeList) expr.evaluate(document,XPathConstants.NODESET);
+        if(nodes != null){
+            for(int i = 0; i < nodes.getLength(); i++){
+                bounds = (nodes.item(i).getAttributes().getNamedItem("bounds").toString());
+            }
+        }
+        /*switch (search_type) {
             case "id":
                 expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]").toString());
                 //expr = xPath.compile("//node[@resource-id=\"" + packagename + ":id/" + search_keyword + "\"]");
@@ -190,12 +254,6 @@ public abstract class ToggleInteraction {
                 //expr = xPath.compile("//node[@content-desc=\"" + search_keyword + "\"]");
                 break;
             case "id-adapterView":
-                /*String node="";
-                if(interaction_type.equals("scrollup")){
-                    node = "1";
-                } else if( interaction_type.equals("scrolldown")){
-                    node = "last()";
-                }*/
                 String node = "1";
                 //expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]/node[last()]").toString());
                 //expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]/node[").append(node).append("]").toString());
@@ -229,10 +287,11 @@ public abstract class ToggleInteraction {
             for(int i = 0; i < nodes.getLength(); i++){
                 bounds = (nodes.item(i).getAttributes().getNamedItem("bounds").toString());
             }
-        }
+        }*/
         System.out.println("bounds = " + bounds);
         String[] splitted_string = bounds.split("(\\[)|(\\])|((,))");
-//todo debug this
+
+
         left = Integer.parseInt(splitted_string[1]);
         top = Integer.parseInt(splitted_string[2]);
 

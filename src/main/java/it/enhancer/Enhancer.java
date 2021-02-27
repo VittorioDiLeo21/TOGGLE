@@ -1336,8 +1336,7 @@ public class Enhancer {
                         if(interactionType.isEmpty()){
                             interactionType = ViewAssertions.getSearchType(operations.get(j).getName());
 
-                            if (searchType.isEmpty() || interactionType.isEmpty()) {
-                                interactionType = ViewMatchers.getSearchType(operations.get(j).getName());
+                            if (srct.isEmpty() || interactionType.isEmpty()) {
 
                                 if(interactionType.isEmpty()){
                                     block.addStatement(i, st);
@@ -1369,6 +1368,8 @@ public class Enhancer {
                             // statements to stay to the bottom
                         } else {
                             //b.addStatement(++i, date);
+                            if(i >= block.getStatements().size())
+                                i = block.getStatements().size()-1;
                             block.addStatement(++i, logNum);
                             block.addStatement(++i, activity);
                         }
@@ -1964,6 +1965,10 @@ public class Enhancer {
         if (log.getInteractionType().isEmpty())
             log.setInteractionType("");
 
+        if(log.getSearchType().contains("&") || log.getSearchType().contains("|") ){
+            String tmp ="\"" + log.getSearchKw() +"\"";
+            log.setSearchKw(tmp);
+        }
         // default handles the normal behavior of the parameters. ES: click(),
         // typeText("TextToBeReplaced")
         switch (log.getInteractionType()) {
@@ -2146,10 +2151,6 @@ public class Enhancer {
 
                 break;
             default:
-                if(log.getSearchType().contains("&") || log.getSearchType().contains("|") ){
-                    String tmp ="\"" + log.getSearchKw() +"\"";
-                    log.setSearchKw(tmp);
-                }
                 if (log.getInteractionParams().isEmpty())
                     l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, "+ "\"" + log.getMethodName() + "\","
                             + "\"" + log.getSearchType() + "\"" + "," + log.getSearchKw() + "," + "\""
