@@ -187,6 +187,9 @@ public abstract class ToggleInteraction {
                 joiner = logicalCondition;
             }
             switch (searchTypes[i]) {
+                case "class":
+                    sb.append(joiner).append("contains(@class,'").append(searchKeys[i]).append("')");
+                    break;
                 case "id":
                     sb.append(joiner).append("@resource-id=\"").append(packagename).append(":id/").append(searchKeys[i]).append("\"");
                     break;
@@ -227,6 +230,7 @@ public abstract class ToggleInteraction {
                     break;
             }
         }
+        System.out.println(sb.toString() + "]");
         expr = xPath.compile(sb.append("]").toString());
 
         assert expr != null;

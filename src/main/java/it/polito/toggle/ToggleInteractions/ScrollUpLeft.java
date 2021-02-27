@@ -107,6 +107,11 @@ public class ScrollUpLeft extends ToggleInteraction {
     @Override
     public ArrayList<String> generateSikuliLines() {
         ArrayList<String> res = new ArrayList<>();
+        int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
+        int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
+        if(totScrollStep<=0)
+            return res;
+        int last = totToBeScrolled%totScrollStep;
         res.add("sleep(1)");
         res.add("wait(\"" + timestamp + "_cropped.png\", 30)");
         res.add("r = find(\"" + timestamp + "_cropped.png\")");
@@ -116,9 +121,6 @@ public class ScrollUpLeft extends ToggleInteraction {
 
         res.add("run = start.below(stepY)");
         res.add("run = run.right(stepX)");
-        int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
-        int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        int last = totToBeScrolled%totScrollStep;
 
         for(int i = 0; i < totToBeScrolled/totScrollStep; i++) {
             res.add("mouseMove(start); wait(0.5)");
@@ -152,13 +154,15 @@ public class ScrollUpLeft extends ToggleInteraction {
     @Override
     public ArrayList<String> generateEyeStudioLines() {
         ArrayList<String> res = new ArrayList<>();
+        int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
+        int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
+        if(totScrollStep<=0)
+            return res;
+        int last = totToBeScrolled%totScrollStep;
         res.add("Check \"{ImageFolder}\\" + timestamp + "_cropped.png\"");
         res.add("Move \"{ImageFolder}\\" + timestamp + "_cropped.png\"");
         res.add("Sleep 10");
 
-        int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
-        int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        int last = totToBeScrolled%totScrollStep;
         //TODO riconosco il primo elemento, mi muovo di scrollStep e inizio a scrollare
         //res.add("MoveRelative \"0\" \"0\"");
         res.add("Sleep 500");
@@ -188,15 +192,17 @@ public class ScrollUpLeft extends ToggleInteraction {
     @Override
     public ArrayList<String> generateSikuliJavaLines(String starting_folder) {
         ArrayList<String> res = new ArrayList<>();
+        int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
+        int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
+        if(totScrollStep<=0)
+            return res;
+        int last = totToBeScrolled%totScrollStep;
         res.add("try {");
         res.add("\tsikuli_screen.wait(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 30);");
         res.add("\torg.sikuli.script.Match sikuli_match = sikuli_screen.find(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\",  "\\\\") + "\");");
         res.add("\torg.sikuli.script.Location l = sikuli_match.getCenter();");
 
         res.add("\tsikuli_screen.wait(0.5);");
-        int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
-        int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        int last = totToBeScrolled%totScrollStep;
 
         for(int i = 0; i < totToBeScrolled/totScrollStep; i++ ){
             res.add("\tsikuli_screen.mouseMove(l);");
@@ -240,6 +246,8 @@ public class ScrollUpLeft extends ToggleInteraction {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
+        if(totScrollStep<=0)
+            return res;
         int last = totToBeScrolled%totScrollStep;
         res.add("image = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
         res.add("if (image != null) {");
@@ -287,6 +295,8 @@ public class ScrollUpLeft extends ToggleInteraction {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
+        if(totScrollStep<=0)
+            return res;
         int last = totToBeScrolled%totScrollStep;
         double ratio = (double)last/(double)totScrollStep;
         res.add("image = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
@@ -378,6 +388,8 @@ public class ScrollUpLeft extends ToggleInteraction {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
+        if(totScrollStep<=0)
+            return res;
         int last = totToBeScrolled%totScrollStep;
         double ratio = (double)last/(double)totScrollStep;
         res.add("try {");

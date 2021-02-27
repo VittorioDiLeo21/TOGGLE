@@ -381,6 +381,7 @@ public class Enhancer {
         //compilationUnit.addImport(packageName + ".TOGGLETools", false, false);
         this.compilationUnit.addImport("java.util.Date", false, false);
         this.compilationUnit.addImport("android.app.Activity", false, false);
+        this.compilationUnit.addImport("android.view.View", false, false);
         this.compilationUnit.addImport("android.app.Instrumentation", false, false);
         this.compilationUnit.addImport("java.util.Collection", false, false);
         this.compilationUnit.addImport(version + "test.InstrumentationRegistry", false, false);
@@ -1382,7 +1383,43 @@ public class Enhancer {
                             TryStmt firstScrollableTry = null;
                             TryStmt scrollableTry = null;
 
-                            if(operations.get(1).getName().equals("withText")){
+                            if(srct.contains("id")){
+                                int index = 2;
+                                for(;index < j;index++){
+                                    if(operations.get(index).getName().equals("withId"))
+                                        break;
+                                }
+                                firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = (View) ScrollHandler.getScrollableParent(activityTOGGLETools.findViewById(R.id." + operations.get(index).getParameter().replace("\"","") + "));");
+                                scrollable = JavaParser.parseStatement("scrollableTOGGLE = (View) ScrollHandler.getScrollableParent(activityTOGGLETools.findViewById(R.id." + operations.get(index).getParameter().replace("\"","") + "));");
+                            } else if(srct.contains("text")) {
+                                int index = 2;
+                                boolean isWithText = false;
+                                for(;index < j;index++){
+                                    if(operations.get(index).getName().equals("withText")) {
+                                        isWithText = true;
+                                        break;
+                                    } else if(operations.get(index).getName().equals("withHint")) {
+                                        break;
+                                    }
+                                }
+                                if(isWithText) {
+                                    firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = null;");
+                                    firstScrollableTry = (TryStmt) JavaParser.parseStatement("try {\r\n" +
+                                            "\tscrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(index).getParameter().replace("\"","") + "\",false);\r\n" +
+                                            "} catch(Exception e) {\r\n" +
+                                            "}");
+                                    scrollableTry = (TryStmt) JavaParser.parseStatement("try {\r\n" +
+                                            "\tscrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(index).getParameter().replace("\"","") + "\",false);\r\n" +
+                                            "} catch (Exception e) {\r\n" +
+                                            "}");
+                                } else if(srct.contains("withHint")) {
+                                    firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(index).getParameter().replace("\"","") + "\",true);");
+                                    scrollable = JavaParser.parseStatement("scrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(index).getParameter().replace("\"","") + "\",true);");
+                                }
+                            }
+
+
+                            /*if(operations.get(1).getName().equals("withText")){
                                 firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = null;");
                                 firstScrollableTry = (TryStmt) JavaParser.parseStatement("try {\r\n" +
                                         "\tscrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",false);\r\n" +
@@ -1398,7 +1435,7 @@ public class Enhancer {
                             } else if(operations.get(1).getName().equals("withHint")){
                                 firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",true);");
                                 scrollable = JavaParser.parseStatement("scrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",true);");
-                            }
+                            }*/
                             if((firstScrollable != null && scrollable != null) || ( firstScrollable!= null &&firstScrollableTry != null && scrollableTry != null)){
                                 if(firstScrollToTest){
                                     firstScrollToTest = false;
@@ -1466,7 +1503,7 @@ public class Enhancer {
                                 block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" + methodName + "\", device);"));
 
                                 // 9 loggare l'operazione che si sta facendo sulla view per la quale si è scrollato
-                                log = new LogCat(methodName, searchType, searchKw, "check", "");
+                                log = new LogCat(methodName, srct, srck, "check", "");
                                 i = addLogInteractionToCu(log, i, block);
                             }
                         } else {
@@ -1497,10 +1534,10 @@ public class Enhancer {
                         } else {
                             if(allOf) {
                                 srct = srct + "&" + interactionType;
-                                srck = srck + "&" + interactionParams.replace("\"", "");
+                                srck = srck + "&" + interactionParams.replace("\"", "").replace(" ","_");
                             } else {
                                 srct = srct + "|" + interactionType;
-                                srck = srck + "|" + interactionParams.replace("\"", "");
+                                srck = srck + "|" + interactionParams.replace("\"", "").replace(" ","_");
                             }
                         }
                     }

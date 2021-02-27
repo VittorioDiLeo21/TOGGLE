@@ -163,8 +163,6 @@ public class Toggle {
         //1
 
         Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath);
-        if(true)
-            return true;
         injectToggleTool(testDirectoryPath);
 
         //2 build and install the apk
@@ -208,13 +206,7 @@ public class Toggle {
             try {
                 it.polito.toggle.Utils.createJavaProjectFolder(guiTestsPath+"\\TOGGLE\\");
                 tcm.createClass(className+"TOGGLE.txt");
-            } catch (XPathExpressionException e) {
-                e.printStackTrace();
-            } catch (SAXException e) {
-                e.printStackTrace();
-            } catch (ParserConfigurationException e) {
-                e.printStackTrace();
-            } catch (ToggleException e) {
+            } catch (XPathExpressionException | SAXException | ParserConfigurationException | ToggleException e) {
                 e.printStackTrace();
             }
         }
