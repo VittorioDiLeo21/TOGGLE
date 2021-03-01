@@ -1192,16 +1192,11 @@ public class Enhancer {
                         block.addStatement(++i, instrumentation);
                         block.addStatement(++i, device);
                         block.addStatement(++i, firstLogNum);
-                        //b.addStatement(++i, firstTestDate);
                         block.addStatement(++i, firstTestActivity);
                     } else if (j == 3 && interactionType.equals("check") || j == 2) {
                         block.addStatement(i, logNum);
-                        //b.addStatement(i, date);
                         block.addStatement(++i, activity);
-                        // this makes it work on test cases with multiple interactions avoiding the try
-                        // statements to stay to the bottom
                     } else {
-                        //b.addStatement(++i, date);
                         block.addStatement(++i, logNum);
                         block.addStatement(++i, activity);
                     }
@@ -1240,9 +1235,7 @@ public class Enhancer {
                                 if(firstScrollableTry != null )
                                     block.addStatement(++i, firstScrollableTry);
                                 block.addStatement(++i, firstScrollableClass);
-                                //block.addStatement(++i,firstScrollableYDirectionStr);
                                 block.addStatement(++i,firstScrollableDirectionStr);
-                                //block.addStatement(++i,firstScrollableXDirectionStr);
                             } else {
                                 block.addStatement(++i,scrollX);
                                 block.addStatement(++i,scrollY);
@@ -1251,9 +1244,7 @@ public class Enhancer {
                                     block.addStatement(++i, scrollable);
                                 else if(scrollableTry != null )
                                     block.addStatement(++i, scrollableTry);
-                                //block.addStatement(++i,scrollableYDirectionStr);
                                 block.addStatement(++i,scrollableDirectionStr);
-                                //block.addStatement(++i,scrollableXDirectionStr);
                             }
 
                             // 1 screenshot pre onView
@@ -1281,7 +1272,7 @@ public class Enhancer {
                             block.addStatement(++i,getScrollableClass);
                             block.addStatement(++i,dirScrollableStmt1);
                             block.addStatement(++i,dirScrollableStmt2);
-                            LogCat log = new LogCat(methodName, "class-scrollTo", "scrollableClassTOGGLE+\"_\"+ScrollHandler.getScrollableCoords(scrollableTOGGLE)", "scrollableDirTOGGLE",
+                            LogCat log = new LogCat(methodName, "class-scrollTo", "scrollableClassTOGGLE+\"_;\"+ScrollHandler.getScrollableCoords(scrollableTOGGLE)", "scrollableDirTOGGLE",
                                     "scrollYTOGGLE[0]+\";\"+scrollYTOGGLE[1]+\";\"+scrollXTOGGLE[0]+\";\"+scrollXTOGGLE[1]+\";-1;-1;\"+scrollableTOGGLE.getHeight()+\";\"+scrollableTOGGLE.getWidth()+\";\"+scrollableTOGGLE.getLeft()+\";\"+scrollableTOGGLE.getTop()");
                             i = addLogInteractionToCu(log,i,block);
 
@@ -1318,7 +1309,7 @@ public class Enhancer {
                         block.addStatement(++i, tryStmt);
                     }
                 }
-            } else if(searchType.isEmpty() && (operations.get(1).getName().equals("allOf") || operations.get(1).getName().equals("anyOf"))){
+            } else if(operations.get(1).getName().equals("allOf") || operations.get(1).getName().equals("anyOf")){
                 boolean allOf = operations.get(1).getName().equals("allOf");
                 String stmtString = stmt.toString();
                 Statement st = JavaParser.parseStatement(stmtString);
@@ -1359,16 +1350,13 @@ public class Enhancer {
                             block.addStatement(++i, instrumentation);
                             block.addStatement(++i, device);
                             block.addStatement(++i, firstLogNum);
-                            //b.addStatement(++i, firstTestDate);
                             block.addStatement(++i, firstTestActivity);
                         } else if (j == 3 && interactionType.equals("check") || j == 2) {
                             block.addStatement(i, logNum);
-                            //b.addStatement(i, date);
                             block.addStatement(++i, activity);
                             // this makes it work on test cases with multiple interactions avoiding the try
                             // statements to stay to the bottom
                         } else {
-                            //b.addStatement(++i, date);
                             if(i >= block.getStatements().size())
                                 i = block.getStatements().size()-1;
                             block.addStatement(++i, logNum);
@@ -1377,7 +1365,6 @@ public class Enhancer {
 
                         System.out.println("logcatting: methodname = " + methodName + "; searchType = " + srct + "; searchKw = " + srck + "; interactionType = " + interactionType + "; interactionParams = " + interactionParams);
                         if(interactionType.equals("scrollto")){
-                            //todo per lo scroll :
                             Statement firstScrollable = null;
                             Statement scrollable = null;
                             TryStmt firstScrollableTry = null;
@@ -1418,24 +1405,6 @@ public class Enhancer {
                                 }
                             }
 
-
-                            /*if(operations.get(1).getName().equals("withText")){
-                                firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = null;");
-                                firstScrollableTry = (TryStmt) JavaParser.parseStatement("try {\r\n" +
-                                        "\tscrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",false);\r\n" +
-                                        "} catch(Exception e) {\r\n" +
-                                        "}");
-                                scrollableTry = (TryStmt) JavaParser.parseStatement("try {\r\n" +
-                                        "\tscrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",false);\r\n" +
-                                        "} catch (Exception e) {\r\n" +
-                                        "}");
-                            } else if(operations.get(1).getName().equals("withId")){
-                                firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = (View) ScrollHandler.getScrollableParent(activityTOGGLETools.findViewById(R.id." + operations.get(1).getParameter().replace("\"","") + "));");
-                                scrollable = JavaParser.parseStatement("scrollableTOGGLE = (View) ScrollHandler.getScrollableParent(activityTOGGLETools.findViewById(R.id." + operations.get(1).getParameter().replace("\"","") + "));");
-                            } else if(operations.get(1).getName().equals("withHint")){
-                                firstScrollable = JavaParser.parseStatement("View scrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",true);");
-                                scrollable = JavaParser.parseStatement("scrollableTOGGLE = ScrollHandler.findScrollableFromText(activityTOGGLETools,\"" + operations.get(1).getParameter().replace("\"","") + "\",true);");
-                            }*/
                             if((firstScrollable != null && scrollable != null) || ( firstScrollable!= null &&firstScrollableTry != null && scrollableTry != null)){
                                 if(firstScrollToTest){
                                     firstScrollToTest = false;
@@ -1445,9 +1414,7 @@ public class Enhancer {
                                     if(firstScrollableTry != null )
                                         block.addStatement(++i, firstScrollableTry);
                                     block.addStatement(++i, firstScrollableClass);
-                                    //block.addStatement(++i,firstScrollableYDirectionStr);
                                     block.addStatement(++i,firstScrollableDirectionStr);
-                                    //block.addStatement(++i,firstScrollableXDirectionStr);
                                 } else {
                                     block.addStatement(++i,scrollX);
                                     block.addStatement(++i,scrollY);
@@ -1456,9 +1423,7 @@ public class Enhancer {
                                         block.addStatement(++i, scrollable);
                                     else if(scrollableTry != null )
                                         block.addStatement(++i, scrollableTry);
-                                    //block.addStatement(++i,scrollableYDirectionStr);
                                     block.addStatement(++i,scrollableDirectionStr);
-                                    //block.addStatement(++i,scrollableXDirectionStr);
                                 }
 
                                 // 1 screenshot pre onView
@@ -1486,7 +1451,7 @@ public class Enhancer {
                                 block.addStatement(++i,getScrollableClass);
                                 block.addStatement(++i,dirScrollableStmt1);
                                 block.addStatement(++i,dirScrollableStmt2);
-                                LogCat log = new LogCat(methodName, "class-scrollTo", "scrollableClassTOGGLE+\"_\"+ScrollHandler.getScrollableCoords(scrollableTOGGLE)", "scrollableDirTOGGLE",
+                                LogCat log = new LogCat(methodName, "class-scrollTo", "scrollableClassTOGGLE+\"_;\"+ScrollHandler.getScrollableCoords(scrollableTOGGLE)", "scrollableDirTOGGLE",
                                         "scrollYTOGGLE[0]+\";\"+scrollYTOGGLE[1]+\";\"+scrollXTOGGLE[0]+\";\"+scrollXTOGGLE[1]+\";-1;-1;\"+scrollableTOGGLE.getHeight()+\";\"+scrollableTOGGLE.getWidth()+\";\"+scrollableTOGGLE.getLeft()+\";\"+scrollableTOGGLE.getTop()");
                                 i = addLogInteractionToCu(log,i,block);
 
@@ -1676,11 +1641,11 @@ public class Enhancer {
             for(int j = 1; j < operations.size(); j++){
                 if(operations.get(j).getName().equals("is")){
                     searchType = "text_adapterView";
-                    searchKw = "\""+listId+"_"+operations.get(j).getParameter().replace("\"","")+"\"";
+                    searchKw = "\""+listId+"_;"+operations.get(j).getParameter().replace("\"","")+"\"";
                     break;
                 }else if(operations.get(j).getName().equals("atPosition")){
                     searchType = "atposition";
-                    searchKw = "\""+listId +"_"+operations.get(j).getParameter()+"_\"+adapterViewTOGGLE.getFirstVisiblePosition()+\"_\"+adapterViewTOGGLE.getLastVisiblePosition()";
+                    searchKw = "\""+listId +"_;"+operations.get(j).getParameter()+"_;\"+adapterViewTOGGLE.getFirstVisiblePosition()+\"_;\"+adapterViewTOGGLE.getLastVisiblePosition()";
                     break;
                 }/*else if(){
 
@@ -1704,7 +1669,7 @@ public class Enhancer {
                         "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
 
                 block.addStatement(++i, screenCapture);
-                log = new LogCat(methodName, "position-adapterView", "\""+listId+"_\"+ScrollHandler.getAdapterViewPosFrom(postScrollYTOGGLE,postScrollXTOGGLE,adapterViewTOGGLE)", interactionType,
+                log = new LogCat(methodName, "position-adapterView", "\""+listId+"_;\"+ScrollHandler.getAdapterViewPosFrom(postScrollYTOGGLE,postScrollXTOGGLE,adapterViewTOGGLE)", interactionType,
                         interactionParams);
                 i = addLogInteractionToCu(log,i,block);
                 block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
@@ -1716,182 +1681,6 @@ public class Enhancer {
             System.out.println("EXCEPTION IN ENHANCER!");
             Utils.logException(e, "enhanceMethodOnData");
         }
-        return ++i;
-    }
-
-    private int enhanceMethodOnData(BlockStmt block, String methodName, Statement stmt, int i) {
-        Statement firstVisiblePosition = JavaParser.parseStatement("int firstVisiblePosition = 0;");
-        Statement height = JavaParser.parseStatement("int height = 0;");
-        Statement offset = JavaParser.parseStatement("int offset = 0;");
-        Statement firstPreScrollY = JavaParser.parseStatement("int preScrollYTOGGLE = 0");
-        Statement preScrollY = JavaParser.parseStatement("preScrollYTOGGLE = 0");
-        Statement firstPostScrollY = JavaParser.parseStatement("int postScrollYTOGGLE = 0");
-        Statement postScrollY = JavaParser.parseStatement("postScrollYTOGGLE = 0");
-        try {
-            // get onData(customMatcher(...)).inAdapterView(withId(R.id.'someId')
-            Node inAdapterView = getOnDataInAdapterView(stmt);
-
-            // get 'someId' in
-            // onData(customMatcher(...)).inAdapterView(withId(R.id.'someId')
-            String listId = getIdInAdapterView(inAdapterView);
-            Statement firstAdapterView = JavaParser.parseStatement("AdapterView adapterViewTOGGLE = ScrollHandler.findAdapterView(activityTOGGLETools.findViewById(R.id." + listId + "));\r\n");
-            Statement adapterView = JavaParser.parseStatement("adapterViewTOGGLE = ScrollHandler.findAdapterView(activityTOGGLETools.findViewById(R.id." + listId + "));\r\n");
-
-            TryStmt findStartingCoord = (TryStmt) JavaParser.parseStatement(
-                    "try {\r\n"
-                            + "            preScrollYTOGGLE = ScrollHandler.getActualOffsetFromTop(adapterView);\r\n"
-                            + "        } catch (Exception e) {\r\n"
-                            + "            e.printStackTrace();\r\n"
-                            + "        }"
-            );
-
-            TryStmt findEndingCoord = (TryStmt) JavaParser.parseStatement(
-                    "try {\r\n"
-                            + "            postScrollYTOGGLE = ScrollHandler.getActualOffsetFromTop(adapterView);\r\n"
-                            + "        } catch (Exception e) {\r\n"
-                            + "            e.printStackTrace();\r\n"
-                            + "        }"
-            );
-
-            TryStmt populateDataFromList = (TryStmt) JavaParser.parseStatement(
-                                "try {\r\n"
-                    + "            ListView l = activityTOGGLETools.findViewById(R.id." + listId + ");\r\n"
-                    + "            int position = l.getFirstVisiblePosition() - firstVisiblePosition;\r\n"
-                    + "            firstVisiblePosition = l.getFirstVisiblePosition();\r\n"
-                    + "            View c = l.getChildAt(0);\r\n"
-                    + "            View v = l.getSelectedView();\r\n"
-                    + "            offset = v.getTop();\r\n"
-                    + "            height = c.getHeight();\r\n"
-                    + "            scrolly" + listId + "= -c.getTop() + position * height;\r\n"
-                    + "        } catch (Exception e) {\r\n"
-                    + "            try {\r\n"
-                    + "                GridView l = activityTOGGLETools.findViewById(R.id." + listId + ");\r\n"
-                    + "                int position = l.getFirstVisiblePosition() - firstVisiblePosition;\r\n"
-                    + "                firstVisiblePosition = l.getFirstVisiblePosition();\r\n"
-                    + "                View c = l.getChildAt(0);\r\n"
-                    + "                View v = l.getSelectedView();\r\n"
-                    + "                offset = v.getTop();\r\n"
-                    + "                height = c.getHeight();\r\n"
-                    + "                scrolly" + listId + " = -c.getTop() + position * height;\r\n"
-                    + "            } catch (Exception e1) {\r\n"
-                    + "                // try {\r\n"
-                    + "                // Spinner s = ...;\r\n"
-                    + "                // ...\r\n"
-                    + "                // } catch (Exception ei){\r\n"
-                    + "                // try {\r\n"
-                    + "                // ...\r\n"
-                    + "                // }\r\n"
-                    + "                // }\r\n"
-                    + "            }\r\n"
-                    + "        }");
-
-            addImportsOnData();
-
-            String scrollToString =
-                    inAdapterView.toString() + ".perform(scrollTo());";
-            Statement scrollToStatement = JavaParser.parseStatement(scrollToString);
-
-            // remove test
-            Statement st = stmt;
-            block.remove(stmt);
-
-            if (firstTest) {
-                firstTest = false;
-                block.addStatement(i, captureTask);
-                block.addStatement(++i, instrumentation);
-                block.addStatement(++i, device);
-                //b.addStatement(++i, firstTestDate);
-                block.addStatement(++i, firstLogNum);
-                block.addStatement(++i, firstTestActivity);
-                //block.addStatement(++i, firstAdapterView);
-                //block.addStatement(++i, firstPreScrollY);
-                //block.addStatement(++i, firstPostScrollY);
-            } else {
-                //b.addStatement(i, date);
-                block.addStatement(i, logNum);
-                block.addStatement(++i, activity);
-                //block.addStatement(++i, adapterView);
-                //block.addStatement(++i, preScrollY);
-                //block.addStatement(++i, postScrollY);
-            }
-
-            // first screen capture before scrolling
-            //	b.addStatement(++i, captureTaskValue);
-            block.addStatement(++i, JavaParser.parseStatement(
-                    "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
-
-            block.addStatement(++i, screenCapture);
-            //b.addStatement(++i, dumpScreen);
-            block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
-
-            LogCat log = new LogCat(methodName, "id", "\"" + listId + "\"", "scrollto", "");
-            i = addLogInteractionToCu(log, i, block);
-
-            // add scrollTo test
-            block.addStatement(++i, scrollToStatement);
-
-            // add variables
-            if (!block.toString().contains("int firstVisiblePosition = 0;")) {
-                block.addStatement(++i, firstVisiblePosition);
-                block.addStatement(++i, height);
-                block.addStatement(++i, offset);
-            }
-
-            Statement scrolly = JavaParser.parseStatement("int scrolly" + listId + " = 0;");
-            if (!block.toString().contains("int scrolly" + listId + " = 0;")) {
-                block.addStatement(++i, scrolly);
-            }
-
-            // populate data in variables
-            block.addStatement(++i, populateDataFromList);
-
-            //b.addStatement(++i, date);
-            block.addStatement(++i, logNum);
-            // log scrollTo interaction with parameters
-            log = new LogCat(methodName, "id", "\"" + listId + "\"", "scrollto",
-                    "scrolly" + listId + "+\";\"+height+\";\"+offset");
-            i = addLogInteractionToCu(log, i, block);
-
-            // second screen capture after scrolling
-            //	b.addStatement(++i, captureTaskValue);
-            block.addStatement(++i, JavaParser.parseStatement(
-                    "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
-
-            block.addStatement(++i, screenCapture);
-
-            // take the interaction to perform on the list
-            int numberOfOperations = operations.size();
-            String interaction = operations.get(numberOfOperations - 1).getName();
-            String interactionType = ViewActions.getSearchType(interaction);
-            String interactionParams = operations.get(numberOfOperations - 1).getParameter();
-
-            // if it's empty could be a check
-            if (interactionType.isEmpty())
-                // if it's not empty is a check
-                if (!ViewAssertions.getSearchType(interaction).isEmpty()) {
-                    interactionType = "check";
-                    interactionParams = "";
-                }
-
-            // if the interaction is scrollTo, it is ignored because the generated code
-            // already does it
-            if (!interactionType.equals("scrollto")) {
-                log = new LogCat(methodName, "id", "\"" + listId + "\"", interactionType, interactionParams);
-                i = addLogInteractionToCu(log, i, block);
-
-                //b.addStatement(++i, dumpScreen);
-                block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
-                block.addStatement(++i, st);
-                block.addStatement(++i, tryStmt);
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
-            System.out.println("EXCEPTION IN ENHANCER!");
-            Utils.logException(e, "enhanceMethodOnData");
-
-
-        }
-
         return ++i;
     }
 
@@ -2002,7 +1791,14 @@ public class Enhancer {
         if (log.getInteractionType().isEmpty())
             log.setInteractionType("");
 
-        if(log.getSearchType().contains("&") || log.getSearchType().contains("|") ){
+        boolean anyAll = false;
+        for(Operation o : operations){
+            if(o.getName().equals("anyOf") || o.getName().equals("allOf") || o.getName().equals("instanceOf")) {
+                anyAll = true;
+                break;
+            }
+        }
+        if(anyAll){
             String tmp ="\"" + log.getSearchKw() +"\"";
             log.setSearchKw(tmp);
         }
@@ -2188,11 +1984,11 @@ public class Enhancer {
 
                 break;
             default:
-                if (log.getInteractionParams().isEmpty())
-                    l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, "+ "\"" + log.getMethodName() + "\","
+                if (log.getInteractionParams().isEmpty()) {
+                    l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\"" + this.currentClass + "\", num, " + "\"" + log.getMethodName() + "\","
                             + "\"" + log.getSearchType() + "\"" + "," + log.getSearchKw() + "," + "\""
                             + log.getInteractionType() + "\"" + ");");
-
+                }
 
                     //l = JavaParser.parseStatement("TOGGLETools.LogInteraction(now," + "\"" + log.getMethodName() + "\","
                     //		+ "\"" + log.getSearchType() + "\"" + "," + log.getSearchKw() + "," + "\""

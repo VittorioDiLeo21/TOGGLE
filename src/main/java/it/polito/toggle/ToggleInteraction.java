@@ -201,17 +201,17 @@ public abstract class ToggleInteraction {
                     sb.append(joiner).append("@content-desc=\"").append(searchKeys[i]).append("\"");
                     break;
                 case "id-adapterView":
-                    expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword).append("\"]/node").toString());
+                    expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(searchKeys[i]).append("\"]/node").toString());
                     handleIdAdapterView(expr,document);
                     return;
                 case "position-adapterView":
-                    String id = searchKeys[i].split("_")[0];
-                    String nodeCoords = searchKeys[i].split("_")[1];
+                    String id = searchKeys[i].split("_;")[0];
+                    String nodeCoords = searchKeys[i].split("_;")[1];
                     sb.append(joiner).append("@resource-id=\"").append(packagename).append(":id/").append(id).append("\"]/node[contains(@bounds,'").append(nodeCoords).append("')");
                     //expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(id).append("\"]/node[contains(@bounds,'").append(nodeCoords).append("')]").toString());
                     break;
                 case "atposition":
-                    String[] parameters = searchKeys[i].split("_");
+                    String[] parameters = searchKeys[i].split("_;");
                     Integer pos = Integer.parseInt(parameters[1]);
                     Integer offset = Integer.parseInt(parameters[2]);
                     pos = pos-offset;
@@ -219,12 +219,12 @@ public abstract class ToggleInteraction {
                     //expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(parameters[0]).append("\"]/node[@index=\"").append(pos).append("\"]").toString());
                     break;
                 case "text_adapterView":
-                    String[] p = searchKeys[i].split("_");
+                    String[] p = searchKeys[i].split("_;");
                     sb.append(joiner).append("@resource-id=\"").append(packagename).append(":id/").append(p[0]).append("\"]//node[node//@text=\"").append(p[1]).append("\"");
                     //expr = xPath.compile(new StringBuilder().append("//node[@resource-id=\"").append(packagename).append(":id/").append(search_keyword.split("_")[0]).append("\"]//node[node//@text=\"").append(search_keyword.split("_")[1]).append("\"]").toString());
                     break;
                 case "class-scrollTo" :
-                    String[] p2 = searchKeys[i].split("_");
+                    String[] p2 = searchKeys[i].split("_;");
                     sb.append(joiner).append("@class=\"android.widget.").append(p2[0]).append("\" and contains(@bounds,'").append(p2[1]).append("')");
                     //expr = xPath.compile(new StringBuilder().append("//node[@class=\"android.widget.").append(search_keyword.split("_")[0]).append("\" and contains(@bounds,'").append(search_keyword.split("_")[1]).append("')]").toString());
                     break;

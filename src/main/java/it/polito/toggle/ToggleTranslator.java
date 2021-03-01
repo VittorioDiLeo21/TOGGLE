@@ -145,8 +145,8 @@ public class ToggleTranslator {
             args = "";
         }
 
-        pullFile(time + ".xml");
-        pullFile(time + ".bmp"); //3001
+        //pullFile(time + ".xml");
+        //pullFile(time + ".bmp"); //3001
         //pullFile(time + ".png"); //3001
 
         //File imageFile = new File(starting_folder + "\\" + time + ".png");  //3001

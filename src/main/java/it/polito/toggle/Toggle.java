@@ -43,7 +43,13 @@ public class Toggle {
         this.appPackageName = appPackageName;
         this.testDirectoryPath = testDirectoryPath;
         int indexProjectPath = testDirectoryPath.indexOf("\\app\\");
+        if(indexProjectPath < 0) {
+            int indexSrc = testDirectoryPath.indexOf("\\src\\");
+            String tmp = testDirectoryPath.substring(0, indexSrc);
+            indexProjectPath = tmp.lastIndexOf("\\");
+        }
         int indexJava = testDirectoryPath.indexOf("\\java\\");
+
         if(testDirectoryPath.endsWith("\\"))
             this.toggleInjectionPath = testDirectoryPath.substring(indexJava+6,testDirectoryPath.length()-1).replace("\\",".");
         else
