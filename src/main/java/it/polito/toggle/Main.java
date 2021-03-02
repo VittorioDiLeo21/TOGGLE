@@ -19,16 +19,16 @@ public class Main {
                 "C:\\Users\\vitto\\AndroidStudioProjects\\OnDataTestApp\\app\\src\\androidTest\\java\\com\\example\\ondatatestapp\\finalTest\\",
                 Emulators.NEXUS_5);*/
 
-        /* COMPLETO!
+        /* COMPLETO!*/
         Toggle toggle = new Toggle(
                 "androidTest",
                 "C:\\Users\\vitto\\OneDrive\\Desktop\\BudgetWatch",
                 "protect.budgetwatch",
                 "D:\\AndroidStudioProject\\bw\\budget-watch-master\\app\\src\\androidTest\\java\\protect\\budgetwatch\\",
-                Emulators.NEXUS_5);*/
+                Emulators.NEXUS_5);
 
-        /* COMPLETO!
-        Toggle toggle = new Toggle(
+        /* COMPLETO!*/
+        /*Toggle toggle = new Toggle(
                 "androidTest",
                 "C:\\Users\\vitto\\OneDrive\\Desktop\\Stoic",
                 "app.reading.stoic.stoicreading",
@@ -51,12 +51,13 @@ public class Main {
                 "D:\\AndroidStudioProject\\Contactbook-master\\app\\src\\androidTest\\java\\de\\hskl\\contacts\\toggle\\",
                 Emulators.NEXUS_5);*/
 
+        /*COMPLETO!
         Toggle toggle = new Toggle(
                 "androidTest",
-                "C:\\Users\\vitto\\OneDrive\\Desktop\\opac",
-                "de.geeksfactory.opacclient",
-                "D:\\AndroidStudioProject\\opacclient-master\\opacclient\\opacapp\\src\\androidTest\\java\\de\\geeksfactory\\opacclient\\",
-                Emulators.NEXUS_5);
+                "C:\\Users\\vitto\\OneDrive\\Desktop\\Calendar",
+                "com.simplemobiletools.calendar.pro.debug",
+                "D:\\AndroidStudioProject\\Simple-Calendar-master\\app\\src\\androidTest\\java\\com\\simplemobiletools\\calendar\\pro\\",
+                Emulators.NEXUS_5);*/
         try {
             toggle.translateTestsWithMethodGranularity();
         } catch (IOException e) {

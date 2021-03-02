@@ -23,6 +23,7 @@ sourceSets {
             exclude('it/polito/toggle/utils/TOGGLETools.java')
             exclude('it/polito/toggle/utils/BitmapSaver.java')
             exclude('it/polito/toggle/utils/ScrollHandler.java')
+            exclude('it/polito/toggle/utils/AppStarter.java')
         }
     }
 }

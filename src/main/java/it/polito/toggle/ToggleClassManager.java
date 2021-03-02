@@ -128,8 +128,218 @@ public class ToggleClassManager {
         headers.add("import eye.Eye.RecognitionMode;");
         headers.add("import eye.Match;");
         headers.add("import eyeautomate.*;");
+        headers.add("import Utils.AppStarter;");
 
         return headers;
+    }
+
+    private ArrayList<String> createEyeAutomateOrSikuliRun(){
+        ArrayList<String> res = new ArrayList<>();
+        res.add("public static void run(String[] args) throws InterruptedException, IOException {");
+        res.add("\n");
+        res.add("\tint tests_ok = 0;");
+        res.add("\tint tests_failed = 0;");
+
+        res.add("\tlong startTime = 0;");
+        res.add("\tlong endTime = 0;");
+        res.add("\tlong executionTime = 0;");
+        res.add("\tString curr_test_return = \"\";");
+        res.add("\tString curr_test_res = \"\";");
+        res.add("\tint curr_test_interactions = 0;");
+
+        for (String test: testNames) {
+            res.add("\tAppStarter.start();");
+            res.add("\tSystem.out.println(\"Starting test + " + test + "\");");
+
+            res.add("\tstartTime = System.currentTimeMillis();");
+            res.add("\ttry {");
+            res.add("\t\tcurr_test_return = " + test + "();");
+            //res.add("\t\tif (curr_test_return == true) {");
+            //res.add("\t\tcurr_test_return = " + test + "();");
+            res.add("\t\tcurr_test_res = curr_test_return.split(\";\")[0];");
+            res.add("\t\tcurr_test_interactions = Integer.valueOf(curr_test_return.split(\";\")[1]);");
+            res.add("\t\tif (curr_test_res.equals(\"pass\")) {");
+
+
+            res.add("\t\t\tSystem.out.println(\"" + test + " ok\");");
+            res.add("\t\t\ttests_ok++;");
+            res.add("\t\t}");
+            res.add("\t\telse {");
+            res.add("\t\t\tSystem.out.println(\"" + test + " failed\");");
+            res.add("\t\t\ttests_failed++;");
+            res.add("\t\t}");
+            res.add("\t}");
+            res.add("\tcatch (Exception e) {");
+            res.add("\t\tSystem.out.println(\"" + test + " failed: \" + e.getMessage());");
+            res.add("\t\ttests_failed++;");
+            res.add("\t}");
+
+
+            res.add("\tendTime = System.currentTimeMillis();");
+            res.add("\texecutionTime = endTime - startTime;");
+            res.add("\tSystem.out.println(\"Execution time: \" + executionTime);");
+            res.add("\tSystem.out.println(\"" + package_name + ";" + class_name + ";" + test + ";\" + curr_test_res +\";\" + executionTime + \";\" +  curr_test_interactions);");
+            res.add("\tAppStarter.stop();");
+            res.add("\tThread.sleep(2000);");
+
+            res.add("\n\n");
+
+        }
+
+        res.add("\tSystem.out.println(\"Passed tests: \" + tests_ok);");
+        res.add("\tSystem.out.println(\"Failed tests: \" + tests_failed);");
+
+
+        res.add("\treturn;");
+        res.add("}");
+
+        return res;
+    }
+
+    private ArrayList<String> createCombinedRunEyeAutomateFirst(){
+        ArrayList<String> res = new ArrayList<>();
+
+        res.add("public static void run(String[] args) throws InterruptedException, IOException {");
+        res.add("\n");
+        res.add("\tint tests_ok = 0;");
+        res.add("\tint tests_failed = 0;");
+
+        res.add("\tint eyeautomate_failures = 0; //number of fallbacks");
+        res.add("\tint curr_test_interactions = 0;");
+
+
+        res.add("\tlong startTime = 0;");
+        res.add("\tlong endTime = 0;");
+        res.add("\tlong executionTime = 0;");
+        res.add("\tString curr_test_return = \"\";");
+        res.add("\tString curr_test_res = \"\";");
+
+        res.add("\tint curr_test_eyeautomate_failures = 0;");
+
+
+        for (String test: testNames) {
+            res.add("\tAppStarter.start();");
+            res.add("\tSystem.out.println(\"Starting test + " + test + "\");");
+
+            res.add("\tstartTime = System.currentTimeMillis();");
+            res.add("\ttry {");
+            res.add("\t\tcurr_test_return = " + test + "();");
+            res.add("\t\tcurr_test_res = curr_test_return.split(\";\")[0];");
+            res.add("\t\tcurr_test_eyeautomate_failures = Integer.valueOf(curr_test_return.split(\";\")[1]);");
+            res.add("\t\tcurr_test_interactions = Integer.valueOf(curr_test_return.split(\";\")[2]);");
+            res.add("\t\tif (curr_test_res.equals(\"pass\")) {");
+            res.add("\t\t\tSystem.out.println(\"" + test + " ok\");");
+            res.add("\t\t\ttests_ok++;");
+            res.add("\t\t}");
+            res.add("\t\telse {");
+            res.add("\t\t\tSystem.out.println(\"" + test + " failed\");");
+            res.add("\t\t\ttests_failed++;");
+            res.add("\t\t}");
+            res.add("\t}");
+            res.add("\tcatch (Exception e) {");
+            res.add("\t\tSystem.out.println(\"" + test + " failed: \" + e.getMessage());");
+            res.add("\t\ttests_failed++;");
+            res.add("\t}");
+
+            res.add("\tSystem.out.println(\"Number of EyeAutomate failures: \" + curr_test_eyeautomate_failures);");
+            res.add("\teyeautomate_failures += curr_test_eyeautomate_failures;");
+
+
+            res.add("\tendTime = System.currentTimeMillis();");
+            res.add("\texecutionTime = endTime - startTime;");
+            res.add("\tSystem.out.println(\"Execution time: \" + executionTime);");
+
+
+            res.add("\tSystem.out.println(\"" + package_name + ";" + class_name + ";" + test + ";\" + curr_test_res +\";\" + executionTime + \";\" +  curr_test_interactions + \";\" + curr_test_eyeautomate_failures);");
+            res.add("\tAppStarter.stop();");
+            res.add("\tThread.sleep(2000);");
+            res.add("\n\n");
+
+        }
+
+        res.add("\tSystem.out.println(\"Passed tests: \" + tests_ok);");
+        res.add("\tSystem.out.println(\"Failed tests: \" + tests_failed);");
+        res.add("\tSystem.out.println(\"Total Eyeautomate failures: \" + eyeautomate_failures);");
+
+
+
+        res.add("\treturn;");
+        res.add("}");
+
+        return res;
+    }
+
+    private ArrayList<String> createCombinedRunSikuliFirst() {
+        ArrayList<String> res = new ArrayList<>();
+
+        res.add("public static void run(String[] args) throws InterruptedException, IOException {");
+        res.add("\n");
+        res.add("\tint tests_ok = 0;");
+        res.add("\tint tests_failed = 0;");
+
+        res.add("\tint sikuli_failures = 0; //number of fallbacks");
+        res.add("\tint curr_test_interactions = 0;");
+
+        res.add("\tlong startTime = 0;");
+        res.add("\tlong endTime = 0;");
+        res.add("\tlong executionTime = 0;");
+        res.add("\tString curr_test_return = \"\";");
+        res.add("\tString curr_test_res = \"\";");
+
+        res.add("\tint curr_test_sikuli_failures = 0;");
+
+
+        for (String test: testNames) {
+            res.add("\tAppStarter.start();");
+            res.add("\tstartTime = System.currentTimeMillis();");
+            res.add("\ttry {");
+            res.add("\t\tcurr_test_return = " + test + "();");
+            res.add("\t\tcurr_test_res = curr_test_return.split(\";\")[0];");
+            res.add("\t\tcurr_test_sikuli_failures = Integer.valueOf(curr_test_return.split(\";\")[1]);");
+            res.add("\t\tcurr_test_interactions = Integer.valueOf(curr_test_return.split(\";\")[2]);");
+
+            res.add("\t\tif (curr_test_res.equals(\"pass\")) {");
+            res.add("\t\t\tSystem.out.println(\"" + test + " ok\");");
+            res.add("\t\t\ttests_ok++;");
+            res.add("\t\t}");
+            res.add("\t\telse {");
+            res.add("\t\t\tSystem.out.println(\"" + test + " failed\");");
+            res.add("\t\t\ttests_failed++;");
+            res.add("\t\t}");
+            res.add("\t}");
+            res.add("\tcatch (Exception e) {");
+            res.add("\t\tSystem.out.println(\"" + test + " failed: \" + e.getMessage());");
+            res.add("\t\ttests_failed++;");
+            res.add("\t}");
+
+
+            res.add("\tSystem.out.println(\"Number of Sikuli failures: \" + curr_test_sikuli_failures);");
+            res.add("\tsikuli_failures += curr_test_sikuli_failures;");
+
+
+            res.add("\tendTime = System.currentTimeMillis();");
+            res.add("\texecutionTime = endTime - startTime;");
+            res.add("\tSystem.out.println(\"Execution time: \" + executionTime);");
+
+
+            res.add("\n\n");
+            res.add("\tAppStarter.stop();");
+            res.add("\tThread.sleep(2000);");
+            res.add("\tSystem.out.println(\"" + package_name + ";" + class_name + ";" + test + ";\" + curr_test_res +\";\" + executionTime + \";\" +  curr_test_interactions + \";\" + curr_test_sikuli_failures);");
+            res.add("\n\n");
+
+        }
+
+        res.add("\tSystem.out.println(\"Passed tests: \" + tests_ok);");
+        res.add("\tSystem.out.println(\"Failed tests: \" + tests_failed);");
+        res.add("\tSystem.out.println(\"Total Sikuli failures: \" + sikuli_failures);");
+
+
+
+        res.add("\treturn;");
+        res.add("}");
+
+        return res;
     }
 
     private ArrayList<String> createEyeAutomateOrSikuliJavaMain() {
@@ -546,12 +756,15 @@ public class ToggleClassManager {
         eyeautomate_sikuli.add("\n\n\n");
         sikuli_eyeautomate.add("\n\n\n");
 
-        ArrayList<String> eyeAutomateOrSiculiMain = this.createEyeAutomateOrSikuliJavaMain();
+        //ArrayList<String> eyeAutomateOrSiculiMain = this.createEyeAutomateOrSikuliJavaMain();
+        ArrayList<String> eyeAutomateOrSiculiMain = this.createEyeAutomateOrSikuliRun();
         eyeautomate_only.addAll(eyeAutomateOrSiculiMain);
         sikuli_only.addAll(eyeAutomateOrSiculiMain);
 
-        eyeautomate_sikuli.addAll(this.createCombinedMainEyeAutomateFirst());
-        sikuli_eyeautomate.addAll(this.createCombinedMainSikuliFirst());
+        //eyeautomate_sikuli.addAll(this.createCombinedMainEyeAutomateFirst());
+        //sikuli_eyeautomate.addAll(this.createCombinedMainSikuliFirst());
+        eyeautomate_sikuli.addAll(this.createCombinedRunEyeAutomateFirst());
+        sikuli_eyeautomate.addAll(this.createCombinedRunSikuliFirst());
 
         //add closure of function
         eyeautomate_only.add("\n\n");
