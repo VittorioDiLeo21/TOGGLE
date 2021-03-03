@@ -2,6 +2,7 @@ package it.polito.toggle;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Objects;
@@ -83,13 +84,14 @@ public class Utils {
         dir = new File(starting_folder + "\\JavaTranslatedProject\\src\\Utils");
         dir.mkdirs();
         File tmp = new File(dir.toPath().toString()+"\\AppStarter.java");
-        String tmpStr = tmp.toPath().toString();
         if(!tmp.exists()){
             Files.copy(new File(System.getProperty("user.dir") + "\\src\\main\\java\\it\\polito\\toggle\\utils\\AppStarter.java").toPath(),
-                    dir.toPath());
+                    tmp.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING);
         }
         /*Files.copy(new File(System.getProperty("user.dir") + "\\src\\main\\java\\it\\polito\\toggle\\utils\\AppStarter.java").toPath(),
-                dir.toPath());*/
+                dir.toPath().toString()+"\\AppStarter.java",
+                StandardCopyOption.REPLACE_EXISTING);*/
 
         dir = new File(starting_folder + "\\JavaTranslatedProject\\libs");
         dir.mkdirs();
@@ -107,15 +109,15 @@ public class Utils {
         bw.write(java_project_classpath);
         bw.close();
 
-        tmp = new File(dir.toPath().toString()+"\\eye2.jar");
-        if(!tmp.exists())
+        File lib = new File(dir.toPath().toString()+"\\eye2.jar");
+        if(!lib.exists())
             copyJarFile(new JarFile(new File(System.getProperty("user.dir") + "\\src\\main\\java\\it\\polito\\toggle\\utils\\eye2.jar")), dir);
 
-        tmp = new File(dir.toPath().toString()+"\\EyeAutomate.jar");
-        if(!tmp.exists())
+        lib = new File(dir.toPath().toString()+"\\EyeAutomate.jar");
+        if(!lib.exists())
             copyJarFile(new JarFile(new File(System.getProperty("user.dir") + "\\src\\main\\java\\it\\polito\\toggle\\utils\\EyeAutomate.jar")), dir);
-        tmp = new File(dir.toPath().toString()+"\\sikulixapi.jar");
-        if(!tmp.exists())
+        lib = new File(dir.toPath().toString()+"\\sikulixapi.jar");
+        if(!lib.exists())
             copyJarFile(new JarFile(new File(System.getProperty("user.dir") + "\\src\\main\\java\\it\\polito\\toggle\\utils\\sikulixapi.jar")), dir);
     }
 
@@ -154,17 +156,53 @@ public class Utils {
         try {
             StringBuilder content = new StringBuilder();
             content.append("import java.io.IOException;");
+            content.append("\n");
+            content.append("import java.io.File;");
+            content.append("\n");
+            content.append("import java.io.FileWriter;");
             content.append("\n\n");
             content.append("public class Main {");
+            content.append("\n\n");
+            content.append("private static FileWriter interactionsLog;");
+            content.append("\n\n");
+            content.append("private static FileWriter testLog;");
             content.append("\n\n");
             content.append("\tpublic static void main(String[] args) {");
             content.append("\n\n");
             content.append("\t\ttry {");
-            content.append("\n\n");
+            content.append("\n");
+            content.append("\t\t\tFile f = new File(System.getProperty(\"user.dir\")+\"\\\\interactions.txt\");");
+            content.append("\n");
+            content.append("\t\t\tif(!f.exists()) {");
+            content.append("\n");
+            content.append("\t\t\t\tf.createNewFile();");
+            content.append("\n");
+            content.append("\t\t\t}");
+            content.append("\n");
+            content.append("\t\t\tinteractionsLog = new FileWriter(f);");
+            content.append("\n");
+            content.append("\t\t\tf = new File(System.getProperty(\"user.dir\")+\"\\\\tests.txt\");");
+            content.append("\n");
+            content.append("\t\t\tif(!f.exists()) {");
+            content.append("\n");
+            content.append("\t\t\t\tf.createNewFile();");
+            content.append("\n");
+            content.append("\t\t\t}");
+            content.append("\n");
+            content.append("\t\t\ttestLog = new FileWriter(f);");
+            content.append("\n");
+            content.append("\t\t\tfor(int i = 0; i < 10; i++) {");
+            content.append("\n");
             for (String className : classes) {
-                content.append("\t\t\t").append(className).append(".run();");
+                content.append("\t\t\t\t").append(className).append(".run(interactionsLog,testLog);");
                 content.append("\n");
             }
+            content.append("\t\t\t}");
+            content.append("\n");
+            content.append("\t\t\tinteractionsLog.close();");
+            content.append("\n");
+            content.append("\t\t\ttestLog.close();");
+            content.append("\n");
             content.append("\t\t} catch (InterruptedException | IOException e) {");
             content.append("\n\n");
             content.append("\t\t\te.printStackTrace();");

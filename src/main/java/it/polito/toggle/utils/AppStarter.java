@@ -8,8 +8,8 @@ import java.io.InputStreamReader;
 public class AppStarter {
 
     private static String adbPath = System.getenv("LOCALAPPDATA")+"\\Android\\Sdk\\platform-tools";
-    private static String activityMain = "protect.budgetwatch.MainActivity";
-    private static String appPackage = "protect.budgetwatch";
+    private static String activityMain = "";
+    private static String appPackage = "";
 
     public static void stop() throws IOException {
         ProcessBuilder builder;

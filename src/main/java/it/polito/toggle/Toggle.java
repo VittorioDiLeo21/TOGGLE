@@ -169,7 +169,7 @@ public class Toggle {
         //1
 
         Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath);
-        injectToggleTool(testDirectoryPath);
+        /*injectToggleTool(testDirectoryPath);
 
         //2 build and install the apk
 
@@ -192,7 +192,7 @@ public class Toggle {
         //eventually resize the emulator
         //5
 
-        executeAllEnhancedEspressoByTestMethod(tests,instrumentation);
+        executeAllEnhancedEspressoByTestMethod(tests,instrumentation);*/
         //executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
 
         //6

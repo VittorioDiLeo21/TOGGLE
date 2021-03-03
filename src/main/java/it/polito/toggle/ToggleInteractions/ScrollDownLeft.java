@@ -37,6 +37,12 @@ public class ScrollDownLeft extends ToggleInteraction {
         //int singleItemW = Integer.parseInt(coords[5]);//
         int singleItemH = this.bottom - this.top;
         int singleItemW = this.right - this.left;//
+        if(search_type.contains("scrollTo")){
+            if(toY != 0)
+                toY += singleItemH;
+            if(toX != 0)
+                toX -= singleItemW;
+        }
         int AVHeight = Integer.parseInt(coords[6]);
         if(AVHeight <= singleItemH){
             singleItemH = (AVHeight)/2;

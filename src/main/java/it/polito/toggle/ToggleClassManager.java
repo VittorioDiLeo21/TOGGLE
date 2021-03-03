@@ -135,7 +135,7 @@ public class ToggleClassManager {
 
     private ArrayList<String> createEyeAutomateOrSikuliRun(){
         ArrayList<String> res = new ArrayList<>();
-        res.add("public static void run(String[] args) throws InterruptedException, IOException {");
+        res.add("public static void run() throws InterruptedException, IOException {");
         res.add("\n");
         res.add("\tint tests_ok = 0;");
         res.add("\tint tests_failed = 0;");
@@ -199,7 +199,7 @@ public class ToggleClassManager {
     private ArrayList<String> createCombinedRunEyeAutomateFirst(){
         ArrayList<String> res = new ArrayList<>();
 
-        res.add("public static void run(String[] args) throws InterruptedException, IOException {");
+        res.add("public static void run() throws InterruptedException, IOException {");
         res.add("\n");
         res.add("\tint tests_ok = 0;");
         res.add("\tint tests_failed = 0;");
@@ -272,7 +272,7 @@ public class ToggleClassManager {
     private ArrayList<String> createCombinedRunSikuliFirst() {
         ArrayList<String> res = new ArrayList<>();
 
-        res.add("public static void run(String[] args) throws InterruptedException, IOException {");
+        res.add("public static void run() throws InterruptedException, IOException {");
         res.add("\n");
         res.add("\tint tests_ok = 0;");
         res.add("\tint tests_failed = 0;");

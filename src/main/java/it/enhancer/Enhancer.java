@@ -1792,16 +1792,24 @@ public class Enhancer {
             log.setInteractionType("");
 
         boolean anyAll = false;
-        for(Operation o : operations){
-            if(o.getName().equals("anyOf") || o.getName().equals("allOf") || o.getName().equals("instanceOf")) {
+        if(log.getSearchType().contains("&") ||
+                log.getSearchType().contains("|") ||
+                (log.getSearchType().contains("class") && !isScrollingInteraction(log.getInteractionType()))){
+            String tmp ="\"" + log.getSearchKw() +"\"";
+            log.setSearchKw(tmp);
+        }
+
+        /*for (Operation o : operations) {
+            if (o.getName().equals("anyOf") || o.getName().equals("allOf") || o.getName().equals("instanceOf")) {
                 anyAll = true;
                 break;
             }
         }
+
         if(anyAll){
             String tmp ="\"" + log.getSearchKw() +"\"";
             log.setSearchKw(tmp);
-        }
+        }*/
         // default handles the normal behavior of the parameters. ES: click(),
         // typeText("TextToBeReplaced")
         switch (log.getInteractionType()) {
@@ -1978,6 +1986,9 @@ public class Enhancer {
             case "scrollDirTOGGLE":
             case "scrollableDirTOGGLE":
                 System.out.println(log.getInteractionParams());
+                System.out.println("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName() + "\","
+                        + "\"" + log.getSearchType() + "\"" + "," + log.getSearchKw() + ","
+                        + log.getInteractionType() + "," + log.getInteractionParams() + ");");
                 l = JavaParser.parseStatement("TOGGLETools.LogInteractionProgressive(\""+this.currentClass+"\", num, " + "\"" + log.getMethodName() + "\","
                         + "\"" + log.getSearchType() + "\"" + "," + log.getSearchKw() + ","
                         + log.getInteractionType() + "," + log.getInteractionParams() + ");");
@@ -2009,6 +2020,11 @@ public class Enhancer {
             b.addStatement(++i, l);
 
         return i;
+    }
+
+    private boolean isScrollingInteraction(String interactionType) {
+        return interactionType.contains("scrollDirTOGGLE") ||
+                interactionType.contains("scrollableDirTOGGLE");
     }
 
     private void addFullCheck(BlockStmt b, String methodName, int i) {

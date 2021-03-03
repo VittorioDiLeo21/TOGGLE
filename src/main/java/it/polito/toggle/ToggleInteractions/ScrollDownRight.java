@@ -33,10 +33,18 @@ public class ScrollDownRight extends ToggleInteraction {
         int toY = Integer.parseInt(coords[1]);
         int fromX = Integer.parseInt(coords[2]);//
         int toX = Integer.parseInt(coords[3]);//
-        //int singleItemH = Integer.parseInt(coords[4]);
-        //int singleItemW = Integer.parseInt(coords[5]);//
         int singleItemH = this.bottom - this.top;
         int singleItemW = this.right - this.left;//
+        if(search_type.contains("scrollTo")){
+            if(toY != 0) {
+                toY += singleItemH;
+                fromY += singleItemH;
+            }
+            if(toX != 0) {
+                toX += singleItemW;
+                fromX += singleItemW;
+            }
+        }
 
         int AVHeight = Integer.parseInt(coords[6]);
         if(AVHeight <= singleItemH){
@@ -59,50 +67,94 @@ public class ScrollDownRight extends ToggleInteraction {
                 }
             }
         }
+
         int AVLeft = Integer.parseInt(coords[8]);
         int AVTop = Integer.parseInt(coords[9]);
         int tmpStepY,tmpStepX;
         int offFromTop = (this.bottom-this.top)/2;
         int offFromStart = (this.right-this.left)/2;
 
-        // Y computing
-        if((toY-fromY) > AVHeight){
-            tmpStepY = AVHeight - singleItemH;
-        } else {
-            tmpStepY = Math.max((toY-fromY) - singleItemW,0);
-        }
-        if((this.top + tmpStepY + offFromTop) > (AVTop + AVHeight)){
-            for(int i = 10; i >=0 ; i--) {
-                int newtmp = tmpStepY - ((this.top + tmpStepY + offFromTop) - (AVTop + AVHeight - i));
-                if( newtmp < tmpStepY ) {
-                    tmpStepY = newtmp;
-                    break;
+        // Y & X computing for scrollTo
+        if(search_type.contains("scrollTo")){
+            // Y computing for scrollTo
+            if (toY > fromY) {
+                tmpStepY = fromY - singleItemH;
+            } else {
+                tmpStepY = 0;
+            }
+            if ((this.top + tmpStepY + offFromTop) > (this.top + AVHeight)) {
+                for (int i = 10; i >= 0; i--) {
+                    int newtmp = tmpStepY - ((this.top + tmpStepY + offFromTop) - (this.top + AVHeight - i));
+                    if (newtmp < tmpStepY) {
+                        tmpStepY = newtmp;
+                        break;
+                    }
                 }
             }
-        }
-        tmpStepY = (int)(tmpStepY*screenYRatio);
-        this.toBeScrolledY = (int)((toY-fromY)*screenYRatio);
-        this.scrollYStep = tmpStepY;
+            tmpStepY -= 10;
+            tmpStepY = (int) (tmpStepY * screenYRatio);
+            this.toBeScrolledY = (int) ((toY - fromY) * screenYRatio);
+            this.scrollYStep = tmpStepY;
 
-        // X computing
-        if((toX-fromX) > AVWidth){
-            tmpStepX = AVWidth - singleItemW;
+            // X computing for scrollto
+            if (toX > fromX) {
+                tmpStepX = AVWidth - singleItemW;
+            } else {
+                tmpStepX = 0;
+            }
+            if ((this.left + tmpStepX + offFromStart) > (this.left + AVWidth)) {
+                for (int i = 10; i >= 0; i--) {
+                    int newtmp = tmpStepX - ((this.left + tmpStepX + offFromStart) - (this.left + AVWidth - i));
+                    if (newtmp < tmpStepX) {
+                        tmpStepX = newtmp;
+                        break;
+                    }
+                }
+                //tmpStepX = tmpStepX-((this.left + tmpStepX + offFromStart) - (AVLeft + AVWidth + 10));
+            }
+            tmpStepX = (int) (tmpStepX * screenXRatio);
+            this.toBeScrolledX = (int) ((toX - fromX) * screenXRatio);
+            this.scrollXStep = tmpStepX;
         } else {
-            tmpStepX = Math.max((toX - fromX) - singleItemW, 0);
-        }
-        if((this.left + tmpStepX + offFromStart) > (AVLeft + AVWidth)){
-            for(int i = 10; i >=0 ; i--) {
-                int newtmp = tmpStepX-((this.left + tmpStepX + offFromStart) - (AVLeft + AVWidth - i));
-                if( newtmp < tmpStepX ) {
-                    tmpStepX = newtmp;
-                    break;
+            // Y computing for onData
+            if ((toY - fromY) > AVHeight) {
+                tmpStepY = AVHeight - singleItemH;
+            } else {
+                tmpStepY = Math.max((toY - fromY) - singleItemH, 0);
+            }
+            if ((this.top + tmpStepY + offFromTop) > (AVTop + AVHeight)) {
+                for (int i = 10; i >= 0; i--) {
+                    int newtmp = tmpStepY - ((this.top + tmpStepY + offFromTop) - (AVTop + AVHeight - i));
+                    if (newtmp < tmpStepY) {
+                        tmpStepY = newtmp;
+                        break;
+                    }
                 }
             }
-            //tmpStepX = tmpStepX-((this.left + tmpStepX + offFromStart) - (AVLeft + AVWidth + 10));
+            tmpStepY = (int) (tmpStepY * screenYRatio);
+            this.toBeScrolledY = (int) ((toY - fromY) * screenYRatio);
+            this.scrollYStep = tmpStepY;
+
+            // X computing for onData
+            if ((toX - fromX) > AVWidth) {
+                tmpStepX = AVWidth - singleItemW;
+            } else {
+                tmpStepX = Math.max((toX - fromX) - singleItemW, 0);
+            }
+            if ((this.left + tmpStepX + offFromStart) > (AVLeft + AVWidth)) {
+                for (int i = 10; i >= 0; i--) {
+                    int newtmp = tmpStepX - ((this.left + tmpStepX + offFromStart) - (AVLeft + AVWidth - i));
+                    if (newtmp < tmpStepX) {
+                        tmpStepX = newtmp;
+                        break;
+                    }
+                }
+                //tmpStepX = tmpStepX-((this.left + tmpStepX + offFromStart) - (AVLeft + AVWidth + 10));
+            }
+            tmpStepX = (int) (tmpStepX * screenXRatio);
+            this.toBeScrolledX = (int) ((toX - fromX) * screenXRatio);
+            this.scrollXStep = tmpStepX;
         }
-        tmpStepX = (int)(tmpStepX*screenXRatio);
-        this.toBeScrolledX = (int)((toX-fromX)*screenXRatio);
-        this.scrollXStep = tmpStepX;
     }
 
     @Override
@@ -412,35 +464,35 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("\torg.sikuli.script.Match sikuli_match = sikuli_screen.find(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\",  "\\\\") + "\");");
         res.add("\torg.sikuli.script.Location l = sikuli_match.getCenter();");
 
-        res.add("\t\t\tsikuli_screen.wait(0.5);");
+        res.add("\t\t\tThread.sleep(500);");
         res.add("\tl = l.below("+this.scrollYStep+");");
         res.add("\tl = l.right("+this.scrollXStep+");");
         for(int i = 0; i < (totToBeScrolled/totScrollStep); i++) {
             res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
             res.add("\t\t\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
             res.add("\t\t\tl = l.above(" + this.scrollYStep + ");");
             res.add("\t\t\tl = l.left(" + this.scrollXStep + ");");
             res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tsikuli_screen.wait(1);");
+            res.add("\t\t\tThread.sleep(1000);");
             res.add("\t\t\tsikuli_screen.mouseUp();");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
             res.add("\t\t\tl = l.below(" + this.scrollYStep + ");");
             res.add("\t\t\tl = l.right(" + this.scrollXStep + ");");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
         }
         if(last > 0){
             res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
             res.add("\t\t\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
             res.add("\t\t\tl = l.above(" + (int)(this.scrollYStep*ratio) + ");");
             res.add("\t\t\tl = l.left(" + (int)(this.scrollXStep*ratio) + ");");
             res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tsikuli_screen.wait(1);");
+            res.add("\t\t\tThread.sleep(1000);");
             res.add("\t\t\tsikuli_screen.mouseUp();");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
         }
         res.add("}");
         res.add("catch (FindFailed ffe) {");
