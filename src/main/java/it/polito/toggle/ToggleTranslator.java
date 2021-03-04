@@ -240,7 +240,7 @@ public class ToggleTranslator {
     public final ArrayList<String> createEyeAutomateJavaMethod(List <ToggleInteraction> interactions) {
         ArrayList<String> res = new ArrayList<>();
 
-        res.add("public static String " + test_name + "() throws Exception {");
+        res.add("public static String " + test_name + "(FileWriter f) throws Exception {");
         res.add("");
 
         res.add("\tSystem.out.println(\"Starting test + " + package_name + "/" + class_name + "/" + test_name + "(" + interactions.size() + "interactions)\");");
@@ -253,17 +253,25 @@ public class ToggleTranslator {
         res.add("\tint interactions = 0;");
         res.add("\n\n\n");
 
+        int index = 0;
+        int size = interactions.size();
         for (ToggleInteraction i:interactions) {
+            /*for (String s:i.generateEyeAutomateJavaLines(starting_folder,test_name,size)) {
+                res.add("\t" + s);
+            }*/
             for (String s:i.generateEyeAutomateJavaLines(starting_folder)) {
                 res.add("\t" + s);
             }
-            res.add("\tThread.sleep(1000);");
-            res.add("\tinteractions++;");
-            res.add("");
+            index++;
+            if(index< size) {
+                res.add("\tThread.sleep(1000);");
+                res.add("\tinteractions++;");
+                res.add("");
+            }
         }
 
         res.add("");
-        res.add("\treturn \"pass;\"+interactions;");
+        res.add("\treturn \"pass;\"+interactions+\";"+size+"\";");
         res.add("");
         res.add("}");
 
@@ -274,7 +282,7 @@ public class ToggleTranslator {
 
         ArrayList<String> res = new ArrayList<>();
 
-        res.add("public static String " + test_name + "() throws Exception {");
+        res.add("public static String " + test_name + "(FileWriter f) throws Exception {");
         res.add("");
 
         res.add("\tSystem.out.println(\"Starting test + " + package_name + "/" + class_name + "/" + test_name + "(" + interactions.size() + "interactions)\");");
@@ -282,18 +290,25 @@ public class ToggleTranslator {
         res.add("\tsikuli_screen.setAutoWaitTimeout(30);");
 
         res.add("\tint interactions = 0;");
-
+        int index = 0;
+        int size = interactions.size();
         for (ToggleInteraction i:interactions) {
+            /*for (String s:i.generateSikuliJavaLines(starting_folder,test_name,size)) {
+                res.add("\t" + s);
+            }*/
             for (String s:i.generateSikuliJavaLines(starting_folder)) {
                 res.add("\t" + s);
             }
-            res.add("\tThread.sleep(1000);");
-            res.add("\tinteractions++;");
-            res.add("");
+            index++;
+            if(index<size) {
+                res.add("\tThread.sleep(1000);");
+                res.add("\tinteractions++;");
+                res.add("");
+            }
         }
 
         res.add("");
-        res.add("\treturn \"pass;\"+ interactions;");
+        res.add("\treturn \"pass;\"+ interactions+\";"+size+"\";");
         res.add("");
         res.add("}");
 
@@ -304,7 +319,7 @@ public class ToggleTranslator {
 
         ArrayList<String> res = new ArrayList<>();
 
-        res.add("public static String " + test_name + "() throws Exception {");
+        res.add("public static String " + test_name + "(FileWriter f) throws Exception {");
         res.add("");
 
         res.add("\tSystem.out.println(\"Starting test + " + package_name + "/" + class_name + "/" + test_name + "(" + interactions.size() + "interactions)\");");
@@ -320,19 +335,26 @@ public class ToggleTranslator {
         res.add("\tint interactions = 0;");
 
         res.add("\n\n\n");
-
+        int index = 0;
+        int size = interactions.size();
         for (ToggleInteraction i:interactions) {
+            /*for (String s:i.generateCombinedJavaLinesSikuliFirst(starting_folder,test_name,size)) {
+                res.add("\t" + s);
+            }*/
             for (String s:i.generateCombinedJavaLinesSikuliFirst(starting_folder)) {
                 res.add("\t" + s);
             }
-            res.add("\tThread.sleep(1000);");
-            res.add("\tinteractions++;");
-            res.add("");
+            index++;
+            if(index<size) {
+                res.add("\tThread.sleep(1000);");
+                res.add("\tinteractions++;");
+                res.add("");
+            }
         }
 
         res.add("");
         //res.add("\treturn true;");
-        res.add("\treturn \"pass;\" + sikuli_failures + \";\" + interactions;");
+        res.add("\treturn \"pass;\" + sikuli_failures + \";\" + interactions+\";"+size+"\";");
         res.add("");
         res.add("}");
 
@@ -343,7 +365,7 @@ public class ToggleTranslator {
 
         ArrayList<String> res = new ArrayList<>();
 
-        res.add("public static String " + test_name + "() throws Exception {");
+        res.add("public static String " + test_name + "(FileWriter f) throws Exception {");
 
         res.add("");
 
@@ -360,18 +382,25 @@ public class ToggleTranslator {
         res.add("\tint interactions = 0;");
 
         res.add("\n\n\n");
-
+        int index = 0;
+        int size = interactions.size();
         for (ToggleInteraction i:interactions) {
+            /*for (String s:i.generateCombinedJavaLines(starting_folder,test_name,size)) {
+                res.add("\t" + s);
+            }*/
             for (String s:i.generateCombinedJavaLines(starting_folder)) {
                 res.add("\t" + s);
             }
-            res.add("\tThread.sleep(1000);");
-            res.add("\tinteractions++;");
-            res.add("");
+            index++;
+            if(index<size) {
+                res.add("\tThread.sleep(1000);");
+                res.add("\tinteractions++;");
+                res.add("");
+            }
         }
         res.add("");
         //res.add("\treturn true;");
-        res.add("\treturn \"pass;\" + eyeautomate_failures + \";\" + interactions;");
+        res.add("\treturn \"pass;\" + eyeautomate_failures + \";\" + interactions+\";"+size+"\";");
         res.add("");
         res.add("}");
 

@@ -129,13 +129,14 @@ public class ToggleClassManager {
         headers.add("import eye.Match;");
         headers.add("import eyeautomate.*;");
         headers.add("import Utils.AppStarter;");
+        headers.add("import java.io.FileWriter;");
 
         return headers;
     }
 
     private ArrayList<String> createEyeAutomateOrSikuliRun(){
         ArrayList<String> res = new ArrayList<>();
-        res.add("public static void run() throws InterruptedException, IOException {");
+        res.add("public static void run(FileWriter f1, FileWriter f2) throws InterruptedException, IOException {");
         res.add("\n");
         res.add("\tint tests_ok = 0;");
         res.add("\tint tests_failed = 0;");
@@ -146,6 +147,7 @@ public class ToggleClassManager {
         res.add("\tString curr_test_return = \"\";");
         res.add("\tString curr_test_res = \"\";");
         res.add("\tint curr_test_interactions = 0;");
+        res.add("\tint curr_tot_interactions = 0;");
 
         for (String test: testNames) {
             res.add("\tAppStarter.start();");
@@ -153,14 +155,14 @@ public class ToggleClassManager {
 
             res.add("\tstartTime = System.currentTimeMillis();");
             res.add("\ttry {");
-            res.add("\t\tcurr_test_return = " + test + "();");
+            res.add("\t\tcurr_test_return = " + test + "(f2);");
             //res.add("\t\tif (curr_test_return == true) {");
             //res.add("\t\tcurr_test_return = " + test + "();");
             res.add("\t\tcurr_test_res = curr_test_return.split(\";\")[0];");
-            res.add("\t\tcurr_test_interactions = Integer.valueOf(curr_test_return.split(\";\")[1]);");
+            res.add("\t\tcurr_test_interactions = Integer.parseInt(curr_test_return.split(\";\")[1]);");
+            res.add("\t\tcurr_tot_interactions = Integer.parseInt(curr_test_return.split(\";\")[2]);");
+            res.add("\t\tf1.write(\""+this.class_name+";"+test+";\"+curr_tot_interactions+\";\"+curr_test_interactions+\"\\n\");");
             res.add("\t\tif (curr_test_res.equals(\"pass\")) {");
-
-
             res.add("\t\t\tSystem.out.println(\"" + test + " ok\");");
             res.add("\t\t\ttests_ok++;");
             res.add("\t\t}");
@@ -199,7 +201,7 @@ public class ToggleClassManager {
     private ArrayList<String> createCombinedRunEyeAutomateFirst(){
         ArrayList<String> res = new ArrayList<>();
 
-        res.add("public static void run() throws InterruptedException, IOException {");
+        res.add("public static void run(FileWriter f1, FileWriter f2) throws InterruptedException, IOException {");
         res.add("\n");
         res.add("\tint tests_ok = 0;");
         res.add("\tint tests_failed = 0;");
@@ -213,6 +215,7 @@ public class ToggleClassManager {
         res.add("\tlong executionTime = 0;");
         res.add("\tString curr_test_return = \"\";");
         res.add("\tString curr_test_res = \"\";");
+        res.add("\tint curr_tot_interactions = 0;");
 
         res.add("\tint curr_test_eyeautomate_failures = 0;");
 
@@ -220,13 +223,14 @@ public class ToggleClassManager {
         for (String test: testNames) {
             res.add("\tAppStarter.start();");
             res.add("\tSystem.out.println(\"Starting test + " + test + "\");");
-
             res.add("\tstartTime = System.currentTimeMillis();");
             res.add("\ttry {");
-            res.add("\t\tcurr_test_return = " + test + "();");
+            res.add("\t\tcurr_test_return = " + test + "(f2);");
             res.add("\t\tcurr_test_res = curr_test_return.split(\";\")[0];");
             res.add("\t\tcurr_test_eyeautomate_failures = Integer.valueOf(curr_test_return.split(\";\")[1]);");
             res.add("\t\tcurr_test_interactions = Integer.valueOf(curr_test_return.split(\";\")[2]);");
+            res.add("\t\tcurr_tot_interactions = Integer.parseInt(curr_test_return.split(\";\")[3]);");
+            res.add("\t\tf1.write(\""+this.class_name+";"+test+";\"+curr_tot_interactions+\";\"+curr_test_interactions+\"\\n\");");
             res.add("\t\tif (curr_test_res.equals(\"pass\")) {");
             res.add("\t\t\tSystem.out.println(\"" + test + " ok\");");
             res.add("\t\t\ttests_ok++;");
@@ -272,7 +276,7 @@ public class ToggleClassManager {
     private ArrayList<String> createCombinedRunSikuliFirst() {
         ArrayList<String> res = new ArrayList<>();
 
-        res.add("public static void run() throws InterruptedException, IOException {");
+        res.add("public static void run(FileWriter f1, FileWriter f2) throws InterruptedException, IOException {");
         res.add("\n");
         res.add("\tint tests_ok = 0;");
         res.add("\tint tests_failed = 0;");
@@ -287,16 +291,19 @@ public class ToggleClassManager {
         res.add("\tString curr_test_res = \"\";");
 
         res.add("\tint curr_test_sikuli_failures = 0;");
+        res.add("\tint curr_tot_interactions = 0;");
 
 
         for (String test: testNames) {
             res.add("\tAppStarter.start();");
             res.add("\tstartTime = System.currentTimeMillis();");
             res.add("\ttry {");
-            res.add("\t\tcurr_test_return = " + test + "();");
+            res.add("\t\tcurr_test_return = " + test + "(f2);");
             res.add("\t\tcurr_test_res = curr_test_return.split(\";\")[0];");
             res.add("\t\tcurr_test_sikuli_failures = Integer.valueOf(curr_test_return.split(\";\")[1]);");
             res.add("\t\tcurr_test_interactions = Integer.valueOf(curr_test_return.split(\";\")[2]);");
+            res.add("\t\tcurr_tot_interactions = Integer.parseInt(curr_test_return.split(\";\")[3]);");
+            res.add("\t\tf1.write(\""+this.class_name+";"+test+";\"+curr_tot_interactions+\";\"+curr_test_interactions+\"\\n\");");
 
             res.add("\t\tif (curr_test_res.equals(\"pass\")) {");
             res.add("\t\t\tSystem.out.println(\"" + test + " ok\");");

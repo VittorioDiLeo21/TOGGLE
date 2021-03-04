@@ -12,6 +12,7 @@ public class Main {
                 "org.ligi.passandroid",
                 "C:\\Users\\vitto\\AndroidStudioProjects\\PassAndroid\\app\\src\\androidTest\\java\\org\\ligi\\passandroid\\tests\\",
                 Emulators.NEXUS_5);*/
+
         /*Toggle toggle = new Toggle(
                 "androidTest",
                 "C:\\Users\\vitto\\OneDrive\\Desktop\\onDataTests",
