@@ -192,7 +192,7 @@ public class ScrollHandler {
         int nItemX = view.getLeft();
         return m_nItemOffX[pos] - nItemX;
     }
-//todo
+    //todo
     public static int getActualOffsetFrom(AdapterView v, int pos ){
         int actual = v.getFirstVisiblePosition();
         View view = v.getChildAt(pos);

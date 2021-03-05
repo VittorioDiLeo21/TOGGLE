@@ -15,10 +15,10 @@ public class ScrollDownRight extends ToggleInteraction {
     private int toBeScrolledY;
     private int scrollXStep;
     private int toBeScrolledX;
-    private int pxUp = 0;
     private int pxDown = 0;
-    private int pxLeft = 0;
+    private int pxUp = 0;
     private int pxRight = 0;
+    private int pxLeft = 0;
 
     public ScrollDownRight(String packagename, String search_type,
                            String search_keyword, String timestamp,
@@ -34,12 +34,6 @@ public class ScrollDownRight extends ToggleInteraction {
         int toX = Integer.parseInt(coords[3]);//
         int singleItemH = this.bottom - this.top;
         int singleItemW = this.right - this.left;//
-
-        //***********************************************
-        int locatorH = this.bottom - this.top;
-        int locatorW = this.right - this.left;//
-        //***********************************************
-
         int AVHeight = Integer.parseInt(coords[6]);
         int AVWidth = Integer.parseInt(coords[7]);
         int offFromTop = (this.bottom-this.top)/2;
@@ -51,107 +45,97 @@ public class ScrollDownRight extends ToggleInteraction {
 
         if(search_type.contains("scrollTo")){
             //scrollTo
-            if(toY != 0) {
+            if(toY != fromY) {
                 toY += singleItemH;
                 fromY += singleItemH;
                 if (offFromTop > 20) {
-                    this.pxUp = offFromTop - 20;
+                    this.pxDown = offFromTop - 20;
                 } else {
-                    this.pxUp = 0;
+                    this.pxDown = 0;
                     for(int i = 18; i > 0; i--){
                         if(offFromTop > i){
-                            this.pxUp = offFromTop-i;
+                            this.pxDown = offFromTop-i;
                             break;
                         }
                     }
                 }
-                this.pxDown = 2*this.pxUp;
+                this.pxUp = 2*this.pxDown;
             }
-            if(toX != 0) {
+            if(toX != fromX) {
                 toX += singleItemW;
                 fromX += singleItemW;
                 if(offFromStart > 20){
-                    this.pxLeft = offFromStart-20;
+                    this.pxRight = offFromStart-20;
                 } else {
-                    this.pxLeft = 0;
+                    this.pxRight = 0;
                     for(int i = 18; i > 0; i--){
                         if(offFromStart > i){
-                            this.pxLeft = offFromStart-i;
+                            this.pxRight = offFromStart-i;
                             break;
                         }
                     }
                 }
-                this.pxDown = 2*pxLeft;
+                this.pxLeft = 2* pxRight;
             }
             this.toBeScrolledY = (int) ((toY - fromY) * screenYRatio);
             if(toBeScrolledY > 0)
                 toBeScrolledY+=20;
-            this.scrollYStep = (int) (this.pxDown*screenYRatio);
+            this.scrollYStep = (int) (this.pxUp *screenYRatio);
             this.toBeScrolledX = (int) ((toX - fromX) * screenXRatio);
             if(toBeScrolledX>0)
                 toBeScrolledX+=20;
-            this.scrollXStep = (int) (this.pxRight*screenXRatio);
+            this.scrollXStep = (int) (this.pxLeft *screenXRatio);
         } else {
             //onData
             int coordItemInAVTop = AVTop - this.top;
             int coordItemInAVLeft = AVLeft - this.left;
             int baseY = AVHeight - coordItemInAVTop - offFromTop;
             int baseX = AVWidth - coordItemInAVLeft - offFromStart;
-            if(toY > AVHeight){
-                if( baseY > 20) {
-                    this.pxUp = baseY - 20;
-                } else {
-                    this.pxUp = 0;
-                    for(int i = 18; i > 0; i--){
-                        if(baseY > i){
-                            this.pxUp = baseY - i;
-                            break;
-                        }
-                    }
-                }
-                if((offFromTop+coordItemInAVTop) > 20) {
-                    this.pxDown = offFromTop+coordItemInAVTop - 20;
-                } else {
-                    this.pxDown = 0;
-                }
+            if( baseY > 20) {
+                this.pxDown = baseY - 20;
             } else {
-                this.pxUp = toY;
                 this.pxDown = 0;
-            }
-            if(toX > AVWidth){
-                if( baseX > 20) {
-                    this.pxLeft = baseX - 20;
-                } else {
-                    this.pxLeft = 0;
-                    for(int i = 18; i > 0; i--){
-                        if(baseX > i){
-                            this.pxLeft = baseX - i;
-                            break;
-                        }
+                for(int i = 18; i > 0; i--){
+                    if(baseY > i){
+                        this.pxDown = baseY - i;
+                        break;
                     }
                 }
-                if((offFromStart+coordItemInAVLeft) > 20) {
-                    this.pxRight = offFromStart+coordItemInAVLeft - 20;
-                } else {
-                    this.pxRight = 0;
-                }
+            }
+            if((offFromTop+coordItemInAVTop) > 20) {
+                this.pxUp = offFromTop+coordItemInAVTop - 20;
             } else {
-                this.pxLeft = toX;
+                this.pxUp = 0;
+            }
+            if( baseX > 20) {
+                this.pxRight = baseX - 20;
+            } else {
                 this.pxRight = 0;
+                for(int i = 18; i > 0; i--){
+                    if(baseX > i){
+                        this.pxRight = baseX - i;
+                        break;
+                    }
+                }
+            }
+            if((offFromStart+coordItemInAVLeft) > 20) {
+                this.pxLeft = offFromStart+coordItemInAVLeft - 20;
+            } else {
+                this.pxLeft = 0;
             }
             this.toBeScrolledY = (int) ((toY - fromY) * screenYRatio);
             if(toBeScrolledY > 0)
                 toBeScrolledY+=20;
-            this.scrollYStep = (int) ((this.pxDown + this.pxUp)*screenYRatio);
+            this.scrollYStep = (int) ((this.pxUp + this.pxDown)*screenYRatio);
 
             this.toBeScrolledX = (int) ((toX - fromX) * screenXRatio);
             if(toBeScrolledX>0)
                 toBeScrolledX+=20;
 
-            this.scrollXStep = (int) ((this.pxRight+this.pxLeft)*screenXRatio);
+            this.scrollXStep = (int) ((this.pxLeft +this.pxRight)*screenXRatio);
         }
-        this.pxLeft = (int)(this.pxLeft*screenXRatio);
-        this.pxUp = (int)(this.pxUp*screenYRatio);
+        this.pxRight = (int)(this.pxRight *screenXRatio);
+        this.pxDown = (int)(this.pxDown *screenYRatio);
         /*if(AVHeight <= singleItemH){
             singleItemH = (AVHeight)/2;
             for(int i = 10; i >= 0; i--){
@@ -260,7 +244,7 @@ public class ScrollDownRight extends ToggleInteraction {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        if(totScrollStep<=0)
+        if(totScrollStep<=0 || totToBeScrolled <= 0)
             return res;
         int last = totToBeScrolled%totScrollStep;
 
@@ -270,8 +254,8 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("stepY = "+this.scrollYStep);
         res.add("stepX = "+this.scrollXStep);
         res.add("start = r.getCenter()");
-        res.add("start = start.below("+this.pxUp+")");
-        res.add("start = start.right("+this.pxLeft+")");
+        res.add("start = start.below("+this.pxDown +")");
+        res.add("start = start.right("+this.pxRight +")");
         res.add("run = start.above(stepY)");
         res.add("run = run.left(stepX)");
         for(int i = 0; i < (totToBeScrolled/totScrollStep); i++) {
@@ -342,14 +326,14 @@ public class ScrollDownRight extends ToggleInteraction {
 
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        if(totScrollStep <= 0)
+        if(totScrollStep <= 0 || totToBeScrolled <= 0)
             return res;
         int last = totToBeScrolled%totScrollStep;
 
         res.add("Check \"{ImageFolder}\\" + timestamp + "_cropped.png\"");
         res.add("Move \"{ImageFolder}\\" + timestamp + "_cropped.png\"");
         res.add("Sleep 10");
-        res.add("MoveRelative \""+ this.pxLeft + "\" \"" + this.pxUp +"\"");
+        res.add("MoveRelative \""+ this.pxRight + "\" \"" + this.pxDown +"\"");
         res.add("Sleep 500");
         for(int i = 0; i < (totToBeScrolled/totScrollStep);i++){
             res.add("MouseLeftPress");
@@ -404,7 +388,7 @@ public class ScrollDownRight extends ToggleInteraction {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        if(totScrollStep<=0)
+        if(totScrollStep<=0 || totToBeScrolled <= 0)
             return res;
         int last = totToBeScrolled%totScrollStep;
 
@@ -414,8 +398,8 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("\torg.sikuli.script.Location l = sikuli_match.getCenter();");
 
         res.add("\tThread.sleep(200);");
-        res.add("\tl = l.below("+this.pxUp+");");
-        res.add("\tl = l.right("+this.pxLeft+");");
+        res.add("\tl = l.below("+this.pxDown +");");
+        res.add("\tl = l.right("+this.pxRight +");");
 
         res.add("\tThread.sleep(500);");
 
@@ -450,10 +434,8 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("\t}");
         res.add("catch (FindFailed ffe) {");
         res.add("\tffe.printStackTrace();");
-        //TODO CLASSNAME
-        res.add("\tf.write(\";\"+interactions+\";f\\n\");");
-        //TODO #INTERACTIONS
-        res.add("\treturn \"fail;\"+interactions+\";4\";");
+        res.add("\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\treturn \"fail;\"+interactions+\";\"+totSize;");
         res.add("}");
 
         /*res.add("try {");
@@ -509,7 +491,7 @@ public class ScrollDownRight extends ToggleInteraction {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        if(totScrollStep<=0)
+        if(totScrollStep<=0 || totToBeScrolled <= 0)
             return res;
         int last = totToBeScrolled%totScrollStep;
 
@@ -518,15 +500,13 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("\tmatch = eye.findImage(image);");
         res.add("\tif (match == null) {");
         res.add("\t\tSystem.out.println(\"Test failed - " + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
-        //todo classname
-        res.add("\t\tf.write(\";\"+interactions+\";f\\n\");");
-        //todo int#
-        res.add("\t\treturn \"fail;\"+interactions+\";4\";");
+        res.add("\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\treturn \"fail;\"+interactions+\";\"+totSize;");
         res.add("\t}");
 
         res.add("\t\teye.move(match.getCenterLocation());\r\n");
         res.add("\t\tThread.sleep(500);\r\n");
-        res.add("\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.pxLeft +"),(int)(match.getCenterLocation().getY() + " + this.pxUp +"));\r\n");
+        res.add("\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.pxRight +"),(int)(match.getCenterLocation().getY() + " + this.pxDown +"));\r\n");
         res.add("\t\tThread.sleep(500);\r\n");
         for (int i = 0 ; i < (totToBeScrolled/totScrollStep); i++){
             res.add("\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
@@ -551,10 +531,8 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("}");
         res.add("else {");
         res.add("\tSystem.out.println(\"image not found\");");
-        //todo classname
-        res.add("f.write(\";\"+interactions+\";f\\n\");");
-        //todo int#
-        res.add("\treturn \"fail;\"+interactions+\";4\";");
+        res.add("\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\treturn \"fail;\"+interactions+\";\"+totSize;");
         res.add("}");
 
         /*res.add("image = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
@@ -602,7 +580,7 @@ public class ScrollDownRight extends ToggleInteraction {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        if(totScrollStep<=0)
+        if(totScrollStep<=0 || totToBeScrolled <= 0)
             return res;
         int last = totToBeScrolled%totScrollStep;
         double ratio = (double)last/(double)totScrollStep;
@@ -610,19 +588,16 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("image = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
         res.add("if (image != null) {");
         res.add("\tmatch = eye.findImage(image);");
-
         //try sikuli
         res.add("\tif (match == null) {");
         res.add("\t\teyeautomate_failures++;");
-
         res.add("\t\ttry {");
         res.add("\t\t\tsikuli_screen.wait(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 25);");
         res.add("\t\t\torg.sikuli.script.Match sikuli_match = sikuli_screen.find(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\",  "\\\\") + "\");");
         res.add("\t\t\torg.sikuli.script.Location l = sikuli_match.getCenter();");
-
         res.add("\t\t\tThread.sleep(200);");
-        res.add("\t\t\tl = l.below("+this.pxUp+");");
-        res.add("\t\t\tl = l.right("+this.pxLeft+");");
+        res.add("\t\t\tl = l.below("+this.pxDown +");");
+        res.add("\t\t\tl = l.right("+this.pxRight +");");
 
         for(int i = 0; i < (totToBeScrolled/totScrollStep); i++) {
             res.add("\t\t\tsikuli_screen.mouseMove(l);");
@@ -654,10 +629,8 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("\t\t\t}");
         res.add("\t\tcatch (FindFailed ffe) {");
         res.add("\t\t\tffe.printStackTrace();");
-        //todo classname
-        res.add("\t\t\tf.write(\";\"+interactions+\";f\\n\");");
-        //todo int#
-        res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";4\";");
+        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
         res.add("\t\t}");
         res.add("\t}");
 
@@ -666,7 +639,7 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("\t\teye.move(match.getCenterLocation());\r\n");
         res.add("\t\tThread.sleep(500);\r\n");
 
-        res.add("\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.pxLeft +"),(int)(match.getCenterLocation().getY() + " + this.pxUp +"));\r\n");
+        res.add("\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.pxRight +"),(int)(match.getCenterLocation().getY() + " + this.pxDown +"));\r\n");
 
         res.add("\t\tThread.sleep(500);\r\n");
         for (int i = 0 ; i < (totToBeScrolled/totScrollStep); i++){
@@ -692,10 +665,8 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("}");
         res.add("else {");
         res.add("\tSystem.out.println(\"image not found\");");
-        //todo classname
-        res.add("\t\t\tf.write(\";\"+interactions+\";f\\n\");");
-        //todo int#
-        res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";4+\";");
+        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
         res.add("}");
 
         /*res.add("image = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
@@ -791,7 +762,7 @@ public class ScrollDownRight extends ToggleInteraction {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        if(totScrollStep<=0)
+        if(totScrollStep<=0 || totToBeScrolled <= 0)
             return res;
         int last = totToBeScrolled%totScrollStep;
         double ratio = (double)last/(double)totScrollStep;
@@ -802,8 +773,8 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("\t\torg.sikuli.script.Location l = sikuli_match.getCenter();");
 
         res.add("\t\tThread.sleep(500);");
-        res.add("\t\tl = l.below("+this.pxUp+");");
-        res.add("\t\tl = l.right("+this.pxLeft+");");
+        res.add("\t\tl = l.below("+this.pxDown +");");
+        res.add("\t\tl = l.right("+this.pxRight +");");
         for(int i = 0; i < (totToBeScrolled/totScrollStep); i++) {
             res.add("\t\tsikuli_screen.mouseMove(l);");
             res.add("\t\tThread.sleep(500);");
@@ -845,15 +816,13 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("\tif (image != null) {");
         res.add("\t\tmatch = eye.findImage(image);");
         res.add("\t\tif (match == null) {");		//test failed also with eyeautomate
-        //todo classname
-        res.add("\t\t\tf.write(\";\"+interactions+\";f\\n\");");
-        //todo int#
-        res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";4\";");
+        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
         res.add("\t\t}");
         res.add("\t\telse {");						//test ok with eyeautomate
         res.add("\t\t\teye.move(match.getCenterLocation());\r\n");
         res.add("\t\t\tThread.sleep(500);\r\n");
-        res.add("\t\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.pxLeft +"),(int)(match.getCenterLocation().getY() + " + this.pxUp +"));\r\n");
+        res.add("\t\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.pxRight +"),(int)(match.getCenterLocation().getY() + " + this.pxDown +"));\r\n");
         res.add("\t\t\tThread.sleep(500);\r\n");
         for (int i = 0 ; i < (totToBeScrolled/totScrollStep); i++){
             res.add("\t\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
@@ -877,10 +846,8 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("\t}");
         res.add("\telse {");
         res.add("\t\tSystem.out.println(\"image not found\");");
-        //todo classname
-        res.add("\t\t\tf.write(\";\"+interactions+\";f\\n\");");
-        //todo int#
-        res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";4\";");
+        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
         res.add("\t}");
         res.add("}");
 

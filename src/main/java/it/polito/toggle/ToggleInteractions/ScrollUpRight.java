@@ -11,15 +11,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ScrollUpRight extends ToggleInteraction {
-
-
-    //TODO : SCREENSHOT DELL'ULTIMO NODO MOSTRATO SPECIFICANDO CHE STO CERCANDO IL NODO N. NEGLI ARGS LOGGARE ANCHE LE COORD TOP E LEFT DEL PRIMO NODO MOSTRATO
-    //       SUCCESSIVAMENTE SI TROVA IL CENTRO E SI SCROLLA DAL CENTRO VERSO L'ALTO DI (TOPUltimo-TOPPrimo).
-    //       SI CONTINUA FINO A RAGGIUNGERE IL NUMERO DI STEP NECESSARI.
     private int scrollYStep;
     private int toBeScrolledY;
     private int scrollXStep;
     private int toBeScrolledX;
+    private int pxUp = 0;
+    private int pxDown = 0;
+    private int pxLeft = 0;
+    private int pxRight = 0;
 
     public ScrollUpRight(String packagename, String search_type,
                          String search_keyword, String timestamp,
@@ -33,18 +32,112 @@ public class ScrollUpRight extends ToggleInteraction {
         int toY = Integer.parseInt(coords[1]);
         int fromX = Integer.parseInt(coords[2]);//
         int toX = Integer.parseInt(coords[3]);//
-        //int singleItemH = Integer.parseInt(coords[4]);
-        //int singleItemW = Integer.parseInt(coords[5]);//
         int singleItemH = this.bottom - this.top;
         int singleItemW = this.right - this.left;//
-        if(search_type.contains("scrollTo")){
-            if(toY != 0)
-                toY -= singleItemH;
-            if(toX != 0)
-                toX += singleItemW;
-        }
         int AVHeight = Integer.parseInt(coords[6]);
-        if(AVHeight <= singleItemH){
+        int AVWidth = Integer.parseInt(coords[7]);
+        int AVLeft = Integer.parseInt(coords[8]);
+        int AVTop = Integer.parseInt(coords[9]);
+        int tmpStepY,tmpStepX;
+        int offFromTop = (this.bottom-this.top)/2;
+        int offFromStart = (this.right-this.left)/2;
+
+        if(search_type.contains("scrollTo")){
+            if(toY != fromY) {
+                toY += singleItemH;
+                fromY += singleItemH;
+                if (offFromTop > 20) {
+                    this.pxUp = offFromTop - 20;
+                } else {
+                    this.pxUp = 0;
+                    for(int i = 18; i > 0; i--){
+                        if(offFromTop > i){
+                            this.pxUp = offFromTop-i;
+                            break;
+                        }
+                    }
+                }
+                this.pxDown = 2*this.pxUp;
+            }
+            if(toX != fromX) {
+                toX += singleItemH;
+                fromX += singleItemH;
+                if(offFromStart > 20){
+                    this.pxRight = offFromStart-20;
+                } else {
+                    this.pxRight = 0;
+                    for(int i = 18; i > 0; i--){
+                        if(offFromStart > i){
+                            this.pxRight = offFromStart-i;
+                            break;
+                        }
+                    }
+                }
+                this.pxLeft = 2*pxRight;
+            }
+            this.toBeScrolledY = (int) (-(toY - fromY) * screenYRatio);
+            if(toBeScrolledY > 0)
+                toBeScrolledY+=20;
+            this.scrollYStep = (int) (this.pxDown*screenYRatio);
+
+            this.toBeScrolledX = (int) ((toX - fromX) * screenXRatio);
+            if(toBeScrolledX>0)
+                toBeScrolledX+=20;
+            this.scrollXStep = (int) (this.pxLeft*screenXRatio);
+        } else {
+            //onData
+            int coordItemInAVTop = AVTop - this.top;
+            int coordItemInAVLeft = AVLeft - this.left;
+            int baseY = coordItemInAVTop + offFromTop;
+            int baseX = AVWidth - coordItemInAVLeft - offFromStart;
+            if( baseY > 20) {
+                this.pxUp = baseY - 20;
+            } else {
+                this.pxUp = 0;
+                for(int i = 18; i > 0; i--){
+                    if(baseY > i){
+                        this.pxUp = baseY - i;
+                        break;
+                    }
+                }
+            }
+            if((AVHeight-baseY) > 20) {
+                this.pxDown = AVHeight - baseY - 20;
+            } else {
+                this.pxDown = 0;
+            }
+            if( baseX > 20) {
+                this.pxRight = baseX - 20;
+            } else {
+                this.pxRight = 0;
+                for(int i = 18; i > 0; i--){
+                    if(baseX > i){
+                        this.pxRight = baseX - i;
+                        break;
+                    }
+                }
+            }
+            if((offFromStart+coordItemInAVLeft) > 20) {
+                this.pxLeft = offFromStart+coordItemInAVLeft - 20;
+            } else {
+                this.pxLeft = 0;
+            }
+
+            this.toBeScrolledY = (int) (-(toY - fromY) * screenYRatio);
+            if(toBeScrolledY > 0)
+                toBeScrolledY+=20;
+            this.scrollYStep = (int) ((this.pxUp + this.pxDown)*screenYRatio);
+
+            this.toBeScrolledX = (int) ((toX - fromX) * screenXRatio);
+            if(toBeScrolledX>0)
+                toBeScrolledX+=20;
+
+            this.scrollXStep = (int) ((this.pxRight+this.pxLeft)*screenXRatio);
+        }
+        this.pxRight = (int)(this.pxRight *screenXRatio);
+        this.pxUp = (int)(this.pxUp *screenYRatio);
+
+        /*if(AVHeight <= singleItemH){
             singleItemH = (AVHeight)/2;
             for(int i = 10; i >= 0; i--){
                 if((singleItemH+i)<AVHeight){
@@ -53,7 +146,6 @@ public class ScrollUpRight extends ToggleInteraction {
                 }
             }
         }
-        int AVWidth = Integer.parseInt(coords[7]);
         if(AVWidth <= singleItemW) {
             singleItemW = (AVWidth)/2;
             for(int i = 10; i >= 0; i--){
@@ -63,11 +155,6 @@ public class ScrollUpRight extends ToggleInteraction {
                 }
             }
         }
-        int AVLeft = Integer.parseInt(coords[8]);
-        int AVTop = Integer.parseInt(coords[9]);
-        int tmpStepY,tmpStepX;
-        int offFromTop = (this.bottom-this.top)/2;
-        int offFromStart = (this.right-this.left)/2;
 
         // Y computing
         if(-(toY-fromY) > AVHeight){
@@ -107,10 +194,11 @@ public class ScrollUpRight extends ToggleInteraction {
         }
         tmpStepX = (int)(tmpStepX*screenXRatio);
         this.toBeScrolledX = (int)((toX-fromX)*screenXRatio);
-        this.scrollXStep = tmpStepX;
+        this.scrollXStep = tmpStepX;*/
     }
 
     @Override
+    //TODO
     public ArrayList<String> generateSikuliLines() {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));

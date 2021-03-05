@@ -64,7 +64,8 @@ public class SwipeDown extends ToggleInteraction {
 		res.add("\t}");
 		res.add("catch (FindFailed ffe) {");
 		res.add("\tffe.printStackTrace();");
-		res.add("\treturn \"fail;\"+interactions;");
+		res.add("\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\treturn \"fail;\"+interactions+\";\"+totSize;");
 		res.add("}");
 
 		return res;
@@ -78,7 +79,8 @@ public class SwipeDown extends ToggleInteraction {
 		res.add("\tmatch = eye.findImage(image);");
 		res.add("\tif (match == null) {");
 		res.add("\t\tSystem.out.println(\"Test failed - " + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
-		res.add("\t\treturn \"fail;\"+interactions;");
+		res.add("\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\treturn \"fail;\"+interactions+\";\"+totSize;");
 		res.add("\t}");
 		res.add("		eye.move(match.getCenterLocation());\r\n" +
 				"		Thread.sleep(20);\r\n" +
@@ -94,7 +96,8 @@ public class SwipeDown extends ToggleInteraction {
 		res.add("}");
 		res.add("else {");
 		res.add("\tSystem.out.println(\"image not found\");");
-		res.add("\treturn \"fail;\"+interactions;");
+		res.add("\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\treturn \"fail;\"+interactions+\";\"+totSize;");
 		res.add("}");
 		return res;
 	}
@@ -122,7 +125,8 @@ public class SwipeDown extends ToggleInteraction {
 		res.add("\t\t\t}");
 		res.add("\t\tcatch (FindFailed ffe) {");
 		res.add("\t\t\tffe.printStackTrace();");
-		res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions;");
+		res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t\t}");
 		res.add("\t}");
 		//eyeautomate
@@ -143,7 +147,8 @@ public class SwipeDown extends ToggleInteraction {
 		res.add("}");
 		res.add("else {");
 		res.add("\tSystem.out.println(\"image not found\");");
-		res.add("\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions;");
+		res.add("\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("}");
 
 		return res;
@@ -169,7 +174,8 @@ public class SwipeDown extends ToggleInteraction {
 		res.add("\tif (image != null) {");
 		res.add("\t\tmatch = eye.findImage(image);");
 		res.add("\t\tif (match == null) {");		//test failed also with eyeautomate
-		res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions;");
+		res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t\t}");
 		res.add("\t\telse {");						//test ok with eyeautomate
 		res.add("		eye.move(match.getCenterLocation());\r\n" +
@@ -187,7 +193,8 @@ public class SwipeDown extends ToggleInteraction {
 		res.add("\t}");
 		res.add("\telse {");
 		res.add("\t\tSystem.out.println(\"image not found\");");
-		res.add("\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions;");
+		res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t}");
 		res.add("}");
 		return res;

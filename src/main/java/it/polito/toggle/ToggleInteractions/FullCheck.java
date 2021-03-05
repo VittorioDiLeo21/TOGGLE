@@ -52,12 +52,14 @@ public class FullCheck extends ToggleInteraction {
 		res.add("\tmatch = eye.findImage(image);");
 		res.add("\tif (match == null) {");
 		res.add("\t\tSystem.out.println(\"Test failed - " + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
-		res.add("\t\treturn \"fail;\"+interactions;");
+		res.add("\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\treturn \"fail;\"+interactions+\";\"+totSize;");
 		res.add("\t}");
 		res.add("}");
 		res.add("else {");
 		res.add("\tSystem.out.println(\"image not found\");");
-		res.add("\treturn \"fail;\"+interactions;");
+		res.add("\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\treturn \"fail;\"+interactions+\";\"+totSize;");
 		res.add("}");
 		return res;
 	}
@@ -72,7 +74,8 @@ public class FullCheck extends ToggleInteraction {
 		res.add("}");
 		res.add("catch (FindFailed ffe) {");
 		res.add("\tffe.printStackTrace();");
-		res.add("\treturn \"fail;\"+interactions;");
+		res.add("\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\treturn \"fail;\"+interactions+\";\"+totSize;");
 		res.add("}");
 
 		return res;
@@ -94,13 +97,15 @@ public class FullCheck extends ToggleInteraction {
 		res.add("\t\t}");
 		res.add("\t\tcatch (FindFailed ffe) {");
 		res.add("\t\t\tffe.printStackTrace();");
-		res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions;");
+		res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t\t}");
 		res.add("\t}");
 		res.add("}");
 		res.add("else {");
 		res.add("\tSystem.out.println(\"image not found\");");
-		res.add("\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions;");
+		res.add("\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("}");
 		return res;
 	}
@@ -119,12 +124,14 @@ public class FullCheck extends ToggleInteraction {
 		res.add("\tif (image != null) {");
 		res.add("\t\tmatch = eye.findImage(image);");
 		res.add("\t\tif (match == null) {");
-		res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions;");
+		res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t\t}");
 		res.add("\t}");
 		res.add("\telse {");
 		res.add("\t\tSystem.out.println(\"image not found\");");
-		res.add("\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions;");
+		res.add("\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t}");
 		res.add("}");
 		return res;

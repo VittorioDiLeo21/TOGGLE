@@ -93,7 +93,8 @@ public class OpenOptionsMenu extends ToggleInteraction {
 		res.add("\t}");
 		res.add("\tcatch (Exception e2) {");
 		res.add("\t\tSystem.out.println(\"catched exception with Sikuli\");");
-		res.add("\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions;");
+		res.add("\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t}");
 		res.add("}");
 
@@ -122,7 +123,8 @@ public class OpenOptionsMenu extends ToggleInteraction {
 		res.add("\t}");
 		res.add("\tcatch (Exception e2) {");
 		res.add("\t\tSystem.out.println(\"Exception with Eyeautomate\");");
-		res.add("\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions;");
+		res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t}");
 		res.add("}");
 

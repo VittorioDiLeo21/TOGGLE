@@ -250,19 +250,19 @@ public class ToggleTranslator {
         res.add("\tBufferedImage image = null;");
         res.add("\tMatch match = null;");
         res.add("\tRobot bot = new Robot();");
-        res.add("\tint interactions = 0;");
+        res.add("\tint interactions = 1;");
         res.add("\n\n\n");
 
         int index = 0;
         int size = interactions.size();
+        res.add("\tint totSize = "+size+";");
+        res.add("\tString testName = \"" + test_name + "\";");
         for (ToggleInteraction i:interactions) {
-            /*for (String s:i.generateEyeAutomateJavaLines(starting_folder,test_name,size)) {
-                res.add("\t" + s);
-            }*/
             for (String s:i.generateEyeAutomateJavaLines(starting_folder)) {
                 res.add("\t" + s);
             }
             index++;
+            res.add("\tf.write(\""+test_name+";\"+interactions+\";p\\n\");");
             if(index< size) {
                 res.add("\tThread.sleep(1000);");
                 res.add("\tinteractions++;");
@@ -289,16 +289,16 @@ public class ToggleTranslator {
         res.add("\tScreen sikuli_screen = new Screen();");
         res.add("\tsikuli_screen.setAutoWaitTimeout(30);");
 
-        res.add("\tint interactions = 0;");
+        res.add("\tint interactions = 1;");
         int index = 0;
         int size = interactions.size();
+        res.add("\tint totSize = "+size+";");
+        res.add("\tString testName = \"" + test_name + "\";");
         for (ToggleInteraction i:interactions) {
-            /*for (String s:i.generateSikuliJavaLines(starting_folder,test_name,size)) {
-                res.add("\t" + s);
-            }*/
             for (String s:i.generateSikuliJavaLines(starting_folder)) {
                 res.add("\t" + s);
             }
+            res.add("\tf.write(\""+test_name+";\"+interactions+\";p\\n\");");
             index++;
             if(index<size) {
                 res.add("\tThread.sleep(1000);");
@@ -332,19 +332,19 @@ public class ToggleTranslator {
         res.add("\tMatch match = null;");
         res.add("\tRobot bot = new Robot();");
         res.add("\tint sikuli_failures = 0;");
-        res.add("\tint interactions = 0;");
+        res.add("\tint interactions = 1;");
 
         res.add("\n\n\n");
         int index = 0;
         int size = interactions.size();
+        res.add("\tint totSize = "+size+";");
+        res.add("\tString testName = \"" + test_name + "\";");
         for (ToggleInteraction i:interactions) {
-            /*for (String s:i.generateCombinedJavaLinesSikuliFirst(starting_folder,test_name,size)) {
-                res.add("\t" + s);
-            }*/
             for (String s:i.generateCombinedJavaLinesSikuliFirst(starting_folder)) {
                 res.add("\t" + s);
             }
             index++;
+            res.add("\tf.write(\""+test_name+";\"+interactions+\";p\\n\");");
             if(index<size) {
                 res.add("\tThread.sleep(1000);");
                 res.add("\tinteractions++;");
@@ -379,19 +379,19 @@ public class ToggleTranslator {
         res.add("\tMatch match = null;");
         res.add("\tRobot bot = new Robot();");
         res.add("\tint eyeautomate_failures = 0;");
-        res.add("\tint interactions = 0;");
+        res.add("\tint interactions = 1;");
 
         res.add("\n\n\n");
         int index = 0;
         int size = interactions.size();
+        res.add("\tint totSize = "+size+";");
+        res.add("\tString testName = \"" + test_name + "\";");
         for (ToggleInteraction i:interactions) {
-            /*for (String s:i.generateCombinedJavaLines(starting_folder,test_name,size)) {
-                res.add("\t" + s);
-            }*/
             for (String s:i.generateCombinedJavaLines(starting_folder)) {
                 res.add("\t" + s);
             }
             index++;
+            res.add("\tf.write(\""+test_name+";\"+interactions+\";p\\n\");");
             if(index<size) {
                 res.add("\tThread.sleep(1000);");
                 res.add("\tinteractions++;");
