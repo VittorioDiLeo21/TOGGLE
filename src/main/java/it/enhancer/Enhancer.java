@@ -25,11 +25,14 @@ import org.json.JSONObject;
 
 import com.github.javaparser.ast.CompilationUnit;
 
+import javax.swing.text.View;
+
 public class Enhancer {
 
     private CompilationUnit compilationUnit;
     private List<Operation> operations;
     private boolean firstTest;
+    private boolean shouldFullCheck;
     private boolean firstOnDataTest;
     private boolean firstScrollToTest;
     private StringBuilder parameters;
@@ -456,6 +459,7 @@ public class Enhancer {
                 NodeList<Statement> nodes = block.getStatements();
                 firstTest = true;
                 firstOnDataTest = true;
+                shouldFullCheck = true;
                 firstScrollToTest = true;
                 parameters = new StringBuilder("");
                 field = new StringBuilder("");
@@ -468,7 +472,7 @@ public class Enhancer {
 
                 }
                 //add fullcheck at the bottom of the method
-                if(!firstTest)
+                if(!firstTest && shouldFullCheck)
                     addFullCheck(block,methodName,i);
             }
 
@@ -1097,6 +1101,19 @@ public class Enhancer {
         return ++index;
     }
 
+    private boolean isContextSwitch(String interactionType){
+        return interactionType.equals("click") ||
+                interactionType.equals("doubleclick") ||
+                interactionType.equals("longclick") ||
+                interactionType.equals("openactionbaroverfloworoptionsmenu") ||
+                interactionType.equals("opencontextualactionmodeoverflowmenu") ||
+                interactionType.equals("pressback") ||
+                interactionType.equals("pressbackunconditionally") ||
+                interactionType.equals("pressmenukey") ||
+                interactionType.equals("pressIme") ||
+                interactionType.equals("presskey");
+    }
+
     private int enhanceMethod(BlockStmt block, String methodName, Statement stmt, int i) {
         // this works on test cases with one matcher
         String searchType = "";
@@ -1203,6 +1220,7 @@ public class Enhancer {
 
                     System.out.println("logcatting: methodname = " + methodName + "; searchType = " + searchType + "; searchKw = " + searchKw + "; interactionType = " + interactionType + "; interactionParams = " + interactionParams);
                     if(interactionType.equals("scrollto")){
+                        shouldFullCheck = false;
                         //todo per lo scroll :
                         Statement firstScrollable = null;
                         Statement scrollable = null;
@@ -1293,6 +1311,10 @@ public class Enhancer {
                             i = addLogInteractionToCu(log, i, block);
                         }
                     } else {
+                        if(!shouldFullCheck)
+                            shouldFullCheck = isContextSwitch(interactionType);
+
+
                         LogCat log = new LogCat(methodName, searchType, searchKw, interactionType, interactionParams);
 
                         //b.addStatement(++i, captureTaskValue);
@@ -1365,6 +1387,7 @@ public class Enhancer {
 
                         System.out.println("logcatting: methodname = " + methodName + "; searchType = " + srct + "; searchKw = " + srck + "; interactionType = " + interactionType + "; interactionParams = " + interactionParams);
                         if(interactionType.equals("scrollto")){
+                            shouldFullCheck = false;
                             Statement firstScrollable = null;
                             Statement scrollable = null;
                             TryStmt firstScrollableTry = null;
@@ -1472,6 +1495,8 @@ public class Enhancer {
                                 i = addLogInteractionToCu(log, i, block);
                             }
                         } else {
+                            if(!shouldFullCheck)
+                                shouldFullCheck = isContextSwitch(interactionType);
                             LogCat log = new LogCat(methodName, srct, srck, interactionType, interactionParams);
 
                             //b.addStatement(++i, captureTaskValue);
@@ -1563,10 +1588,6 @@ public class Enhancer {
                 block.addStatement(++i, firstPostScrollY);
                 block.addStatement(++i, firstPostScrollX);
                 block.addStatement(++i, firstScrollDirectionStr);
-                //block.addStatement(++i, firstSingleItemFirstH);
-                //block.addStatement(++i, firstSingleItemFirstW);
-                //block.addStatement(++i, firstSingleItemLastH);
-                //block.addStatement(++i, firstSingleItemLastW);
                 block.addStatement(++i, firstSingleItemH);
                 block.addStatement(++i, firstSingleItemW);
                 block.addStatement(++i, firstLoc);
@@ -1577,10 +1598,6 @@ public class Enhancer {
                 block.addStatement(++i, postScrollY);
                 block.addStatement(++i, postScrollX);
                 block.addStatement(++i, scrollDirectionStr);
-                /*block.addStatement(++i, singleItemFirstH);
-                block.addStatement(++i, singleItemFirstW);
-                block.addStatement(++i, singleItemLastH);
-                block.addStatement(++i, singleItemLastW);*/
                 block.addStatement(++i, singleItemH);
                 block.addStatement(++i, singleItemW);
                 block.addStatement(++i, loc);
@@ -1601,17 +1618,17 @@ public class Enhancer {
             String interactionType = ViewActions.getSearchType(interaction);
             String interactionParams = operations.get(numberOfOperations - 1).getParameter();
             block.addStatement(++i,getSingleItemHeightFirst);
-            //block.addStatement(++i,getSingleItemHeightLast);
             block.addStatement(++i,getSingleItemWidthFirst);
-            //block.addStatement(++i,getSingleItemWidthLast);
             Statement stmt2 = null;
             if (interactionType.isEmpty()) {
+                shouldFullCheck = false;
                 // if it's not empty it is a check
                 if (!ViewAssertions.getSearchType(interaction).isEmpty()) {
                     interactionType = "check";
                     interactionParams = "";
                 }
             } else {
+                shouldFullCheck=isContextSwitch(interactionType);
                 //it is not a check so we should split the espresso interaction
                 int index = stmt.toString().lastIndexOf(".perform(");
                 String substmt = stmt.toString().substring(0,index);
@@ -1669,18 +1686,22 @@ public class Enhancer {
                         "capture_task = new FutureTask<Boolean> (new TOGGLETools.TakeScreenCaptureTaskProgressive(num, \"" + methodName + "\", activityTOGGLETools));"));
 
                 block.addStatement(++i, screenCapture);
-                log = new LogCat(methodName, "position-adapterView", "\""+listId+"_;\"+ScrollHandler.getAdapterViewPosFrom(postScrollYTOGGLE,postScrollXTOGGLE,adapterViewTOGGLE)", interactionType,
+                /*log = new LogCat(methodName, "position-adapterView", "\""+listId+"_;\"+ScrollHandler.getAdapterViewPosFrom(postScrollYTOGGLE,postScrollXTOGGLE,adapterViewTOGGLE)", interactionType,
                         interactionParams);
+                i = addLogInteractionToCu(log,i,block);
+                block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));*/
+
+                log = new LogCat(methodName, searchType, searchKw, interactionType, interactionParams);
                 i = addLogInteractionToCu(log,i,block);
                 block.addStatement(++i, JavaParser.parseStatement("TOGGLETools.DumpScreenProgressive(num, \"" +methodName + "\", device);"));
 
                 block.addStatement(++i, stmt2);
             }
         } catch (Exception e) {
-            // TODO: handle exception
             System.out.println("EXCEPTION IN ENHANCER!");
             Utils.logException(e, "enhanceMethodOnData");
         }
+        //shouldFullCheck = false;
         return ++i;
     }
 
@@ -1792,15 +1813,16 @@ public class Enhancer {
             log.setInteractionType("");
 
         boolean anyAll = false;
-        if(log.getSearchType().contains("&") ||
+        /*if(log.getSearchType().contains("&") ||
                 log.getSearchType().contains("|") ||
                 (log.getSearchType().contains("class") && !isScrollingInteraction(log.getInteractionType()))){
             String tmp ="\"" + log.getSearchKw() +"\"";
             log.setSearchKw(tmp);
-        }
+        }*/
 
-        /*for (Operation o : operations) {
-            if (o.getName().equals("anyOf") || o.getName().equals("allOf") || o.getName().equals("instanceOf")) {
+        for (Operation o : operations) {
+            if ((o.getName().equals("anyOf") || o.getName().equals("allOf") || o.getName().equals("instanceOf")) &&
+                    !isScrollingInteraction(log.getInteractionType())) {
                 anyAll = true;
                 break;
             }
@@ -1809,7 +1831,7 @@ public class Enhancer {
         if(anyAll){
             String tmp ="\"" + log.getSearchKw() +"\"";
             log.setSearchKw(tmp);
-        }*/
+        }
         // default handles the normal behavior of the parameters. ES: click(),
         // typeText("TextToBeReplaced")
         switch (log.getInteractionType()) {

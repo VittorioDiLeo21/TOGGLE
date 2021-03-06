@@ -85,9 +85,11 @@ public class Utils {
         dir.mkdirs();
         File tmp = new File(dir.toPath().toString()+"\\AppStarter.java");
         if(!tmp.exists()){
+            /*System.out.println(tmp.getAbsolutePath());
+            tmp.createNewFile();
+            copyAppStarter(new File(System.getProperty("user.dir") + "\\src\\main\\java\\it\\polito\\toggle\\utils\\AppStarter.java"),tmp);*/
             Files.copy(new File(System.getProperty("user.dir") + "\\src\\main\\java\\it\\polito\\toggle\\utils\\AppStarter.java").toPath(),
-                    tmp.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
+                    tmp.toPath());
         }
         /*Files.copy(new File(System.getProperty("user.dir") + "\\src\\main\\java\\it\\polito\\toggle\\utils\\AppStarter.java").toPath(),
                 dir.toPath().toString()+"\\AppStarter.java",
@@ -121,8 +123,23 @@ public class Utils {
             copyJarFile(new JarFile(new File(System.getProperty("user.dir") + "\\src\\main\\java\\it\\polito\\toggle\\utils\\sikulixapi.jar")), dir);
     }
 
-    private static void copyAppStarter(File dst) throws IOException {
-        //TODO
+    private static void copyAppStarter(File src, File dst) throws IOException {
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            is = new FileInputStream(src);
+            os = new FileOutputStream(dst); // buffer size 1K
+            byte[] buf = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = is.read(buf)) > 0) {
+                os.write(buf, 0, bytesRead);
+            }
+        } finally {
+            if(is!= null && os!=null) {
+                is.close();
+                os.close();
+            }
+        }
     }
 
     private static void copyJarFile(JarFile jar, File dst) throws IOException {

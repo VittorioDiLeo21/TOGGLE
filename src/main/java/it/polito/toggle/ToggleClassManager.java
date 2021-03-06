@@ -161,7 +161,6 @@ public class ToggleClassManager {
             res.add("\t\tcurr_test_res = curr_test_return.split(\";\")[0];");
             res.add("\t\tcurr_test_interactions = Integer.parseInt(curr_test_return.split(\";\")[1]);");
             res.add("\t\tcurr_tot_interactions = Integer.parseInt(curr_test_return.split(\";\")[2]);");
-            res.add("\t\tf1.write(\""+this.class_name+";"+test+";\"+curr_tot_interactions+\";\"+curr_test_interactions+\"\\n\");");
             res.add("\t\tif (curr_test_res.equals(\"pass\")) {");
             res.add("\t\t\tSystem.out.println(\"" + test + " ok\");");
             res.add("\t\t\ttests_ok++;");
@@ -169,7 +168,10 @@ public class ToggleClassManager {
             res.add("\t\telse {");
             res.add("\t\t\tSystem.out.println(\"" + test + " failed\");");
             res.add("\t\t\ttests_failed++;");
+            res.add("\t\t\tcurr_test_interactions--;");
             res.add("\t\t}");
+            res.add("\t\tf1.write(\""+this.class_name+";"+test+";\"+curr_tot_interactions+\";\"+curr_test_interactions+\"\\n\");");
+
             res.add("\t}");
             res.add("\tcatch (Exception e) {");
             res.add("\t\tSystem.out.println(\"" + test + " failed: \" + e.getMessage());");
@@ -230,7 +232,6 @@ public class ToggleClassManager {
             res.add("\t\tcurr_test_eyeautomate_failures = Integer.valueOf(curr_test_return.split(\";\")[1]);");
             res.add("\t\tcurr_test_interactions = Integer.valueOf(curr_test_return.split(\";\")[2]);");
             res.add("\t\tcurr_tot_interactions = Integer.parseInt(curr_test_return.split(\";\")[3]);");
-            res.add("\t\tf1.write(\""+this.class_name+";"+test+";\"+curr_tot_interactions+\";\"+curr_test_interactions+\"\\n\");");
             res.add("\t\tif (curr_test_res.equals(\"pass\")) {");
             res.add("\t\t\tSystem.out.println(\"" + test + " ok\");");
             res.add("\t\t\ttests_ok++;");
@@ -238,7 +239,10 @@ public class ToggleClassManager {
             res.add("\t\telse {");
             res.add("\t\t\tSystem.out.println(\"" + test + " failed\");");
             res.add("\t\t\ttests_failed++;");
+            res.add("\t\t\tcurr_test_interactions--;");
             res.add("\t\t}");
+            res.add("\t\tf1.write(\""+this.class_name+";"+test+";\"+curr_tot_interactions+\";\"+curr_test_interactions+\"\\n\");");
+
             res.add("\t}");
             res.add("\tcatch (Exception e) {");
             res.add("\t\tSystem.out.println(\"" + test + " failed: \" + e.getMessage());");
@@ -303,8 +307,6 @@ public class ToggleClassManager {
             res.add("\t\tcurr_test_sikuli_failures = Integer.valueOf(curr_test_return.split(\";\")[1]);");
             res.add("\t\tcurr_test_interactions = Integer.valueOf(curr_test_return.split(\";\")[2]);");
             res.add("\t\tcurr_tot_interactions = Integer.parseInt(curr_test_return.split(\";\")[3]);");
-            res.add("\t\tf1.write(\""+this.class_name+";"+test+";\"+curr_tot_interactions+\";\"+curr_test_interactions+\"\\n\");");
-
             res.add("\t\tif (curr_test_res.equals(\"pass\")) {");
             res.add("\t\t\tSystem.out.println(\"" + test + " ok\");");
             res.add("\t\t\ttests_ok++;");
@@ -312,7 +314,9 @@ public class ToggleClassManager {
             res.add("\t\telse {");
             res.add("\t\t\tSystem.out.println(\"" + test + " failed\");");
             res.add("\t\t\ttests_failed++;");
+            res.add("\t\t\tcurr_test_interactions--;");
             res.add("\t\t}");
+            res.add("\t\tf1.write(\""+this.class_name+";"+test+";\"+curr_tot_interactions+\";\"+curr_test_interactions+\"\\n\");");
             res.add("\t}");
             res.add("\tcatch (Exception e) {");
             res.add("\t\tSystem.out.println(\"" + test + " failed: \" + e.getMessage());");

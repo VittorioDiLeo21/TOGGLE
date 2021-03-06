@@ -169,7 +169,7 @@ public class Toggle {
         //1
 
         Map<String,ClassData> tests = enhanceEspressoTestFolder(testDirectoryPath);
-        /*injectToggleTool(testDirectoryPath);
+        injectToggleTool(testDirectoryPath);
 
         //2 build and install the apk
 
@@ -192,16 +192,13 @@ public class Toggle {
         //eventually resize the emulator
         //5
 
-        executeAllEnhancedEspressoByTestMethod(tests,instrumentation);*/
-        //executeAllEnhancedEspresso(new ArrayList<>(tests.keySet()),instrumentation);
+        executeAllEnhancedEspressoByTestMethod(tests,instrumentation);
 
         //6
         ArrayList<String> classes = new ArrayList<>();
         for(String testClassName : tests.keySet()){
-            //ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolution(),windowUtils.getEmulatorScreenPixelsWidth(this.device));
             String className = testClassName.replace("Enhanced","");
             classes.add(className + "SikuliEyeAutomate");
-            //ToggleClassManager tcm = new ToggleClassManager(testClassName,appPackageName,guiTestsPath, new ArrayList<>(tests.get(testClassName).getTests()),getEmulatorResolutionAndHeight(),windowUtils.getEmulatorScreenPixelsWidth(this.device),windowUtils.getEmulatorScreenPixelHeight(this.device));
             ToggleClassManager tcm = new ToggleClassManager(className,
                     appPackageName,
                     guiTestsPath+"\\TOGGLE\\",
