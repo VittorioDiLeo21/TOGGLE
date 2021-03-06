@@ -90,39 +90,42 @@ public class ScrollUpRight extends ToggleInteraction {
             int coordItemInAVLeft = AVLeft - this.left;
             int baseY = coordItemInAVTop + offFromTop;
             int baseX = AVWidth - coordItemInAVLeft - offFromStart;
-            if( baseY > 20) {
-                this.pxUp = baseY - 20;
-            } else {
-                this.pxUp = 0;
-                for(int i = 18; i > 0; i--){
-                    if(baseY > i){
-                        this.pxUp = baseY - i;
-                        break;
+            if(fromY != toY) {
+                if (baseY > 20) {
+                    this.pxUp = baseY - 20;
+                } else {
+                    this.pxUp = 0;
+                    for (int i = 18; i > 0; i--) {
+                        if (baseY > i) {
+                            this.pxUp = baseY - i;
+                            break;
+                        }
                     }
                 }
-            }
-            if((AVHeight-baseY) > 20) {
-                this.pxDown = AVHeight - baseY - 20;
-            } else {
-                this.pxDown = 0;
-            }
-            if( baseX > 20) {
-                this.pxRight = baseX - 20;
-            } else {
-                this.pxRight = 0;
-                for(int i = 18; i > 0; i--){
-                    if(baseX > i){
-                        this.pxRight = baseX - i;
-                        break;
-                    }
+                if ((AVHeight - baseY) > 20) {
+                    this.pxDown = AVHeight - baseY - 20;
+                } else {
+                    this.pxDown = 0;
                 }
             }
-            if((offFromStart+coordItemInAVLeft) > 20) {
-                this.pxLeft = offFromStart+coordItemInAVLeft - 20;
-            } else {
-                this.pxLeft = 0;
+            if(fromX != toX) {
+                if (baseX > 20) {
+                    this.pxRight = baseX - 20;
+                } else {
+                    this.pxRight = 0;
+                    for (int i = 18; i > 0; i--) {
+                        if (baseX > i) {
+                            this.pxRight = baseX - i;
+                            break;
+                        }
+                    }
+                }
+                if ((offFromStart + coordItemInAVLeft) > 20) {
+                    this.pxLeft = offFromStart + coordItemInAVLeft - 20;
+                } else {
+                    this.pxLeft = 0;
+                }
             }
-
             this.toBeScrolledY = (int) (-(toY - fromY) * screenYRatio);
             if(toBeScrolledY > 0)
                 toBeScrolledY+=20;
@@ -198,12 +201,11 @@ public class ScrollUpRight extends ToggleInteraction {
     }
 
     @Override
-    //TODO
     public ArrayList<String> generateSikuliLines() {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        if(totScrollStep<=0)
+        if(totScrollStep<=0 || totToBeScrolled <=0)
             return res;
         int last = totToBeScrolled%totScrollStep;
         res.add("sleep(1)");
@@ -213,8 +215,8 @@ public class ScrollUpRight extends ToggleInteraction {
         res.add("stepX = "+this.scrollXStep);
         res.add("start = r.getCenter()");
 
-        //res.add("start = start.above(stepY)");
-        res.add("start = start.right(stepX)");
+        res.add("start = start.above(" + this.pxUp +")");
+        res.add("start = start.right(" + this.pxRight +")");
 
         res.add("run = start.below(stepY)");
         res.add("run = run.left(stepX)");
@@ -222,16 +224,10 @@ public class ScrollUpRight extends ToggleInteraction {
         for(int i = 0; i < totToBeScrolled/totScrollStep; i++) {
             res.add("mouseMove(start); wait(0.5)");
             res.add("mouseDown(Button.LEFT); wait(0.5)");
-            //res.add("run = run.below(stepY)");
-            //res.add("run = run.left(stepX)");
-            //res.add("wait(0.5)");//
             res.add("mouseMove(run)");
             res.add("wait(1)");//
             res.add("mouseUp()");
             res.add("wait(0.5)");
-            //res.add("start = run.above(stepY)");
-            //res.add("start = run.right(stepX)");
-            //res.add("wait(0.5)");
         }
         if(last > 0){
             double ratio = (double)last/(double)totScrollStep;
@@ -253,17 +249,14 @@ public class ScrollUpRight extends ToggleInteraction {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        if(totScrollStep<=0)
+        if(totScrollStep<=0 || totToBeScrolled<=0)
             return res;
         int last = totToBeScrolled%totScrollStep;
         res.add("Check \"{ImageFolder}\\" + timestamp + "_cropped.png\"");
         res.add("Move \"{ImageFolder}\\" + timestamp + "_cropped.png\"");
         res.add("Sleep 10");
-
-        //TODO riconosco il primo elemento, mi muovo di scrollStep e inizio a scrollare
-        res.add("MoveRelative \""+ this.scrollXStep + "\" \"0\"");
+        res.add("MoveRelative \""+ this.pxRight + "\" \"-"+this.pxUp+"\"");
         res.add("Sleep 500");
-        //int last = toBeScrolled%this.scrollStep;
         for(int i = 0; i < totToBeScrolled/totScrollStep;i++){
             res.add("MouseLeftPress");
             res.add("Sleep 500");
@@ -291,7 +284,7 @@ public class ScrollUpRight extends ToggleInteraction {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        if(totScrollStep<=0)
+        if(totScrollStep<=0 || totToBeScrolled <=0)
             return res;
         int last = totToBeScrolled%totScrollStep;
         res.add("try {");
@@ -299,44 +292,43 @@ public class ScrollUpRight extends ToggleInteraction {
         res.add("\torg.sikuli.script.Match sikuli_match = sikuli_screen.find(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\",  "\\\\") + "\");");
         res.add("\torg.sikuli.script.Location l = sikuli_match.getCenter();");
 
-        res.add("\tsikuli_screen.wait(0.2);");
-        //res.add("\tl = l.below("+this.scrollYStep+");");
-        res.add("\tl = l.right("+this.scrollXStep+");");
-
-        res.add("\tsikuli_screen.wait(0.5);");
-
+        res.add("\tThread.sleep(200);");
+        res.add("\tl = l.above("+this.pxUp+");");
+        res.add("\tl = l.right("+this.pxRight+");");
+        res.add("\tThread.sleep(500);");
         for(int i = 0; i < totToBeScrolled/totScrollStep; i++ ){
             res.add("\tsikuli_screen.mouseMove(l);");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
             res.add("\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
             res.add("\tl = l.below("+this.scrollYStep+");");
             res.add("\tl = l.left("+this.scrollXStep+");");
             res.add("\tsikuli_screen.mouseMove(l);");
-            res.add("\tsikuli_screen.wait(1);");
+            res.add("\tThread.sleep(1000);");
             res.add("\tsikuli_screen.mouseUp();");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
             res.add("\tl = l.above("+this.scrollYStep+");");
             res.add("\tl = l.right("+this.scrollXStep+");");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
         }
         if(last > 0){
             double ratio = (double)last/(double)totScrollStep;
             res.add("\tsikuli_screen.mouseMove(l);");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
             res.add("\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
             res.add("\tl = l.below("+(int)(this.scrollYStep*ratio)+");");
             res.add("\tl = l.left("+(int)(this.scrollXStep*ratio)+");");
             res.add("\tsikuli_screen.mouseMove(l);");
-            res.add("\tsikuli_screen.wait(1);");
+            res.add("\tThread.sleep(1000);");
             res.add("\tsikuli_screen.mouseUp();");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
         }
         res.add("\t}");
         res.add("\tcatch (FindFailed ffe) {");
         res.add("\tffe.printStackTrace();");
-        res.add("\treturn \"fail;\"+interactions;");
+        res.add("\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\treturn \"fail;\"+interactions+\";\"+totSize;");
         res.add("}");
 
         return res;
@@ -347,7 +339,7 @@ public class ScrollUpRight extends ToggleInteraction {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        if(totScrollStep<=0)
+        if(totScrollStep<=0 || totToBeScrolled <= 0)
             return res;
         int last = totToBeScrolled%totScrollStep;
         res.add("image = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
@@ -355,28 +347,29 @@ public class ScrollUpRight extends ToggleInteraction {
         res.add("\tmatch = eye.findImage(image);");
         res.add("\tif (match == null) {");
         res.add("\t\tSystem.out.println(\"Test failed - " + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
-        res.add("\t\treturn \"fail;\"+interactions;");
+        res.add("\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\treturn \"fail;\"+interactions+\";\"+totSize;");
         res.add("\t}");
 
         res.add("\teye.move(match.getCenterLocation());\r\n");
         res.add("\tThread.sleep(500);\r\n");
-        res.add("\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.scrollXStep +"),(int)(match.getCenterLocation().getY()));\r\n");
+        res.add("\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.pxRight +"),(int)(match.getCenterLocation().getY() - " +this.pxLeft+ "));\r\n");
         res.add("\tThread.sleep(500);\r\n");
         for (int i = 0 ; i < (totToBeScrolled/totScrollStep); i++){
             res.add("\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("\tThread.sleep(500);\r\n");
-            res.add("\tbot.mouseMove((int)(match.getCenterLocation().getX()),(int)(match.getCenterLocation().getY() + " + this.scrollYStep + "));\r\n"); //from bottom to top
+            res.add("\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() - " + this.scrollXStep +"),(int)MouseInfo.getPointerInfo().getLocation().getY() + " + this.scrollYStep + "));\r\n"); //from bottom to top
             res.add("\tThread.sleep(1000);\r\n");
             res.add("\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("\tThread.sleep(500);\r\n");
-            res.add("\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.scrollXStep +"),(int)(match.getCenterLocation().getY()));\r\n");
+            res.add("\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + this.scrollXStep +"),(int)(MouseInfo.getPointerInfo().getLocation().getY() - " +this.scrollYStep + "));\r\n");
             res.add("\tThread.sleep(500);\r\n");
         }
         if(last > 0){
             double ratio = (double)last/(double)totScrollStep;
             res.add("\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("\tThread.sleep(500);\r\n");
-            res.add("\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() - "+(int)(this.scrollXStep*ratio)+"),(int)(match.getCenterLocation().getY() + "+(int)(this.scrollYStep*ratio)+"));");
+            res.add("\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() - "+(int)(this.scrollXStep*ratio)+"),(int)(MouseInfo.getPointerInfo().getLocation().getY() + "+(int)(this.scrollYStep*ratio)+"));");
             res.add("\tThread.sleep(1000);\r\n");
             res.add("\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
             res.add("\tThread.sleep(500);\r\n");
@@ -385,7 +378,8 @@ public class ScrollUpRight extends ToggleInteraction {
         res.add("}");
         res.add("else {");
         res.add("\tSystem.out.println(\"image not found\");");
-        res.add("\treturn \"fail;\"+interactions;");
+        res.add("\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\treturn \"fail;\"+interactions+\";\"+totSize;");
         res.add("}");
         return res;
     }
@@ -395,7 +389,7 @@ public class ScrollUpRight extends ToggleInteraction {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        if(totScrollStep<=0)
+        if(totScrollStep<=0 || totToBeScrolled<=0)
             return res;
         int last = totToBeScrolled%totScrollStep;
         double ratio = (double)last/(double)totScrollStep;
@@ -411,42 +405,43 @@ public class ScrollUpRight extends ToggleInteraction {
         res.add("\t\t\tsikuli_screen.wait(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 25);");
         res.add("\t\t\torg.sikuli.script.Match sikuli_match = sikuli_screen.find(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\",  "\\\\") + "\");");
         res.add("\t\t\torg.sikuli.script.Location l = sikuli_match.getCenter();");
-
-        res.add("\t\t\tsikuli_screen.wait(0.2);");
-        //res.add("\t\t\tl = l.below("+this.scrollYStep+");");
-        res.add("\t\t\tl = l.right("+this.scrollXStep+");");
+        res.add("\t\t\tThread.sleep(200);");
+        res.add("\t\t\tl = l.above("+this.pxUp+");");
+        res.add("\t\t\tl = l.right("+this.pxRight+");");
+        res.add("\t\t\tThread.sleep(500);");
 
         for(int i = 0; i < (totToBeScrolled/totScrollStep); i++) {
             res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
             res.add("\t\t\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
             res.add("\t\t\tl = l.below(" + this.scrollYStep + ");");
             res.add("\t\t\tl = l.left(" + this.scrollXStep + ");");
             res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tsikuli_screen.wait(1);");
+            res.add("\t\t\tThread.sleep(1000);");
             res.add("\t\t\tsikuli_screen.mouseUp();");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
             res.add("\t\t\tl = l.above(" + this.scrollYStep + ");");
             res.add("\t\t\tl = l.right(" + this.scrollXStep + ");");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
         }
         if(last > 0){
             res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
             res.add("\t\t\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
             res.add("\t\t\tl = l.below("+(int)(this.scrollYStep*ratio)+");");
             res.add("\t\t\tl = l.left("+(int)(this.scrollXStep*ratio)+");");
             res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tsikuli_screen.wait(1);");
+            res.add("\t\t\tThread.sleep(1000);");
             res.add("\t\t\tsikuli_screen.mouseUp();");
-            res.add("\t\t\tsikuli_screen.wait(0.5);");
+            res.add("\t\t\tThread.sleep(500);");
         }
         res.add("\t\t}");
         res.add("\t\tcatch (FindFailed ffe) {");
         res.add("\t\t\tffe.printStackTrace();");
-        res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions;");
+        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
         res.add("\t\t}");
         res.add("\t}");
 
@@ -455,23 +450,23 @@ public class ScrollUpRight extends ToggleInteraction {
         res.add("\t\teye.move(match.getCenterLocation());\r\n");
         res.add("\t\tThread.sleep(500);\r\n");
 
-        res.add("\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.scrollXStep +"),(int)(match.getCenterLocation().getY()));\r\n");
+        res.add("\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.pxRight +"),(int)(match.getCenterLocation().getY() - " + this.pxUp + "));\r\n");
 
         res.add("\t\tThread.sleep(500);\r\n");
         for (int i = 0 ; i < (totToBeScrolled/totScrollStep); i++){
             res.add("\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("\t\tThread.sleep(500);\r\n");
-            res.add("\t\tbot.mouseMove((int)(match.getCenterLocation().getX()),(int)(match.getCenterLocation().getY() + " + this.scrollYStep + "));\r\n"); //from bottom to top
+            res.add("\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() - "+ this.scrollXStep + "),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + this.scrollYStep + "));\r\n"); //from bottom to top
             res.add("\t\tThread.sleep(1000);\r\n");
             res.add("\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
             res.add("\t\tThread.sleep(500);\r\n");
-            res.add("\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + this.scrollXStep +"),(int)(match.getCenterLocation().getY()));\r\n");
+            res.add("\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + this.scrollXStep +"),(int)(MouseInfo.getPointerInfo().getLocation().getY() - " + this.scrollYStep + "));\r\n");
             res.add("\t\tThread.sleep(500);\r\n");
         }
         if(last > 0){
             res.add("\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("\t\tThread.sleep(500);\r\n");
-            res.add("\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() - " + (int)(this.scrollXStep*ratio) + "),(int)(match.getCenterLocation().getY() + " + (int)(this.scrollYStep*ratio) +"));");
+            res.add("\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() - " + (int)(this.scrollXStep*ratio) + "),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + (int)(this.scrollYStep*ratio) +"));");
             res.add("\t\tThread.sleep(1000);\r\n");
             res.add("\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
             res.add("\t\tThread.sleep(500);\r\n");
@@ -481,7 +476,8 @@ public class ScrollUpRight extends ToggleInteraction {
         res.add("}");
         res.add("else {");
         res.add("\tSystem.out.println(\"image not found\");");
-        res.add("\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions;");
+        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
         res.add("}");
 
         return res;
@@ -492,7 +488,7 @@ public class ScrollUpRight extends ToggleInteraction {
         ArrayList<String> res = new ArrayList<>();
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
-        if(totScrollStep<=0)
+        if(totScrollStep<=0 || totToBeScrolled <= 0)
             return res;
         int last = totToBeScrolled%totScrollStep;
         double ratio = (double)last/(double)totScrollStep;
@@ -501,35 +497,36 @@ public class ScrollUpRight extends ToggleInteraction {
         res.add("\torg.sikuli.script.Match sikuli_match = sikuli_screen.find(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\",  "\\\\") + "\");");
         res.add("\torg.sikuli.script.Location l = sikuli_match.getCenter();");
 
-        res.add("\tsikuli_screen.wait(0.5);");
-        //res.add("\tl = l.below("+this.scrollYStep+");");
-        res.add("\tl = l.right("+this.scrollXStep+");");
+        res.add("\tThread.sleep(200);");
+        res.add("\tl = l.above("+this.pxUp+");");
+        res.add("\tl = l.right("+this.pxRight+");");
+        res.add("\tThread.sleep(500);");
         for(int i = 0; i < totToBeScrolled/totScrollStep; i++) {
             res.add("\tsikuli_screen.mouseMove(l);");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
             res.add("\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
             res.add("\tl = l.below(" + this.scrollYStep + ");");
             res.add("\tl = l.left(" + this.scrollXStep + ");");
             res.add("\tsikuli_screen.mouseMove(l);");
-            res.add("\tsikuli_screen.wait(1);");
+            res.add("\tThread.sleep(1000);");
             res.add("\tsikuli_screen.mouseUp();");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
             res.add("\tl = l.above(" + this.scrollYStep + ");");
             res.add("\tl = l.right(" + this.scrollXStep + ");");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
         }
         if(last > 0){
             res.add("\tsikuli_screen.mouseMove(l);");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
             res.add("\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
             res.add("\t\t\tl = l.below(" + (int)(this.scrollYStep*ratio) + ");");
             res.add("\t\t\tl = l.left(" + (int)(this.scrollXStep*ratio) + ");");
             res.add("\tsikuli_screen.mouseMove(l);");
-            res.add("\tsikuli_screen.wait(1);");
+            res.add("\tThread.sleep(1000);");
             res.add("\tsikuli_screen.mouseUp();");
-            res.add("\tsikuli_screen.wait(0.5);");
+            res.add("\tThread.sleep(500);");
         }
         res.add("}");
         res.add("catch (FindFailed ffe) {");
@@ -538,27 +535,28 @@ public class ScrollUpRight extends ToggleInteraction {
         res.add("\tif (image != null) {");
         res.add("\t\tmatch = eye.findImage(image);");
         res.add("\t\tif (match == null) {");		//test failed also with eyeautomate
-        res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions;");
+        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
         res.add("\t\t}");
         res.add("\t\telse {");						//test ok with eyeautomate
         res.add("\t\t\teye.move(match.getCenterLocation());\r\n");
         res.add("\t\t\tThread.sleep(500);\r\n");
-        res.add("\t\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.scrollXStep +"),(int)(match.getCenterLocation().getY()));\r\n");
+        res.add("\t\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.pxRight +"),(int)(match.getCenterLocation().getY() - "+this.pxUp +"));\r\n");
         res.add("\t\t\tThread.sleep(500);\r\n");
         for (int i = 0 ; i < (totToBeScrolled/totScrollStep); i++){
             res.add("\t\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("\t\t\tThread.sleep(500);\r\n");
-            res.add("\t\t\tbot.mouseMove((int)(match.getCenterLocation().getX()),(int)(match.getCenterLocation().getY() + " + this.scrollYStep + "));\r\n"); //from bottom to top
+            res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() - "+this.scrollXStep +"),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + this.scrollYStep + "));\r\n"); //from bottom to top
             res.add("\t\t\tThread.sleep(1000);\r\n");
             res.add("\t\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
             res.add("\t\t\tThread.sleep(500);\r\n");
-            res.add("\t\t\tbot.mouseMove((int)(match.getCenterLocation().getX() + " + this.scrollXStep +"),(int)(match.getCenterLocation().getY()));\r\n");
+            res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + this.scrollXStep +"),(int)(MouseInfo.getPointerInfo().getLocation().getY() - " +this.scrollYStep+"));\r\n");
             res.add("\t\t\tThread.sleep(500);\r\n");
         }
         if(last > 0){
             res.add("\t\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("\t\t\tThread.sleep(500);\r\n");
-            res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() - " + (int)(this.scrollXStep*ratio) +"),(int)(match.getCenterLocation().getY() + " + (int)(this.scrollYStep*ratio) +"));\r\n");
+            res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() - " + (int)(this.scrollXStep*ratio) +"),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + (int)(this.scrollYStep*ratio) +"));\r\n");
             res.add("\t\t\tThread.sleep(1000);\r\n");
             res.add("\t\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
             res.add("\t\t\tThread.sleep(500);\r\n");
@@ -567,7 +565,8 @@ public class ScrollUpRight extends ToggleInteraction {
         res.add("\t}");
         res.add("\telse {");
         res.add("\t\tSystem.out.println(\"image not found\");");
-        res.add("\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions;");
+        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
         res.add("\t}");
         res.add("}");
         return res;

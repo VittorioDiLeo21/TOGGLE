@@ -90,39 +90,42 @@ public class ScrollUpLeft extends ToggleInteraction {
             int coordItemInAVLeft = AVLeft - this.left;
             int baseY = coordItemInAVTop + offFromTop;
             int baseX = coordItemInAVLeft + offFromStart;
-            if( baseY > 20) {
-                this.pxUp = baseY - 20;
-            } else {
-                this.pxUp = 0;
-                for(int i = 18; i > 0; i--){
-                    if(baseY > i){
-                        this.pxUp = baseY - i;
-                        break;
+            if(fromY != toY) {
+                if (baseY > 20) {
+                    this.pxUp = baseY - 20;
+                } else {
+                    this.pxUp = 0;
+                    for (int i = 18; i > 0; i--) {
+                        if (baseY > i) {
+                            this.pxUp = baseY - i;
+                            break;
+                        }
                     }
                 }
-            }
-            if((AVHeight-baseY) > 20) {
-                this.pxDown = AVHeight - baseY - 20;
-            } else {
-                this.pxDown = 0;
-            }
-            if( baseX > 20) {
-                this.pxLeft = baseX - 20;
-            } else {
-                this.pxLeft = 0;
-                for(int i = 18; i > 0; i--){
-                    if(baseX > i){
-                        this.pxLeft = baseX - i;
-                        break;
-                    }
+                if ((AVHeight - baseY) > 20) {
+                    this.pxDown = AVHeight - baseY - 20;
+                } else {
+                    this.pxDown = 0;
                 }
             }
-            if((AVWidth-baseX) > 20) {
-                this.pxRight = AVWidth - baseX - 20;
-            } else {
-                this.pxRight = 0;
+            if(fromX != toX) {
+                if (baseX > 20) {
+                    this.pxLeft = baseX - 20;
+                } else {
+                    this.pxLeft = 0;
+                    for (int i = 18; i > 0; i--) {
+                        if (baseX > i) {
+                            this.pxLeft = baseX - i;
+                            break;
+                        }
+                    }
+                }
+                if ((AVWidth - baseX) > 20) {
+                    this.pxRight = AVWidth - baseX - 20;
+                } else {
+                    this.pxRight = 0;
+                }
             }
-
             this.toBeScrolledY = (int) (-(toY - fromY) * screenYRatio);
             if(toBeScrolledY > 0)
                 toBeScrolledY+=20;
@@ -366,7 +369,7 @@ public class ScrollUpLeft extends ToggleInteraction {
             double ratio = (double)last/(double)totScrollStep;
             res.add("\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("\tThread.sleep(500);\r\n");
-            res.add("\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + "+(int)(this.scrollXStep*ratio)+"),(int)(match.getCenterLocation().getY() + "+(int)(this.scrollYStep*ratio)+"));");
+            res.add("\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + "+(int)(this.scrollXStep*ratio)+"),(int)(MouseInfo.getPointerInfo().getLocation().getY() + "+(int)(this.scrollYStep*ratio)+"));");
             res.add("\tThread.sleep(1000);\r\n");
             res.add("\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
             res.add("\tThread.sleep(500);\r\n");
@@ -463,7 +466,7 @@ public class ScrollUpLeft extends ToggleInteraction {
         if(last > 0){
             res.add("\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("\t\tThread.sleep(500);\r\n");
-            res.add("\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + (int)(this.scrollXStep*ratio) + "),(int)(match.getCenterLocation().getY() + " + (int)(this.scrollYStep*ratio) +"));");
+            res.add("\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + (int)(this.scrollXStep*ratio) + "),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + (int)(this.scrollYStep*ratio) +"));");
             res.add("\t\tThread.sleep(1000);\r\n");
             res.add("\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
             res.add("\t\tThread.sleep(500);\r\n");
@@ -553,7 +556,7 @@ public class ScrollUpLeft extends ToggleInteraction {
         if(last > 0){
             res.add("\t\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
             res.add("\t\t\tThread.sleep(500);\r\n");
-            res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + (int)(this.scrollXStep*ratio) +"),(int)(match.getCenterLocation().getY() + " + (int)(this.scrollYStep*ratio) +"));\r\n");
+            res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + (int)(this.scrollXStep*ratio) +"),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + (int)(this.scrollYStep*ratio) +"));\r\n");
             res.add("\t\t\tThread.sleep(1000);\r\n");
             res.add("\t\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
             res.add("\t\t\tThread.sleep(500);\r\n");

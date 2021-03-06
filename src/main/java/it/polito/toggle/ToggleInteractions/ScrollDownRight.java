@@ -91,37 +91,41 @@ public class ScrollDownRight extends ToggleInteraction {
             int coordItemInAVLeft = AVLeft - this.left;
             int baseY = AVHeight - coordItemInAVTop - offFromTop;
             int baseX = AVWidth - coordItemInAVLeft - offFromStart;
-            if( baseY > 20) {
-                this.pxDown = baseY - 20;
-            } else {
-                this.pxDown = 0;
-                for(int i = 18; i > 0; i--){
-                    if(baseY > i){
-                        this.pxDown = baseY - i;
-                        break;
+            if(fromY != toY) {
+                if (baseY > 20) {
+                    this.pxDown = baseY - 20;
+                } else {
+                    this.pxDown = 0;
+                    for (int i = 18; i > 0; i--) {
+                        if (baseY > i) {
+                            this.pxDown = baseY - i;
+                            break;
+                        }
                     }
                 }
-            }
-            if((offFromTop+coordItemInAVTop) > 20) {
-                this.pxUp = offFromTop+coordItemInAVTop - 20;
-            } else {
-                this.pxUp = 0;
-            }
-            if( baseX > 20) {
-                this.pxRight = baseX - 20;
-            } else {
-                this.pxRight = 0;
-                for(int i = 18; i > 0; i--){
-                    if(baseX > i){
-                        this.pxRight = baseX - i;
-                        break;
-                    }
+                if ((offFromTop + coordItemInAVTop) > 20) {
+                    this.pxUp = offFromTop + coordItemInAVTop - 20;
+                } else {
+                    this.pxUp = 0;
                 }
             }
-            if((offFromStart+coordItemInAVLeft) > 20) {
-                this.pxLeft = offFromStart+coordItemInAVLeft - 20;
-            } else {
-                this.pxLeft = 0;
+            if(fromX != toX) {
+                if (baseX > 20) {
+                    this.pxRight = baseX - 20;
+                } else {
+                    this.pxRight = 0;
+                    for (int i = 18; i > 0; i--) {
+                        if (baseX > i) {
+                            this.pxRight = baseX - i;
+                            break;
+                        }
+                    }
+                }
+                if ((offFromStart + coordItemInAVLeft) > 20) {
+                    this.pxLeft = offFromStart + coordItemInAVLeft - 20;
+                } else {
+                    this.pxLeft = 0;
+                }
             }
             this.toBeScrolledY = (int) ((toY - fromY) * screenYRatio);
             if(toBeScrolledY > 0)
