@@ -278,6 +278,7 @@ public class ScrollDownLeft extends ToggleInteraction {
     @Override
     public ArrayList<String> generateSikuliJavaLines(String starting_folder) {
         ArrayList<String> res = new ArrayList<>();
+        res.add("interactionName = \"ScrollDownLeft\";");
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
         if(totScrollStep<=0 || totToBeScrolled<=0)
@@ -323,7 +324,7 @@ public class ScrollDownLeft extends ToggleInteraction {
         res.add("\t}");
         res.add("catch (FindFailed ffe) {");
         res.add("\tffe.printStackTrace();");
-        res.add("\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\tf.write(testName+\";\"+interactions+\";f;\"+interactionName+\"\\n\");");
         res.add("\treturn \"fail;\"+interactions+\";\"+totSize;");
         res.add("}");
 
@@ -333,6 +334,7 @@ public class ScrollDownLeft extends ToggleInteraction {
     @Override
     public ArrayList<String> generateEyeAutomateJavaLines(String starting_folder) {
         ArrayList<String> res = new ArrayList<>();
+        res.add("interactionName = \"ScrollDownLeft\";");
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
         if(totScrollStep<=0 || totToBeScrolled<=0 )
@@ -343,7 +345,7 @@ public class ScrollDownLeft extends ToggleInteraction {
         res.add("\tmatch = eye.findImage(image);");
         res.add("\tif (match == null) {");
         res.add("\t\tSystem.out.println(\"Test failed - " + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
-        res.add("\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\tf.write(testName+\";\"+interactions+\";f;\"+interactionName+\"\\n\");");
         res.add("\t\treturn \"fail;\"+interactions+\";\"+totSize;");
         res.add("\t}");
 
@@ -374,7 +376,7 @@ public class ScrollDownLeft extends ToggleInteraction {
         res.add("}");
         res.add("else {");
         res.add("\tSystem.out.println(\"image not found\");");
-        res.add("\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\tf.write(testName+\";\"+interactions+\";f;\"+interactionName+\"\\n\");");
         res.add("\treturn \"fail;\"+interactions+\";\"+totSize;");
         res.add("}");
         return res;
@@ -383,6 +385,7 @@ public class ScrollDownLeft extends ToggleInteraction {
     @Override
     public ArrayList<String> generateCombinedJavaLines(String starting_folder) {
         ArrayList<String> res = new ArrayList<>();
+        res.add("interactionName = \"ScrollDownLeft\";");
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
         if(totScrollStep<=0 || totToBeScrolled<=0 )
@@ -433,7 +436,7 @@ public class ScrollDownLeft extends ToggleInteraction {
         res.add("\t\t\t}");
         res.add("\t\tcatch (FindFailed ffe) {");
         res.add("\t\t\tffe.printStackTrace();");
-        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f;\"+interactionName+\"\\n\");");
         res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
         res.add("\t\t}");
         res.add("\t}");
@@ -469,7 +472,7 @@ public class ScrollDownLeft extends ToggleInteraction {
         res.add("}");
         res.add("else {");
         res.add("\tSystem.out.println(\"image not found\");");
-        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f;\"+interactionName+\"\\n\");");
         res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
         res.add("}");
 
@@ -479,6 +482,7 @@ public class ScrollDownLeft extends ToggleInteraction {
     @Override
     public ArrayList<String> generateCombinedJavaLinesSikuliFirst(String starting_folder) {
         ArrayList<String> res = new ArrayList<>();
+        res.add("interactionName = \"ScrollDownLeft\";");
         int totToBeScrolled = (int) Math.sqrt((Math.pow(this.toBeScrolledY,2)) + Math.pow(this.toBeScrolledX,2));
         int totScrollStep = (int) Math.sqrt((Math.pow(this.scrollYStep,2)) + Math.pow(this.scrollXStep,2));
         if(totScrollStep<=0 || totToBeScrolled <= 0)
@@ -528,7 +532,7 @@ public class ScrollDownLeft extends ToggleInteraction {
         res.add("\tif (image != null) {");
         res.add("\t\tmatch = eye.findImage(image);");
         res.add("\t\tif (match == null) {");		//test failed also with eyeautomate
-        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f;\"+interactionName+\"\\n\");");
         res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
         res.add("\t\t}");
         res.add("\t\telse {");						//test ok with eyeautomate
@@ -558,7 +562,7 @@ public class ScrollDownLeft extends ToggleInteraction {
         res.add("\t}");
         res.add("\telse {");
         res.add("\t\tSystem.out.println(\"image not found\");");
-        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+        res.add("\t\t\tf.write(testName+\";\"+interactions+\";f;\"+interactionName+\"\\n\");");
         res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
         res.add("\t}");
         res.add("}");

@@ -257,12 +257,13 @@ public class ToggleTranslator {
         int size = interactions.size();
         res.add("\tint totSize = "+size+";");
         res.add("\tString testName = \"" + test_name + "\";");
+        res.add("\tString interactionName = \"\";");
         for (ToggleInteraction i:interactions) {
             for (String s:i.generateEyeAutomateJavaLines(starting_folder)) {
                 res.add("\t" + s);
             }
             index++;
-            res.add("\tf.write(\""+test_name+";\"+interactions+\";p\\n\");");
+            res.add("\tf.write(\""+test_name+";\"+interactions+\";p;\"+interactionName+\"\\n\");");
             if(index< size) {
                 res.add("\tThread.sleep(1000);");
                 res.add("\tinteractions++;");
@@ -294,11 +295,12 @@ public class ToggleTranslator {
         int size = interactions.size();
         res.add("\tint totSize = "+size+";");
         res.add("\tString testName = \"" + test_name + "\";");
+        res.add("\tString interactionName = \"\";");
         for (ToggleInteraction i:interactions) {
             for (String s:i.generateSikuliJavaLines(starting_folder)) {
                 res.add("\t" + s);
             }
-            res.add("\tf.write(\""+test_name+";\"+interactions+\";p\\n\");");
+            res.add("\tf.write(\""+test_name+";\"+interactions+\";p;\"+interactionName+\"\\n\");");
             index++;
             if(index<size) {
                 res.add("\tThread.sleep(1000);");
@@ -339,12 +341,13 @@ public class ToggleTranslator {
         int size = interactions.size();
         res.add("\tint totSize = "+size+";");
         res.add("\tString testName = \"" + test_name + "\";");
+        res.add("\tString interactionName = \"\";");
         for (ToggleInteraction i:interactions) {
             for (String s:i.generateCombinedJavaLinesSikuliFirst(starting_folder)) {
                 res.add("\t" + s);
             }
             index++;
-            res.add("\tf.write(\""+test_name+";\"+interactions+\";p\\n\");");
+            res.add("\tf.write(\""+test_name+";\"+interactions+\";p;\"+interactionName+\"\\n\");");
             if(index<size) {
                 res.add("\tThread.sleep(1000);");
                 res.add("\tinteractions++;");
@@ -386,12 +389,13 @@ public class ToggleTranslator {
         int size = interactions.size();
         res.add("\tint totSize = "+size+";");
         res.add("\tString testName = \"" + test_name + "\";");
+        res.add("\tString interactionName = \"\";");
         for (ToggleInteraction i:interactions) {
             for (String s:i.generateCombinedJavaLines(starting_folder)) {
                 res.add("\t" + s);
             }
             index++;
-            res.add("\tf.write(\""+test_name+";\"+interactions+\";p\\n\");");
+            res.add("\tf.write(\""+test_name+";\"+interactions+\";p;\"+interactionName+\"\\n\");");
             if(index<size) {
                 res.add("\tThread.sleep(1000);");
                 res.add("\tinteractions++;");

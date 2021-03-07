@@ -96,6 +96,7 @@ public class DialogEscape extends ToggleInteraction {
 	@Override
 	public ArrayList<String> generateCombinedJavaLines(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
+		res.add("interactionName = \"DialogEscape\";");
 		//IS IT POSSIBLE TO HAVE EXCEPTIONS IN THIS SIMPLE OPERATIONS WITH EYEAUTOMATE??? CHECK
 		res.add("try {");
 		res.add("\teye.type(\"[TAB]\");");
@@ -128,7 +129,7 @@ public class DialogEscape extends ToggleInteraction {
 		res.add("\t}");
 		res.add("\tcatch (Exception e2) {");
 		res.add("\t\tSystem.out.println(\"catched exception with Sikuli\");");
-		res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\t\tf.write(testName+\";\"+interactions+\";f;\"+interactionName+\"\\n\");");
 		res.add("\t\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t}");
 		res.add("}");
@@ -138,6 +139,7 @@ public class DialogEscape extends ToggleInteraction {
 	@Override
 	public ArrayList<String> generateCombinedJavaLinesSikuliFirst(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
+		res.add("interactionName = \"DialogEscape\";");
 		res.add("try {");
 		res.add("\t\tsikuli_screen.type(Key.TAB);");
 		res.add("\t\tsikuli_screen.type(Key.TAB);");
@@ -169,7 +171,7 @@ public class DialogEscape extends ToggleInteraction {
 		res.add("\t}");
 		res.add("\tcatch (Exception e2) {");
 		res.add("\t\tSystem.out.println(\"Exception with Eyeautomate\");");
-		res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\t\tf.write(testName+\";\"+interactions+\";f;\"+interactionName+\"\\n\");");
 		res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t}");
 		res.add("}");

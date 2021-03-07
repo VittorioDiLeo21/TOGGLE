@@ -58,6 +58,7 @@ public class TypeIntoFocused extends ToggleInteraction {
 	@Override
 	public ArrayList<String> generateCombinedJavaLines(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
+		res.add("interactionName = \"TypeIntoFocused\";");
 		//IS IT POSSIBLE TO HAVE EXCEPTIONS IN THIS SIMPLE OPERATIONS WITH EYEAUTOMATE??? CHECK
 		res.add("try {");
 		res.add("\teye.type(\"" + text + "\");");
@@ -70,7 +71,7 @@ public class TypeIntoFocused extends ToggleInteraction {
 		res.add("\t}");
 		res.add("\tcatch (Exception e2) {");
 		res.add("\t\tSystem.out.println(\"Exception with Sikuli\");");
-		res.add("\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\tf.write(testName+\";\"+interactions+\";f;\"+interactionName+\"\\n\");");
 		res.add("\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t}");
 		res.add("}");
@@ -80,6 +81,7 @@ public class TypeIntoFocused extends ToggleInteraction {
 	@Override
 	public ArrayList<String> generateCombinedJavaLinesSikuliFirst(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
+		res.add("interactionName = \"TypeIntoFocused\";");
 		res.add("try {");
 		res.add("\tsikuli_screen.type(\"" + text + "\");");
 		res.add("}");
@@ -91,7 +93,7 @@ public class TypeIntoFocused extends ToggleInteraction {
 		res.add("\t}");
 		res.add("\tcatch (Exception e2) {");
 		res.add("\t\tSystem.out.println(\"Exception with Eyeautomate\");");
-		res.add("\t\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\t\tf.write(testName+\";\"+interactions+\";f;\"+interactionName+\"\\n\");");
 		res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t}");
 		res.add("}");

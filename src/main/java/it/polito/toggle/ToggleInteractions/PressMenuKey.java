@@ -74,6 +74,7 @@ public class PressMenuKey extends ToggleInteraction {
 	@Override
 	public ArrayList<String> generateCombinedJavaLines(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
+		res.add("interactionName = \"PressMenuKey\";");
 		//IS IT POSSIBLE TO HAVE EXCEPTIONS IN THIS SIMPLE OPERATIONS WITH EYEAUTOMATE??? CHECK
 		res.add("try {");
 		res.add("\teye.type(\"[CTRL_PRESS]\");");
@@ -94,7 +95,7 @@ public class PressMenuKey extends ToggleInteraction {
 		res.add("\t}");
 		res.add("\tcatch (Exception e2) {");
 		res.add("\t\tSystem.out.println(\"catched exception with Sikuli\");");
-		res.add("\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\tf.write(testName+\";\"+interactions+\";f;\"+interactionName+\"\\n\");");
 		res.add("\t\treturn \"fail;\" + eyeautomate_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t}");
 		res.add("}");
@@ -104,6 +105,7 @@ public class PressMenuKey extends ToggleInteraction {
 	@Override
 	public ArrayList<String> generateCombinedJavaLinesSikuliFirst(String starting_folder) {
 		ArrayList<String> res = new ArrayList<>();
+		res.add("interactionName = \"PressMenuKey\";");
 		res.add("try {");
 		res.add("\t\tsikuli_screen.keyDown(Key.CTRL);");
 		res.add("\t\tThread.sleep(10);");
@@ -123,7 +125,7 @@ public class PressMenuKey extends ToggleInteraction {
 		res.add("\t}");
 		res.add("\tcatch (Exception e2) {");
 		res.add("\t\tSystem.out.println(\"Exception with Eyeautomate\");");
-		res.add("\t\tf.write(testName+\";\"+interactions+\";f\\n\");");
+		res.add("\t\tf.write(testName+\";\"+interactions+\";f;\"+interactionName+\"\\n\");");
 		res.add("\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions+\";\"+totSize;");
 		res.add("\t}");
 		res.add("}");
