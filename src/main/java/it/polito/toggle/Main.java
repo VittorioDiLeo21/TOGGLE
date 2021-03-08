@@ -29,12 +29,12 @@ public class Main {
                 Emulators.NEXUS_5);*/
 
         /* COMPLETO!*/
-        Toggle toggle = new Toggle(
+        /*Toggle toggle = new Toggle(
                 "androidTest",
                 "C:\\Users\\vitto\\OneDrive\\Desktop\\Stoic",
                 "app.reading.stoic.stoicreading",
                 "D:\\AndroidStudioProject\\StoicReading-master\\app\\src\\androidTest\\java\\app\\reading\\stoic\\stoicreading\\toggle\\",
-                Emulators.NEXUS_5);
+                Emulators.NEXUS_5);*/
 
         /* COMPLETO!*/
         /*Toggle toggle = new Toggle(
@@ -45,12 +45,12 @@ public class Main {
                 Emulators.NEXUS_5);*/
 
         /* COMPLETO!*/
-        /*Toggle toggle = new Toggle(
+        Toggle toggle = new Toggle(
                 "androidTest",
                 "C:\\Users\\vitto\\OneDrive\\Desktop\\ContactBook",
                 "de.hskl.contacts",
                 "D:\\AndroidStudioProject\\Contactbook-master\\app\\src\\androidTest\\java\\de\\hskl\\contacts\\toggle\\",
-                Emulators.NEXUS_5);*/
+                Emulators.NEXUS_5);
 
         /* COMPLETO!*/
         /*Toggle toggle = new Toggle(

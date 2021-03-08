@@ -774,6 +774,12 @@ public class ScrollDownRight extends ToggleInteraction {
             return res;
         int last = totToBeScrolled%totScrollStep;
         double ratio = (double)last/(double)totScrollStep;
+        int midY = this.scrollYStep/3;
+        if(scrollYStep > 0 && scrollYStep%3 != 0)
+            midY++;
+        int midX = this.scrollXStep/3;
+        if(scrollXStep > 0 && scrollXStep%3 != 0)
+            midX++;
 
         res.add("\ttry {");
         res.add("\t\tsikuli_screen.wait(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 5);");
@@ -787,31 +793,54 @@ public class ScrollDownRight extends ToggleInteraction {
             res.add("\t\tsikuli_screen.mouseMove(l);");
             res.add("\t\tThread.sleep(500);");
             res.add("\t\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\t\tThread.sleep(500);");
-            res.add("\t\tl = l.above(" + this.scrollYStep + ");");
-            res.add("\t\tl = l.left(" + this.scrollXStep + ");");
+            res.add("\t\tThread.sleep(100);");
+            res.add("\t\tl = l.above(" + midY + ");");
+            res.add("\t\tl = l.left(" + midX + ");");
+            res.add("\t\tsikuli_screen.mouseMove(l);");
+            res.add("\t\tThread.sleep(250);");
+            res.add("\t\tl = l.above(" + midY + ");");
+            res.add("\t\tl = l.left(" + midX + ");");
+            res.add("\t\tsikuli_screen.mouseMove(l);");
+            res.add("\t\tThread.sleep(250);");
+            res.add("\t\tl = l.above(" + midY + ");");
+            res.add("\t\tl = l.left(" + midX + ");");
             res.add("\t\tsikuli_screen.mouseMove(l);");
             res.add("\t\tThread.sleep(1000);");
             res.add("\t\tsikuli_screen.mouseUp();");
             res.add("\t\tThread.sleep(500);");
-            res.add("\t\tl = l.below(" + this.scrollYStep + ");");
-            res.add("\t\tl = l.right(" + this.scrollXStep + ");");
+            res.add("\t\tl = l.below(" + 3*midY + ");");
+            res.add("\t\tl = l.right(" + 3*midX + ");");
             res.add("\t\tThread.sleep(500);");
         }
         if(last > 0){
             res.add("\t\tsikuli_screen.mouseMove(l);");
             res.add("\t\tThread.sleep(500);");
             res.add("\t\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\t\tThread.sleep(500);");
+            res.add("\t\tThread.sleep(100);");
             int tmpY = 0,tmpX = 0;
+
             if((int)(this.scrollYStep*ratio) > 0){
                 tmpY = (int)(this.scrollYStep*ratio + 15);
             }
             if((int)(this.scrollXStep*ratio) > 0){
                 tmpX =(int)(this.scrollXStep*ratio + 15);
             }
-            res.add("\t\tl = l.above(" + tmpY + ");");
-            res.add("\t\tl = l.left(" + tmpX + ");");
+            midY = tmpY / 3;
+            midX = tmpX / 3;
+            if(tmpY > 0 && tmpY % 3 != 0)
+                midY++;
+            if(tmpX > 0 && tmpX % 3 != 0)
+                midX++;
+            res.add("\t\tl = l.above(" + midY + ");");
+            res.add("\t\tl = l.left(" + midX + ");");
+            res.add("\t\tsikuli_screen.mouseMove(l);");
+            res.add("\t\tThread.sleep(250);");
+            res.add("\t\tl = l.above(" + midY + ");");
+            res.add("\t\tl = l.left(" + midX + ");");
+            res.add("\t\tsikuli_screen.mouseMove(l);");
+            res.add("\t\tThread.sleep(250);");
+            res.add("\t\tl = l.above(" + midY + ");");
+            res.add("\t\tl = l.left(" + midX + ");");
             res.add("\t\tsikuli_screen.mouseMove(l);");
             res.add("\t\tThread.sleep(1000);");
             res.add("\t\tsikuli_screen.mouseUp();");
@@ -859,80 +888,6 @@ public class ScrollDownRight extends ToggleInteraction {
         res.add("\t}");
         res.add("}");
 
-        /*res.add("try {");
-        res.add("\tsikuli_screen.wait(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\", 5);");
-        res.add("\torg.sikuli.script.Match sikuli_match = sikuli_screen.find(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\",  "\\\\") + "\");");
-        res.add("\torg.sikuli.script.Location l = sikuli_match.getCenter();");
-
-        res.add("\t\t\tThread.sleep(500);");
-        res.add("\tl = l.below("+this.scrollYStep+");");
-        res.add("\tl = l.right("+this.scrollXStep+");");
-        for(int i = 0; i < (totToBeScrolled/totScrollStep); i++) {
-            res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tThread.sleep(500);");
-            res.add("\t\t\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\t\t\tThread.sleep(500);");
-            res.add("\t\t\tl = l.above(" + this.scrollYStep + ");");
-            res.add("\t\t\tl = l.left(" + this.scrollXStep + ");");
-            res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tThread.sleep(1000);");
-            res.add("\t\t\tsikuli_screen.mouseUp();");
-            res.add("\t\t\tThread.sleep(500);");
-            res.add("\t\t\tl = l.below(" + this.scrollYStep + ");");
-            res.add("\t\t\tl = l.right(" + this.scrollXStep + ");");
-            res.add("\t\t\tThread.sleep(500);");
-        }
-        if(last > 0){
-            res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tThread.sleep(500);");
-            res.add("\t\t\tsikuli_screen.mouseDown(Button.LEFT);");
-            res.add("\t\t\tThread.sleep(500);");
-            res.add("\t\t\tl = l.above(" + (int)(this.scrollYStep*ratio) + ");");
-            res.add("\t\t\tl = l.left(" + (int)(this.scrollXStep*ratio) + ");");
-            res.add("\t\t\tsikuli_screen.mouseMove(l);");
-            res.add("\t\t\tThread.sleep(1000);");
-            res.add("\t\t\tsikuli_screen.mouseUp();");
-            res.add("\t\t\tThread.sleep(500);");
-        }
-        res.add("}");
-        res.add("catch (FindFailed ffe) {");
-        res.add("\tsikuli_failures++;");
-        res.add("\timage = eye.loadImage(\"" + new String(starting_folder + "\\" + timestamp + "_cropped.png").replace("\\", "\\\\") + "\");");
-        res.add("\tif (image != null) {");
-        res.add("\t\tmatch = eye.findImage(image);");
-        res.add("\t\tif (match == null) {");		//test failed also with eyeautomate
-        res.add("\t\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions;");
-        res.add("\t\t}");
-        res.add("\t\telse {");						//test ok with eyeautomate
-        res.add("\t\t\teye.move(match.getCenterLocation());\r\n");
-        res.add("\t\t\tThread.sleep(500);\r\n");
-        res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + this.scrollXStep +"),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + this.scrollYStep +"));\r\n");
-        res.add("\t\t\tThread.sleep(500);\r\n");
-        for (int i = 0 ; i < (totToBeScrolled/totScrollStep); i++){
-            res.add("\t\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
-            res.add("\t\t\tThread.sleep(500);\r\n");
-            res.add("\t\t\tbot.mouseMove((int)(match.getCenterLocation().getX()),(int)(match.getCenterLocation().getY()));\r\n"); //from bottom to top
-            res.add("\t\t\tThread.sleep(1000);\r\n");
-            res.add("\t\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
-            res.add("\t\t\tThread.sleep(500);\r\n");
-            res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() + " + this.scrollXStep +"),(int)(MouseInfo.getPointerInfo().getLocation().getY() + " + this.scrollYStep +"));\r\n");
-            res.add("\t\t\tThread.sleep(500);\r\n");
-        }
-        if(last > 0){
-            res.add("\t\t\tbot.mousePress(InputEvent.BUTTON1_DOWN_MASK);\r\n");
-            res.add("\t\t\tThread.sleep(500);\r\n");
-            res.add("\t\t\tbot.mouseMove((int)(MouseInfo.getPointerInfo().getLocation().getX() - " + (int)(this.scrollXStep*ratio) +"),(int)(MouseInfo.getPointerInfo().getLocation().getY() - " + (int)(this.scrollYStep*ratio) +"));\r\n");
-            res.add("\t\t\tThread.sleep(1000);\r\n");
-            res.add("\t\t\tbot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);");
-            res.add("\t\t\tThread.sleep(500);\r\n");
-        }
-        res.add("\t\t}");
-        res.add("\t}");
-        res.add("\telse {");
-        res.add("\t\tSystem.out.println(\"image not found\");");
-        res.add("\t\treturn \"fail;\" + sikuli_failures + \";\" + interactions;");
-        res.add("\t}");
-        res.add("}");*/
         return res;
     }
 }
