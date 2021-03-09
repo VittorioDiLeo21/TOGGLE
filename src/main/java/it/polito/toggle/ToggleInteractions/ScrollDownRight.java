@@ -820,10 +820,10 @@ public class ScrollDownRight extends ToggleInteraction {
             int tmpY = 0,tmpX = 0;
 
             if((int)(this.scrollYStep*ratio) > 0){
-                tmpY = (int)(this.scrollYStep*ratio + 15);
+                tmpY = (int)(this.scrollYStep*ratio);
             }
             if((int)(this.scrollXStep*ratio) > 0){
-                tmpX =(int)(this.scrollXStep*ratio + 15);
+                tmpX =(int)(this.scrollXStep*ratio);
             }
             midY = tmpY / 3;
             midX = tmpX / 3;

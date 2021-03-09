@@ -45,20 +45,20 @@ public class Main {
                 Emulators.NEXUS_5);*/
 
         /* COMPLETO!*/
-        Toggle toggle = new Toggle(
+        /*Toggle toggle = new Toggle(
                 "androidTest",
                 "C:\\Users\\vitto\\OneDrive\\Desktop\\ContactBook",
                 "de.hskl.contacts",
                 "D:\\AndroidStudioProject\\Contactbook-master\\app\\src\\androidTest\\java\\de\\hskl\\contacts\\toggle\\",
-                Emulators.NEXUS_5);
+                Emulators.NEXUS_5);*/
 
         /* COMPLETO!*/
-        /*Toggle toggle = new Toggle(
+        Toggle toggle = new Toggle(
                 "androidTest",
                 "C:\\Users\\vitto\\OneDrive\\Desktop\\Calendar",
                 "com.simplemobiletools.calendar.pro.debug",
                 "D:\\AndroidStudioProject\\Simple-Calendar-master\\app\\src\\androidTest\\java\\com\\simplemobiletools\\calendar\\pro\\",
-                Emulators.NEXUS_5);*/
+                Emulators.NEXUS_5);
         try {
             toggle.translateTestsWithMethodGranularity();
         } catch (IOException e) {
